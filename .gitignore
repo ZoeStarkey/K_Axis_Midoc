@@ -1,3 +1,8 @@
+# excel temporary files
+~$*
+
+
+### Github defaults for R below
 # History files
 .Rhistory
 .Rapp.history
