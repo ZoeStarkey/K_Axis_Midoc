@@ -13,7 +13,7 @@
 		# directory with data
 		the.dir <- "./excel source data/"
 		# latest excel workbook
-		the.wb <- "k_axis_IYGPT_field_data9Oct2017.xlsx"
+		the.wb <- "k_axis_IYGPT_field_data_8Nov2017.xlsx"
 		f <- paste0(the.dir, the.wb)
 		
 		# read
@@ -59,7 +59,7 @@
 	
 	# create full IDs for individuals that were just given numbers to speed data entry
 			# these are rows 
-	ind<- !(grepl("MIDOC", SD$sample.id))&(SD$midoc.stn!="TRIAL")&!(grepl("CE", SD$sample.id)) # index for relevant rows
+		ind<- !(grepl("MIDOC", SD$sample.id))&(SD$midoc.stn!="TRIAL")&!(grepl("CE", SD$sample.id)) # index for relevant rows
 	SD[ind,]$sample.id<- paste(SD[ind,]$midoc.stn,SD[ind,]$cod.end,SD[ind,]$sample.id, sep="_")
 
 	# remove "_" between MIDOC and number in IDs so all are MICOCnn (not MIDOC_nn)
@@ -76,99 +76,78 @@
 		tmp[tmp$Freq>1,]
 		tmp[grepl(c("discard"), x=tmp$Var1, ignore.case = T)==F & grepl(c("tray"), x=tmp$Var1, ignore.case = T)==F & tmp$Freq>1,]
 		# list of duplicate IDs that need to be resolved:
-				            MIDOC06_CE2_08 
- #       MIDOC06_CE3_39 
- #       MIDOC06_CE4_14 
- #       MIDOC06_CE6_31 
- #       MIDOC07_CE2_23 
- #       MIDOC11_CE2_24 
- #       MIDOC11_CE2_31 
- #       MIDOC12_CE2_38 
- #       MIDOC13_CE6_07 
- #       MIDOC13_CE6_21 
- #       MIDOC13_CE6_22 
- #       MIDOC13_CE6_23 
- #       MIDOC13_CE6_24 
- #       MIDOC13_CE6_25 
- #       MIDOC14_CE3_32 
- #       MIDOC14_CE4_07 
- #       MIDOC15_CE4_07 
- #       MIDOC15_CE4_09 
- #       MIDOC15_CE6_28 
- #       MIDOC15_CE6_32 
- #       MIDOC16_CE1_01 
- #       MIDOC16_CE3_30 
- #       MIDOC16_CE6_24 
- #       MIDOC19_CE1_01 
- #       MIDOC19_CE2_24 
- #       MIDOC19_CE2_25 
- #       MIDOC19_CE2_26 
- #       MIDOC19_CE2_27 
- #       MIDOC19_CE2_28 
- #       MIDOC19_CE2_29 
- #       MIDOC19_CE2_30 
- #    MIDOC20_CE1_no.ID 
- #       MIDOC20_CE6_42 
- #       MIDOC21_CE1_04 
- #       MIDOC21_CE1_05 
- #       MIDOC21_CE1_08 
- #       MIDOC21_CE6_02 
- #       MIDOC21_CE6_03 
- #       MIDOC21_CE6_04 
- #       MIDOC21_CE6_05 
- #       MIDOC21_CE6_06 
- #       MIDOC21_CE6_07 
- #       MIDOC21_CE6_08 
- #       MIDOC21_CE6_09 
- #       MIDOC21_CE6_10 
- #       MIDOC21_CE6_11 
- #      MIDOC22_CE1_BAG 
- #      MIDOC23_CE1_BAG 
- #       MIDOC23_CE3_37 
- #       MIDOC23_CE5_37 
- # MIDOC23_front.of.net 
- #       MIDOC24_CE4_25 
- #       MIDOC24_CE6_01 
- #       MIDOC24_CE6_02 
- #       MIDOC24_CE6_28 
- # MIDOC24_front.of.net 
- #      MIDOC25_CE1_BAG 
- #       MIDOC25_CE5_42 
- #       MIDOC25_CE6_53 
- #       MIDOC26_CE3_35 
- #       MIDOC26_CE3_36 
- #       MIDOC26_CE5_22 
- #       MIDOC26_CE6_11 
- #       MIDOC26_CE6_45 
- #      MIDOC27_CE1_BAG 
- #       MIDOC27_CE4_11 
- #       MIDOC27_CE6_30 
- #       MIDOC29_CE2_29 
- #       MIDOC29_CE2_35 
- #       MIDOC29_CE3_03 
- #       MIDOC29_CE6_19 
- #       MIDOC29_CE6_29 
- #       MIDOC29_CE6_32 
- #       MIDOC31_CE1_02 
- #       MIDOC31_CE2_27 
- #       MIDOC31_CE2_38 
- #       MIDOC31_CE3_37 
- #       MIDOC31_CE5_37 
- #       MIDOC32_CE2_40 
- #       MIDOC34_CE4_30 
- #       MIDOC34_CE6_26 
- #       MIDOC34_CE6_38 
- #       MIDOC35_CE2_46 
- #       MIDOC38_CE6_54 
- #       MIDOC39_CE3_30 
- #       MIDOC39_CE6_15 
- #       MIDOC40_CE1_06 
+		      # MIDOC06_CE2_08 
+		#       MIDOC06_CE4_14 
+		#       MIDOC06_CE6_31 
+		#       MIDOC07_CE2_23 
+		#       MIDOC11_CE2_31 
+		#       MIDOC12_CE2_38 
+		#       MIDOC13_CE6_21 
+		#       MIDOC13_CE6_22 
+		#       MIDOC13_CE6_23 
+		#       MIDOC13_CE6_24 
+		#       MIDOC13_CE6_25 
+		#       MIDOC14_CE3_32 
+		#       MIDOC15_CE4_07 
+		#       MIDOC15_CE4_09 
+		#       MIDOC16_CE1_01 
+		#       MIDOC16_CE3_30 
+		#       MIDOC16_CE3_40 
+		#       MIDOC16_CE6_24 
+		#       MIDOC19_CE1_01 
+		#       MIDOC19_CE2_24 
+		#       MIDOC19_CE2_25 
+		#       MIDOC19_CE2_26 
+		#       MIDOC19_CE2_27 
+		#       MIDOC19_CE2_28 
+		#       MIDOC19_CE2_29 
+		#       MIDOC19_CE2_30 
+		#       MIDOC19_CE4_25 
+		#    MIDOC20_CE1_no.ID 
+		#       MIDOC20_CE6_42 
+		#       MIDOC21_CE1_04 
+		#       MIDOC21_CE1_05 
+		#       MIDOC21_CE1_08 
+		#      MIDOC22_CE1_BAG 
+		#      MIDOC23_CE1_BAG 
+		#       MIDOC23_CE3_37 
+		#       MIDOC23_CE5_37 
+		# MIDOC23_front.of.net 
+		#       MIDOC24_CE4_25 
+		#       MIDOC24_CE6_01 
+		#       MIDOC24_CE6_02 
+		# MIDOC24_front.of.net 
+		#      MIDOC25_CE1_BAG 
+		#       MIDOC25_CE5_42 
+		#       MIDOC25_CE6_53 
+		#       MIDOC26_CE3_35 
+		#       MIDOC26_CE3_36 
+		#       MIDOC26_CE5_22 
+		#       MIDOC26_CE6_11 
+		#       MIDOC26_CE6_45 
+		#      MIDOC27_CE1_BAG 
+		#       MIDOC27_CE6_45 
+		#       MIDOC28_CE6_01 
+		#       MIDOC29_CE2_35 
+		#       MIDOC29_CE6_19 
+		#       MIDOC29_CE6_32 
+		#       MIDOC31_CE1_02 
+		#       MIDOC31_CE2_27 
+		#       MIDOC31_CE2_38 
+		#       MIDOC31_CE5_37 
+		#       MIDOC34_CE6_26 
+		#       MIDOC34_CE6_38 
+		#       MIDOC35_CE2_46 
+		#       MIDOC37_CE2_48 
+		#       MIDOC38_CE6_54 
+		#       MIDOC39_CE6_15 
+		#       MIDOC40_CE1_06 	 
 		#
 		# NEED TO LOOK AT THESE INDIVIDUALLY!!!! 
 		#
 
 	# adjust codend totals for weights of codends
-		cew<- read.csv("Dropbox/ACE CRC/K_axis/field_data/codend.wts.csv")
+		cew<- read.csv("./excel source data/codend.wts.csv")
 		cew$cen.col <- paste(cew$cen, cew$col)
 		CD$cen.col <- paste(CD$cod.end, CD$codend.col)
 		CD$cew<- cew$wt[match(CD$cen.col, cew$cen.col)]
@@ -185,6 +164,14 @@
 		data.frame(pbm=pbm)
 	})
 	
+	# come back to this
+	SD %>% 	group_by(midoc.stn, cod.end) %>% 
+			mutate(tbm=sum(wt.g, na.rm=T)) %>% # total biomass for each cod-end
+			group_by(midoc.stn, tax.grp) %>%
+			summarize(bm = sum(wt.g, na.rm=T)) %>%
+			group_by()
+
+
 	bm.dat<- merge(bm.gd, bm.pgd)
 
 # biomass plots
