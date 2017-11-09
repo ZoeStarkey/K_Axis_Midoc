@@ -3,7 +3,6 @@
 
 	library(readxl)
 	library(ggplot2)
-	library(plyr)
 	library(dplyr)
 	library(SGAT)
 	library(tidyr)
@@ -155,24 +154,19 @@
 #
 # summarise biomass by site and depth stratum, within each taxonomic grouping
 #		
+	# exclude TRIAL from calculations
+	SD <- SD %>% filter(midoc.stn%in%"TRIAL" == F)
+
 	# as totals and proportions
-	# first add total biomass column (per cod-end) to enable calculation of proportions
-	SD <- ddply(SD, .(midoc.stn,cod.end), mutate, tbm=sum(wt.g, na.rm=T))
-	bm.gd  <- ddply(SD, .(midoc.stn,cod.end,tax.grp), summarise, bm=sum(wt.g, na.rm=T))
-	bm.pgd <- ddply(SD, .(midoc.stn,cod.end,tax.grp), function(x){
-		pbm <- sum(x$wt.g, na.rm=x)/x$tbm[1]
-		data.frame(pbm=pbm)
-	})
-	
-	# come back to this
-	SD %>% 	group_by(midoc.stn, cod.end) %>% 
+
+	bm.codends <- SD %>% 	group_by(midoc.stn, cod.end) %>% 
 			mutate(tbm=sum(wt.g, na.rm=T)) %>% # total biomass for each cod-end
-			group_by(midoc.stn, tax.grp) %>%
-			summarize(bm = sum(wt.g, na.rm=T)) %>%
-			group_by()
-
-
-	bm.dat<- merge(bm.gd, bm.pgd)
+			group_by(midoc.stn, cod.end , tax.grp) %>% # total biomass for each taxon in each cod end
+			mutate(bm = sum(wt.g, na.rm=T)) %>%
+			mutate(pbm = bm/tbm) %>%
+			distinct(pbm, .keep_all = T) %>% # keeps unique values of pbm for each combination of station, cod.end, tax.grp; retains all columns
+			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm)
+			# not sure why slice(1) doesn't work here.
 
 # biomass plots
 	# first cut with ggplot
@@ -192,14 +186,13 @@
 	ggsave("proportion_biomass_by_coarse_taxonomic_grp190216.pdf")
 
 # within fish, relative dominance of groups
-	fd <- ddply(SD[SD$tax.grp%in%"fish",], .(midoc.stn,cod.end), mutate, tbm=sum(wt.g, na.rm=T))
-	fbm.gd  <- ddply(fd, .(midoc.stn,cod.end,fish.grp), summarise, bm=sum(wt.g, na.rm=T))
-	fbm.pgd <- ddply(fd, .(midoc.stn,cod.end,fish.grp), function(x){
-		pbm <- sum(x$wt.g, na.rm=x)/x$tbm[1]
-		data.frame(pbm=pbm)
-	})
+	fd <- SD %>% filter(tax.group %in% "fish") %>% group_by(midoc.stn,cod.end) %>% mutate(tbm=sum(wt.g, na.rm=T)) %>%
+	group_by(midoc.stn,cod.end,fish.grp) %>%
+	mutate(bm=sum(wt.g, na.rm=T)) %>%
+	mutate(pbm = bm/tbm) %>%
+	distinct(pbm, .keep_all = T) %>%
+	select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm)
 	
-	fbm.dat<- merge(fbm.gd, fbm.pgd)
 
 	fp.d<- fbm.dat[fbm.dat$cod.end%in%c("front.of.net","1")==F & fbm.dat$midoc.stn%in%"TRIAL"==F ,]
 	ggplot(data=fp.d, aes(x=cod.end, weight=bm, fill=fish.grp, facets=midoc.stn), geom="bar", ylab="biomass") +

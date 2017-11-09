@@ -1,6 +1,11 @@
 # excel temporary files
 ~$*
 
+#sublime project files
+*.sublime-*
+
+# mac system files
+.DS_Store
 
 ### Github defaults for R below
 # History files
