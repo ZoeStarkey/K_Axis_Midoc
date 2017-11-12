@@ -1,5 +1,6 @@
+library(dplyr)
 # path to parent folder 
-
+setwd("/Users/dougt/GitHub/K_axis_midoc")
 pth <- "~/Library/Mobile Documents/com~apple~CloudDocs/RT_downloads/Shared/midoc"
 
 files <- list.files(pth, pattern = "^SvMIDOC.*csv$", recursive = TRUE, full.names = TRUE)
@@ -15,9 +16,9 @@ md_acoustic <- dplyr::bind_rows(
 d <- dplyr::select(md_acoustic, filename, Sv_mean, PRC_NASC, Region_name) %>%
 		group_by(filename, Region_name) %>%
 		summarise(sum_NASC = sum(PRC_NASC), sum_Sv_mean=sum(Sv_mean)) %>%
-		mutate(midoc = substr(filename,3,7), codend=substr(Region_name, 8,8), sum_Sv_mean_linear=10^(sum_Sv_mean/10)) %>% select(-Region_name)
+		mutate(midoc.stn = substr(filename,3,9), cod.end=substr(Region_name, 8,8), sum_Sv_mean_linear=10^(sum_Sv_mean/10)) %>% select(-Region_name)
 
-saveRDS(d, "midoc_acoustic_sums.rda")
+saveRDS(d, "./derived data/midoc_acoustic_sums.rda")
 
 
 
