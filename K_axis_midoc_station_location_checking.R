@@ -17,9 +17,20 @@ SB_st <- readRDS("k_axis_oceanog_summ.Rda")
 # station locations from MIDOC logger
 md_st <- readRDS("midoc_stations_locations_times.rds")
 
-# also have voyage track for reference
+# voyage waypoints
 ktr <- read_csv("v3_201516030_waypoints_dec.csv")
 colnames(ktr) <- c("wp","lat","lon","wp.grp")
 
+# voyage track
+vt <- readRDS("thinned_voyage_track.rds")
 
-ggplot(data=subset(ktr, ktr$lat< -55), aes(y=lat, x=lon)) + geom_point() 
+
+ggplot(data=subset(ktr, ktr$lat< -55), aes(y=lat, x=lon)) +
+	geom_point(col="black") +
+	geom_point(data=vt, aes(x=LONGITUDE, y=LATITUDE), col="grey", cex=0.5)+
+	geom_label(data=SB_st, col="blue", alpha=0.5, aes(x=longitude, y=latidue, label=station)) +
+	geom_label(data=AW_st, col="red", alpha=0.5, aes(x=lon, y=lat, label=Station)) +
+	geom_label(data=md_st, col="green", alpha=0.5, aes(x=LONGITUDE, y=LATITUDE, label=midoc.stn)) +
+	theme_bw()
+
+

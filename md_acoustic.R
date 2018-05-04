@@ -20,5 +20,7 @@ d <- dplyr::select(md_acoustic, filename, Sv_mean, PRC_NASC, Region_name) %>%
 
 saveRDS(d, "./derived data/midoc_acoustic_sums.rda")
 
+# generate a plot with all data summed over all midocs to show diurnal cycle
 
+md_acoustic$dt <- ymd_hms(paste(md_acoustic$Date_M, md_acoustic$Time_M))
 
