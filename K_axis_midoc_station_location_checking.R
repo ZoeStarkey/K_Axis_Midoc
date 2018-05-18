@@ -52,3 +52,11 @@ ggplot(data=vt, aes(x=LONGITUDE ,y=LATITUDE)) + geom_point(col="grey", size=.2) 
 # to illustrate the problems with the midoc logger data
 last_plot() + 	geom_point(data=md %>% filter(Latitude< -55 & Longitude>69), aes(x=Longitude, y=Latitude))
 
+# checking start and end points for calculating swept volumes
+smn <- readRDS("scanmar_nets.rds")
+nav <- readRDS("navigation_1min.rds")
+
+ggplot(ktr, aes(x=lon, y=lat)) + geom_path() + geom_path(data=nav, aes(y=LATITUDE, x=LONGITUDE), col="blue")
+
+smn %>% group_by(station, status) %>% summarise(t.start=first(time), t.end=last(time))
+

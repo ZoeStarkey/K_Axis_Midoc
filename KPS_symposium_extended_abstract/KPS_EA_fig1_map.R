@@ -55,6 +55,7 @@ ktr <- ktr[-1,]
 ktr <- ll2prj(ktr)
 
 km <- readRDS("../source data/midoc_stations_locations_times.rds")
+km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
 tmp <- read_csv("../source data/midoc_stations_zones.csv")
 km <- inner_join(km, tmp); rm(tmp)
 tmp <- read_csv(("../source data/midoc_crepuscular.csv"))
@@ -62,7 +63,9 @@ km <- inner_join(km, tmp); rm(tmp)
 
 # day/night/crep colours
 km$DNC.col <- NA
-km$DNC.col <- ifelse(km$DNC.visual=="D", "yellow", ifelse(km$DNC.visual=="N", "dark blue", ifelse(km$DNC.visual=="NC", "violet", "orange")))
+km$DNC.col <- ifelse(km$DNC.visual=="D", "yellow", ifelse(km$DNC.visual=="N", "dark blue", ifelse(km$DNC.visual=="NC", "orange", "violet")))
+# just non-problem stations
+km <- km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,]
 km <- ll2prj(km, loncol="LONGITUDE", latcol="LATITUDE")
 
 # bathy
@@ -109,12 +112,23 @@ xx <- c(0,30, 60, 90, 120,150,180); yy <- c(-90,-80, -70,-60, -50,-40,-30,-20)
 
 # geographic labels
 glabs <- data.frame(
-  lon = c(74, 76, 63, 78, 78, 75, 77, 77, 70, 75, 78),
-  lat = c(-49, -53, -70, -57.5, -58, -68, -59, -59.5, -57, -56.5, -65.345),
-  lab= c("Kerguelen Is.","Heard Is.","Antarctica","Kerguelen","Plateau","Prydz Bay","Banzare","Bank","Elan Bank","Fawn Trough","Princess Elizabeth Trough")
+  lon = c(74, 76, 63, 78, 78, 75, 77, 77, 70, 76.5, 78),
+  lat = c(-49, -53, -70, -57.5, -58.15, -68, -59, -59.65, -57, -56.5, -65.345),
+  lab= c("Kerguelen Is.","Heard Is.","Antarctica","Kerguelen","Plateau","Prydz Bay","Banzare","Bank","Elan Bank","Fawn Trough","Princess Elizabeth\nTrough")
 )
 glabs <- ll2prj(glabs)
 
+keepOnlyMostComplexLine <- function(x) {
+  for (iObj in seq_len(nrow(x))) {
+    if (inherits(x, "SpatialLinesDataFrame")) {
+      wmax <- which.max(sapply(x[iObj, ]@lines[[1]]@Lines, function(x)
+        nrow(x@coords)))
+      x@lines[[iObj]]@Lines <- x@lines[[iObj]]@Lines[wmax]
+    }
+    
+  }
+  x
+}
 
 
 pdf("KPS_EA_fig1_map.pdf", width=4.5, height=4.5)
@@ -126,17 +140,19 @@ plot(cbct, col="grey", add=T) # bathy contours
 # ice and fronts
 plot(ofp, add = TRUE, col="#053061", lty=3, lwd=2)
 plot(rasterToContour(pij, lev = 15),add = TRUE, lty=1, col="blue", lwd=1.5)
-plot(rasterToContour(pin, lev = 15),add = TRUE, lty=1, col="purple", lwd=1.5)
+plot(keepOnlyMostComplexLine(rasterToContour(pin, lev = 15)),add = TRUE, lty=1, col="purple", lwd=1.5)
 
 plot(wp, add=T, col="darkgrey", border=F)
 plot(graticule(lons = xx, lats = yy,  proj = prj), add=T, lty=2, col="gray40")
-points(ktr, type="l", lwd=1.5)
+points(ktr[1:66,], type="l", lwd=1)
 # can add large points for midoc stations by un-commenting line below
 #points(kos, pch=19, col="gray20", cex=0.6)
 
 # points(km, pch=19, col="green") # all placed midoc went in water
 # points(km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,], pch=19, col="green") # things where
-points(km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,], pch=19, col=km$DNC.col) # things where
+points(km, pch=21, bg=(km$DNC.col), cex=2)
+TeachingDemos::shadowtext(coordinates(km), lab=as.character(km$midoc.n), cex=.5, col="black", bg="white")
+# can use bg=grDevices::adjustcolor(km$DNC.col, alpha=.6)
 
 g1labs <- graticule_labels(lons=c(150, 120,90,60), xline=180, yline=-55, proj=projection(prj))
 TeachingDemos::shadowtext(coordinates(g1labs[g1labs$islon, ]), lab=parse(text=g1labs$lab[g1labs$islon]), pos=3, cex=0.8, col="gray30", bg="white")
@@ -147,6 +163,17 @@ TeachingDemos::shadowtext(coordinates(g2labs[!g2labs$islon, ]), lab=parse(text=g
 TeachingDemos::shadowtext(coordinates(glabs[1:9,]), lab=glabs$lab[1:9], family="Times", cex=0.8, col="black", bg="white")
 
 TeachingDemos::shadowtext(coordinates(glabs[10:11,]), lab=glabs$lab[10:11], family="Times", srt=25, cex=0.6, col="black", bg="white")
+
+# add a key
+## could do it by plotting points... but may be difficult to get aligned vertically with projection
+ll <- data.frame(lat=c(-68,-69,-70,-71), lon= rep(90,4), pcol=c("yellow","orange","dark blue","violet"))
+ll<- ll2prj(ll)
+
+# hack
+xs <- rep(ll$lon[1]+400000,4)
+points(x=xs, y=ll$lat-60000, bg=as.character(ll$pcol), pch=21, cex=2)
+text(xs, y=ll$lat-60000, labels=c("day", "sunset", "night", "sunrise"), pos=4, family="Times", cex=0.8)
+
 
 box()
 
