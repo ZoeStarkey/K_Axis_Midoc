@@ -42,8 +42,6 @@ md <- readRDS("midoc_data.rds") ## note that something is wrong with the locatio
 ggplot(md, aes(x=datetime, y=Pressure..dbar., colour=status)) + geom_point() + facet_wrap(~deployment, scales = "free_x")
 ggsave("midoc_deployment_pressure.pdf", height=16, width=20)
 
-md$midoc<- 
-
 
 # also have voyage track for reference
 ktr <- read_csv("v3_201516030_waypoints_dec.csv") 
@@ -64,7 +62,21 @@ last_plot() + 	geom_point(data=md %>% filter(Latitude< -55 & Longitude>69), aes(
 smn <- readRDS("scanmar_nets.rds")
 nav <- readRDS("navigation_1min.rds")
 
-ggplot(ktr, aes(x=lon, y=lat)) + geom_path() + geom_path(data=nav, aes(y=LATITUDE, x=LONGITUDE), col="blue")
+# showing the various quibbles of the different data: 
+ggplot(ktr, aes(x=lon, y=lat)) + geom_path() +
+	geom_path(data=nav, aes(y=LATITUDE, x=LONGITUDE), col="blue") +
+	xlim(60,100) +ylim(-70,-55) +
+	geom_path(data=vt %>% arrange(gmt), aes(x=LONGITUDE, y=LATITUDE), lwd=2, col="green", alpha=.5) +
+	geom_point(data=smn %>% arrange(time), aes(x=LONGITUDE, y=LATITUDE), cex=2, col="orange", alpha=.5)+
+	geom_text(data=md_st, aes(x=LONGITUDE ,y=LATITUDE, label=substr(midoc.stn, 6,8)),col = "blue") +
+	geom_point(data=md, aes(x=Longitude, y=Latitude), col="pink")
+
+## Things to note
+## - the path based on waypoints 'ktr' is whacky
+## - should instead use either vt or nav, which are congruent (both are subsets of the full nav, 'nav' is every minute; vt is random subset)
+## - locations for scnamar data are OK, but missing for 7-17
+## - something has gone very wrong with the locations in the midoc data... 
+
 
 # start and end for each midoc shot
 md.se <- smn %>% group_by(station) %>% summarise(t.start=first(time), t.end=last(time))
