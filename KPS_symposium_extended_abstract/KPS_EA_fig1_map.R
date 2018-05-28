@@ -15,14 +15,7 @@ library(rgeos)
 library(rgdal)
 library(dplyr)
 library(readr)
-
-#
-# TODO for KPS2 version
-# adjust spacing for labels (Fawn, PET, Banzare Bank, Kerg plat)
-# - add station numbers inside points
-# - add legend for DNC categories
-# - trim voyage track to not show krill box
-
+setwd("/Users/dougt/GitHub/K_axis_midoc/KPS_symposium_extended_abstract")
 
 # projection
 prj<- "+proj=laea +lat_0=-60 +lon_0=75 +datum=WGS84 +ellps=WGS84 +no_defs +towgs84=0,0,0"
@@ -54,7 +47,7 @@ colnames(ktr) <- c("wp","lat","lon","wp.grp")
 ktr <- ktr[-1,]
 ktr <- ll2prj(ktr)
 
-km <- readRDS("../source data/midoc_stations_locations_times.rds")
+km <- readRDS("../derived data/midoc_stations_checked.rds")
 km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
 tmp <- read_csv("../source data/midoc_stations_zones.csv")
 km <- inner_join(km, tmp); rm(tmp)
@@ -65,8 +58,10 @@ km <- inner_join(km, tmp); rm(tmp)
 km$DNC.col <- NA
 km$DNC.col <- ifelse(km$DNC.visual=="D", "yellow", ifelse(km$DNC.visual=="N", "dark blue", ifelse(km$DNC.visual=="NC", "orange", "violet")))
 # just non-problem stations
-km <- km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,]
+km <- km[km$midoc.stn%in%c("TRIAL","MIDOC08","MIDOC10","MIDOC13")==F,]
 km <- ll2prj(km, loncol="LONGITUDE", latcol="LATITUDE")
+
+##TODO: make grey circles around 2, 12 and 33: cannot be included in quantitative comparisons
 
 # bathy
   # reading in using raadtools if available
