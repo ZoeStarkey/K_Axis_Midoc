@@ -1,22 +1,27 @@
 # 01_import_net_logger_and_voyage_track.R
 # 23 May 2018
 #
-# started from 'scratch' to rectify errors that had been generated for midoc tow locations in previous extractions
+# started from 'scratch' to rectify errors that had been generated for midoc tow locations in previous extractions. It replaces 'K_axis_midoc_station_location_checking.R' and the 'midoc_methods' markdown document on aceecostats.
+
+# it produces the files, which should be used for all subsequent analyses:
+  # 'midoc_logger_checked.rds' - on-board midoc logger data matched to lats and lons
+  # 'midoc_stations_checked.rds' starts, ends and summary info for each stations (including those missing midoc logger data)
+  # nav_reduced.rds - version of ship nav files trimmed just to main k-axis voyage and randomly sub-sampled for faster plotting
+  # 'midoc_cod_ends_checked.rds' as above, but for individual cod-ends.
+
 
 # the following commented lines facilitate extraction of nav (ships's automated log) and on-board midoc logger data
 # these were run on data.aad.gov.au/rstudio (username and password deleted)
 # previously the script 'k_axis_voyage_stations_checks' on the above server did these extraction steps
 
-# it produces the files, which should be used for all subsequent analyses:
-	# 'midoc_logger_checked.rds' - on-board midoc logger data matched to lats and lons
-	# 'midoc_stations_checked.rds' starts, ends and summary info for each stations (including those missing midoc logger data)
-	# 'midoc_cod_ends_checked.rds' as above, but for individual cod-ends.
-
 library(dplyr)
 library(ggplot2)
 library(readr)
 library(lubridate)
-Sys.setenv(TZ='GMT') # set default system time to avoid confusing printing of times (otherwise times will be converted to AEDT for printing)
+Sys.setenv(TZ='GMT') 
+skip.plots <- T # flag to skip plots if just regenerating outputs
+
+# set default system time to avoid confusing printing of times (otherwise times will be converted to AEDT for printing)
 
 # db <- src_postgres(dbname = "kerguelen-axis-2016", host = "aadc-docker-test.aad.gov.au", 
 #                    port = 5432, 
@@ -40,7 +45,8 @@ Sys.setenv(TZ='GMT') # set default system time to avoid confusing printing of ti
 # these have been downloaded and added to this git repository; data.aad.gov.au/rstudio is not supported and may not persist
 # first location from each station
 
-setwd("/Users/dougt/GitHub/K_axis_midoc/source data")
+# setwd("/Users/dougt/GitHub/K_axis_midoc/source data")
+setwd("/Users/rowan/GitHub/K_axis_midoc/source data")
 mdd <- readRDS("midoc_raw.rds")
 mdd <- mdd%>% arrange(datetime)
 
@@ -51,6 +57,7 @@ scanmar <- readRDS("scanmar_raw.rds")
 
 # make a point for each station, as the first record of each midoc deployment
 mds <- mdd %>% group_by(deployment) %>% slice(1) %>% select(-status) 
+# note that this is temporary and replaced once issues with midoc 5 and 13 have been fixed
 
 # field notebook info on stations; including manual matching of midoc station numbers to deployments
 stns <- read_csv("k_axis_midoc_stations_notes.csv")
@@ -58,9 +65,6 @@ stns <- read_csv("k_axis_midoc_stations_notes.csv")
 # match midoc numbers to deployment
 mds$midoc.stn <- stns$midoc.stn[match(mds$deployment, stns$midoc.deployment)] 
 mds <- mds %>% select(datetime, deployment, LONGITUDE, LATITUDE, midoc.stn) 
-
-# nav.tmp <- nav %>% filter(gmt > "2016-01-31 18:54" & gmt < "2016-01-31 19:36") this shows the location for midoc 13
-
 
 # time in notes was "2016-01-31 18:54:00"; t
 mds[mds$midoc.stn%in%"MIDOC13", c("datetime","LONGITUDE","LATITUDE")] <- c("2016-01-31 18:54:00", 84.36604, -64.44445)
@@ -72,7 +76,26 @@ mds <- mds %>% arrange(datetime)
 # subset midoc logger data to just the relevant bits
 mdd$midoc.stn <- stns$midoc.stn[match(mdd$deployment, stns$midoc.deployment)]
 
+md.se <- mdd %>% group_by(midoc.stn) %>% summarise(t.start=first(datetime), t.end=last(datetime)) %>% mutate(total.t=difftime(t.end,t.start)) %>% mutate(total.t=as.numeric(total.t, units="hours"))
+
+# # look at speed from nav around midoc13
+# nav %>% filter(gmt > as_datetime("2016-01-31 19:00:00") & gmt < as_datetime("2016-01-31 20:00:00")) %>% ggplot(aes(x=gmt, y=SHIP_SPD_OVER_GROUND_KNOT)) + geom_point() + geom_vline(xintercept=as_datetime("2016-01-31 18:54:00")) + geom_vline(xintercept=as_datetime("2016-01-31 19:36:00")) 
+#   # looks right for start and end
+#   # can also use this to roughly assign "up component" of haul as starting at 19:12
+# TODO: come back and check this once time difference issue has been sorted. These times for midoc 13 should be pushed forward by 11 hours for comparison with vessel records.
+  
+# manually plug in for midoc 13
+md.se$t.start <-as.character(md.se$t.start)
+md.se$t.end <-as.character(md.se$t.end)
+md.se[md.se$midoc.stn%in%"MIDOC13",]$t.start<- "2016-01-31 18:54:00"
+md.se[md.se$midoc.stn%in%"MIDOC13",]$t.end<- "2016-01-31 19:36:00"
+md.se$t.start<- as_datetime(md.se$t.start, tz="gmt")
+md.se$t.end<- as_datetime(md.se$t.end, tz="gmt")
+
 mdd <- mdd %>% filter(!is.na(midoc.stn))
+
+md.se <- mdd %>% group_by(midoc.stn) %>% summarise(t.start=first(datetime), t.end=last(datetime)) %>% mutate(total.t=difftime(t.end,t.start)) %>% mutate(total.t=as.numeric(total.t, units="hours"))
+
 mdd <- mdd %>% filter(!is.na(deployment))
 mds <- mds %>% filter(!is.na(midoc.stn))
 
@@ -93,10 +116,9 @@ mds <- mds %>% filter(!is.na(midoc.stn))
 # Distances of hauls and volumes
 ## SHOULD BE ABLE TO SEE WHEN MIDOC 13 WAS DEPLOYED AND RETRIEVED BASED ON SHIP NAV --- AS WILL BE SLOW AT THESE POINTS, 3KT WHILE MIDOC OUT, AND FASTER EITHER SIDE... MAYBE
 
-saveRDS(mdd, "/Users/dougt/GitHub/K_axis_midoc/derived data/midoc_logger_checked.rds")
+saveRDS(mdd, "../derived data/midoc_logger_checked.rds")
 
-
-md.se <- mdd %>% group_by(midoc.stn) %>% summarise(t.start=first(datetime), t.end=last(datetime)) %>% mutate(total.t=difftime(t.end,t.start)) %>% mutate(total.t=as.numeric(total.t, units="hours"))
+nav %>% filter(as_datetime("2016-01-24 00:00:00", tz="GMT")< gmt &  gmt < as_datetime("2016-02-16 17:00:00", tz="GMT")) %>% sample_frac(0.01) %>% arrange(gmt) %>% saveRDS("../derived data/nav_reduced.rds")
 
 # # look at speed from nav around midoc13
 # nav %>% filter(gmt > as_datetime("2016-01-31 19:00:00") & gmt < as_datetime("2016-01-31 20:00:00")) %>% ggplot(aes(x=gmt, y=SHIP_SPD_OVER_GROUND_KNOT)) + geom_point() + geom_vline(xintercept=as_datetime("2016-01-31 18:54:00")) + geom_vline(xintercept=as_datetime("2016-01-31 19:36:00")) 
@@ -152,8 +174,8 @@ ce.se$CE <- as.numeric(ce.key$CE[match(ce.se$status,ce.key$status)])
 rm(ce.key)
 
 # these are all straight-forward apart from MIDOC5 -- where the midoc file does not have any "status" records. Can still roughly assign the cod-ends to the depth profile to calculate volumes swept (all cod-ends had roughly normal catch); program was for 100 min for CE1 then 30 min for each subsequent CE.
-# this record starts at 20:39, so subsequent CE starts should be 22:19; 22:49; 23:19; 23:49. 
-md5t <- as_datetime(c("2016-01-27 20:39:00","2016-01-27 22:19:00","2016-01-27 22:49:00","2016-01-27 23:19:00","2016-01-27 23:49:00","2016-01-28 00:19:00","2016-01-28 00:49:00" ), tz="gmt")
+# this record starts at 09:39, so subsequent CE starts should be 11:19; 11:49; 12:19; 12:49. 
+md5t <- as_datetime(c("2016-01-27 09:39:00","2016-01-27 11:19:00","2016-01-27 11:49:00","2016-01-27 12:19:00","2016-01-27 12:49:00","2016-01-27 13:19:00","2016-01-27 13:49:00" ), tz="gmt")
 # plotting to check:
 # mdd %>% filter(midoc.stn=="MIDOC05") %>% ggplot(aes(x=as_datetime(datetime, tz="gmt"), y=-Pressure..dbar.)) +geom_point() + geom_vline(xintercept=md5t)
 # looks correct
@@ -197,7 +219,7 @@ for(i in 1:nrow(ce.se)){
 # check once cod-end summaries are done that the totals across CE1--6 are the same as the station totals
 
 # speeds: a lot of stations are still showing way higher speeds than we wanted... need to correct for current
-ggplot(swept.ce, aes(x=CE, y=mean_grnd_spd)) + geom_point() +facet_wrap(~midoc.stn)
+if(!skip.plots) ggplot(swept.ce, aes(x=CE, y=mean_grnd_spd)) + geom_point() +facet_wrap(~midoc.stn)
 
 # # use scanmar data as a first check
 # scanmar <- scanmar %>% mutate(tv = sqrt(trawl_speed_y^2 + trawl_speed_x^2))
@@ -217,7 +239,8 @@ ggplot(swept.ce, aes(x=CE, y=mean_grnd_spd)) + geom_point() +facet_wrap(~midoc.s
 # # looks pretty whack for all the stations.
 
 # super-impose these on the midoc depth trace plot, laid out linearly; make sure all lines up
-ggplot(mdd, aes(x=datetime, y=Pressure..dbar.)) + geom_path() + 
+if(!skip.plots)
+{ggplot(mdd, aes(x=datetime, y=Pressure..dbar.)) + geom_path() + 
 	geom_vline(data=md.se, aes(xintercept=t.start),colour="dark green")+
 	geom_vline(data=md.se, aes(xintercept=t.end),colour="red") +
 	geom_text(data=mds, aes(x=datetime, y=500, label=substr(midoc.stn,6,7), col="red"))
@@ -226,7 +249,7 @@ ggplot(mdd, aes(x=datetime, y=Pressure..dbar.)) + geom_path() +
 ggplot(mdd[substr(mdd$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(x=datetime, y=Pressure..dbar.)) + geom_path() + 
 	geom_vline(data=md.se[substr(md.se$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(xintercept=t.start),colour="dark green")+
 	geom_vline(data=md.se[substr(md.se$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(xintercept=t.end),colour="red") +
-	geom_text(data=mds[substr(mds$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(x=datetime, y=500, label=substr(midoc.stn,6,7), col="red"))	
+	geom_text(data=mds[substr(mds$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(x=datetime, y=500, label=substr(midoc.stn,6,7), col="red"))
 # all makes sense
 
 # checks above indicated that precise calculations of volumes swept wouldn't be possible, so assume 3.5 kt to calculate volumes
@@ -259,13 +282,28 @@ text(md.crep$start_time[1:40], yj, labels=substr(md.crep$midoc.stn,6,7))
 abline(v=md.crep$start_sunset, col="dark blue")
 abline(v=md.crep$start_sunrise, col="goldenrod")
 lines(mdd$datetime, -mdd$Pressure..dbar.)
+# lines up with existing classification
 
 maxds <- mdd %>% group_by(midoc.stn) %>% arrange(-Pressure..dbar.) %>% dplyr::slice(1) %>% ungroup()
 
 mdd %>% ggplot(aes(x = datetime, y = -Pressure..dbar.)) + geom_path() + geom_text(data=maxds, aes(label=substr(midoc.stn, 6,7), y=-Pressure..dbar.)) +
 	geom_vline(data=md.crep, aes(xintercept=start_sunset), col="dark blue") +
 	geom_vline(data=md.crep, aes(xintercept=start_sunrise), col="goldenrod") + theme_bw()
+}
 
- swept.stn %>% select(midoc.stn, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% saveRDS("/Users/dougt/GitHub/K_axis_midoc/derived data/midoc_stations_checked.rds")
+swept.stn %>% select(midoc.stn, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% filter(!is.na(midoc.stn)) %>% arrange(start_time) %>% saveRDS("../derived data/midoc_stations_checked.rds")
 
-swept.ce %>% select(midoc.stn,CE, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% saveRDS("/Users/dougt/GitHub/K_axis_midoc/derived data/midoc_cod_ends_checked.rds")
+swept.ce %>% select(midoc.stn,CE, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% saveRDS("../derived data/midoc_cod_ends_checked.rds")
+
+# final checking
+
+# quick check that everything looks ok
+if(!skip.plots){
+ggplot(nav %>% sample_frac(0.01) %>% arrange(gmt), aes(x=LONGITUDE, y=LATITUDE)) + geom_path() +
+  geom_point(data=mdd, aes(x=LONGITUDE, y=LATITUDE), colour="pink", cex=2) +
+  geom_point(data=mds, aes(x=lon_start, y=lat_start), col="green", cex=1.5) +
+  geom_point(data=mds, aes(x=lon_end, y=lat_end), col="red", cex=1.5) +
+  geom_text(data=mds, aes(x=lon_start, y=lat_start, label=midoc.stn)) +
+  geom_point(data=ce.se, aes(x=lon_start, y=lat_start), col="yellow", cex=.7 ) +
+  geom_text(data=ce.se, aes(x=lon_start, y=lat_start, label=substr(midoc.stn, 6,7)), vjust=1)
+}
