@@ -7,23 +7,58 @@
   # codend_fish_biomass.rds
   # codend_taxa_biomass.rds
 
-# TODO:
-# fix/bear in mind
-# problems with cable sensors on net meant mouth of net was skewed, and swept volume will not be comparable with other stations
-# winch and scanmar problems; depth strata are wrong (cod ends 2 and 3 were both at 1200 - 1000 m, 4 was 900 - 600, 5 was 600 - 200, 6 was usual 200 - surface)
-# MIDOC05: add assumed depths as log data lost 
-# MIDOC08: all catch in CE1 
-# MIDOC09: CE5 & 6 combined 
-# MIDOC12: CE5 & 6 combined 
-# MIDOC13: cannot assign valid depths for this station, other than that the max depth was 1022 m. 
-# MIDOC33 was a failed deployment (twisted bridle)
+## TODO finish this:
+# cod.end depths and volumes
+
+# for converting to biomass per unit area
+# checks in '01_import_net_logger_and_voyage_track.R' indicated that precise calculations of volumes swept wouldn't be possible, so assume 3.5 kt to calculate volumes
+
+# 3.5 knots = 1.80056 m/s; mouth of net is nominally 180 m2
+# so calculation will be 188 m^2 * 1.80056 m/s * time s to give swept volumes in m3
+# durations for cod-end 6 are often somewhat longer as the net was at the surface for a while; but not fishing - manually set these to 30 min
+
+# There was a switch from 100 min for CE1 to 90 min at MIDOC 14 (miodc 12 was 100 min; MIDOC 14 onward were 90 min )
+	# Apart from exceptions (midoc 10, 13, ) volumes will be:
+	# CE2--6: 188 m^2 * 1.80056 m/s * 1800 s = 609309.5
+	# CE1 (stations 01 -- 12) : 188 m^2 * 1.80056 m/s * 6000 s = 2031032
+	# CE1 (stations 14 -- 40) : 1827929
+# ** this is conservative for CE1, as the ship typically went faster at the beginning of deployments while net was flying down **
+
+# exclude midoc 33 - twisted bridle
+
+function(x){
+	ce1vol100 <- 2031032
+	ce1vol90 <- 1827929
+	ce2_6vol <- 609309.5
+
+	x$depth_mid_m <- NA
+	x$swept_m3 <- NA
+	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(1:12) & x$cod.end=="1",]$swept_m3 <- ce1vol100
+	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(14:40) & x$cod.end=="1",]$swept_m3 <- ce1vol90
+	x[x$cod.end=="1",]
+
+	# MIDOC 2: cod ends 2 and 3 were both at 1200 - 1000 m, 4 was 900 - 600, 5 was 600 - 200, 6 was usual 200 - surface
+	x[x$midoc.stn=="MIDOC02" & as.character(x$cod.end)%in%c("2","3"),]$depth <- 1100
+	x 
+	# MIDOC 9: CE 5 & 6 combined ==> depth.mid = 200; time = 60 min
+
+	# MIDOC12: CE5 & 6 combined ==> depth.mid = 200; time = 60 min
+
+
+
+	x$g_per_m3 <- x$biomass.g/x$swept_m3
+
+	})
+}
+
 
 library("tidyverse")
 library(lubridate)
 library(readxl)
 Sys.setenv(TZ='GMT')
 
-f <- "/Users/rowan/GitHub/K_axis_midoc/derived data"
+#f <- "/Users/rowan/GitHub/K_axis_midoc/derived data"
+f <- "/Users/dougt/GitHub/K_axis_midoc/derived data"
 setwd(f)
 
 
@@ -34,7 +69,9 @@ nav <- readRDS("nav_reduced.rds")
 
 # import from excel
 		# directory with data
-		the.dir <- "/Users/rowan/GitHub/K_axis_midoc/source data/"
+		#the.dir <- "/Users/rowan/GitHub/K_axis_midoc/source data/"
+		the.dir <- "/Users/dougt/GitHub/K_axis_midoc/source data/"
+
 		# latest excel workbook
 		the.wb <- "k_axis_IYGPT_field_data_8Nov2017.xlsx"
 		f <- paste0(the.dir, the.wb)
@@ -172,7 +209,7 @@ nav <- readRDS("nav_reduced.rds")
 		#
 
 	# adjust codend totals for weights of codends
-		cew<- read.csv("./source data/codend.wts.csv")
+		cew<- read.csv("../source data/codend.wts.csv")
 		cew$cen.col <- paste(cew$cen, cew$col)
 		CD$cen.col <- paste(CD$cod.end, CD$codend.col)
 		CD$cew<- cew$wt[match(CD$cen.col, cew$cen.col)]
@@ -194,29 +231,15 @@ nav <- readRDS("nav_reduced.rds")
 			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm)
 			# not sure why slice(1) doesn't work here.
 
-# for converting to biomass per unit area
-# checks in '01_import_net_logger_and_voyage_track.R' indicated that precise calculations of volumes swept wouldn't be possible, so assume 3.5 kt to calculate volumes
-# 3.5 knots = 1.80056 m/s; mouth of net is nominally 180 m2
-# so calculation will be 188 m^2 * 1.80056 m/s * time s to give swept volumes in m3
-# durations for cod-end 6 are often somewhat longer as the net was at the surface for a while; but not fishing - manually set these to 30 min
-# There was a switch from 100 min for CE1 to 90 min at MIDOC 14 (miodc 12 was 100 min; MIDOC 14 onward were 90 min )
-	# Apart from exceptions (midoc 10, 13, ) volumes will be:
-	# CE2--6: 188 m^2 * 1.80056 m/s * 1800 s = 609309.5
-	# CE1 (stations 01 -- 12) : 188 m^2 * 1.80056 m/s * 6000 s = 2031032
-	# CE1 (stations 14 -- 40) : 1827929
-
-# exclude midoc 33 - twisted bridle
-
-
-	saveRDS(bm.codends, "./derived data/codend_taxa_biomass.rds")
+	saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
 
 	# fish only
 	fbm <- SD %>% filter(tax.grp %in% "fish") %>% group_by(midoc.stn,cod.end) %>% mutate(tbm=sum(wt.g, na.rm=T))
-	saveRDS(fbm, "./derived data/codend_fish_biomass.rds")	
+	saveRDS(fbm, "../derived data/codend_fish_biomass.rds")	
 
 
 # within fish, relative dominance of groups
-	group_by(midoc.stn,cod.end,fish.grp) %>%
+	fbm.dat<- fbm %>% group_by(midoc.stn,cod.end,fish.grp) %>%
 	mutate(bm=sum(wt.g, na.rm=T)) %>%
 	mutate(pbm = bm/tbm) %>%
 	distinct(pbm, .keep_all = T) %>%
@@ -271,22 +294,9 @@ nav <- readRDS("nav_reduced.rds")
        	 # MIDOC07       3  4216.0 MIDOC073   3755 1.122770
        	 # MIDOC09       2 10644.2 MIDOC092  10000 1.064420
 
-	# outliers with a lot more biomass for cod-end totals than summed samples (these are likely to be errors)
-
 
 	# next plot - reproduce this in base; with following additions
 		# full bars showing codend wet-weight, behind morphospecies bars
 		# background colour coded by time of day
 		# for now, use "Set3" colours from RColorBrewer
 		col.key <- data.frame(tax.grp= na.omit(unique(p.d$tax.grp)), col=brewer.pal(11, "Set3"))
-
-# details for report:
-	# towing speed during deployment and retrieval from voyage logs
-	# average net opening (height and width) from scanmar
-	# ? average accuracy in achieving target depths
-	# number of day/night/crepuscular shots
-
-
-# get lengths from photos then do xy plots by species for lengths vs weights: visually assess outliers 
-	
-
