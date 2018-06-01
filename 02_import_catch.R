@@ -33,17 +33,33 @@ function(x){
 
 	x$depth_mid_m <- NA
 	x$swept_m3 <- NA
+	# stations 1:12; CE1s have swept vol for 100 min at 3.5 kt
 	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(1:12) & x$cod.end=="1",]$swept_m3 <- ce1vol100
+	# stations 14:40; CE1s have swept vol for 90 min at 3.5 kt
 	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(14:40) & x$cod.end=="1",]$swept_m3 <- ce1vol90
 	x[x$cod.end=="1",]
+
+	# CE 2--6 have 30 min at 3.5 kt; other than exceptions 
+		# MIDOC09 and 12: CE 5 & 6 combined ==> depth.mid = 200; time = 60 min
+		x[x$cod.end%in%as.character(c(2:6)) & ((midoc.stn%in% c("MIDOC08","MIDOC09","MIDOC12")) == F),]$swept_m3 <- ce2_6vol
+		x[x$cod.end%in%as.character(c(2:4)) & midoc.stn%in% c("MIDOC09","MIDOC12"),]$swept_m3 <- ce2_6vol
+		x[x$cod.end== "5" & midoc.stn%in% c("MIDOC09","MIDOC12"),]$swept_m3 <- ce2_6vol*2
+
+	# mid depths are
+
+	x[x$midoc.stn=="MIDOC08",]$swept_m3 <- ce1vol100 + 5*ce2_6vol
+	x[x$cod.end== "5" & midoc.stn%in% c("MIDOC09","MIDOC12"),]$depth.mid <- 200
+	x[x$midoc.stn=="MIDOC08",]$depth_mid_m <- 500
+
+
+	
 
 	# MIDOC 2: cod ends 2 and 3 were both at 1200 - 1000 m, 4 was 900 - 600, 5 was 600 - 200, 6 was usual 200 - surface
 	x[x$midoc.stn=="MIDOC02" & as.character(x$cod.end)%in%c("2","3"),]$depth <- 1100
 	x 
-	# MIDOC 9: CE 5 & 6 combined ==> depth.mid = 200; time = 60 min
+	
 
-	# MIDOC12: CE5 & 6 combined ==> depth.mid = 200; time = 60 min
-
+	
 
 
 	x$g_per_m3 <- x$biomass.g/x$swept_m3

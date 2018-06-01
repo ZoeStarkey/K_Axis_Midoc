@@ -10,3 +10,6 @@
 ## midoc_staions_notes.csv
 - changed deployment number form 464 to 463 for MIDOC05. Previously thought that data had been lost for this station, and it was assigned to deployment 464; checks showed that this had been a mistake.
 
+## k_axis_IYGPT_field_data_1Jun2018.xlsx
+### changes relative to previous verison (k_axis_IYGPT_field_data_8Nov2017.xlsx)
+- Entered weights for sample data from stations 30 and 31 that were missing (from field logbook)
