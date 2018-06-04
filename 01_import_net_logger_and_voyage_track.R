@@ -166,7 +166,9 @@ for(i in 1:nrow(md.se)){
 # several stations had unexpectedly long tracks and fast surface speeds... need to figure out why this is -- hopefully cod-end results will shed light on it.
 
 # split by cod-end
-ce.se <- mdd %>% group_by(midoc.stn,status) %>% summarise(t.start=first(datetime), t.end=last(datetime)) %>% mutate(total.t.min=difftime(t.end,t.start)) %>% mutate(total.t.min=as.numeric(total.t.min, units="hours")*60)
+ce.se <- mdd %>% group_by(midoc.stn,status) %>% summarise(t.start=first(datetime), t.end=last(datetime), max.dep = max(CTD.Press..dbar.), min.dep = min(CTD.Press..dbar.)) %>% mutate(total.t.min=difftime(t.end,t.start)) %>% mutate(total.t.min=as.numeric(total.t.min, units="hours")*60)
+
+ce.se <- ce.se %>% group_by(midoc.stn, status) %>% mutate(mid.dep=median(c(max.dep,min.dep)))
 
 # convert "status" to codend numbers
 ce.key <- data.frame(status=c("logging", "net1", "net2", "net3","net4","net5"), CE=as.character(c(1:6)))
@@ -186,11 +188,17 @@ md5 <- tbl_df(data.frame(
 	status = rep(NA,6),
 	t.start = md5t[1:6],
 	t.end = md5t[2:7],
+  max.dep = c(1000,1000,800,601,401,201),
+  min.dep = c(0,800,601,401,201,0),
+  mid.dep = c(500,900,700.5,501,301,100.5),
 	total.t.min = c(100,rep(30,5)),
 	CE = c(1:6), stringsAsFactors = F
 ))
 
-ce.se <- ce.se %>% filter(midoc.stn!="MIDOC05") %>% bind_rows(md5) %>% arrange(t.start)
+ce.se <- ce.se %>% filter(midoc.stn!="MIDOC05") %>% bind_rows(md5) %>% arrange(t.start) %>% ungroup()
+
+# manually setting CE6 to 30 min so that retrieval isn't included in volume calculations
+ce.se<- ce.se %>% filter(CE==6) %>% mutate(t.end = t.start + minutes(30)) %>% bind_rows(.,filter(ce.se, CE<6)) %>% arrange(t.start)
 
 for(i in 1:nrow(ce.se)){
 	the.ce<- ce.se[i,]
@@ -207,23 +215,15 @@ for(i in 1:nrow(ce.se)){
          med_grnd_spd = median(SHIP_SPD_OVER_GROUND_KNOT),
          start_time = min(gmt),
          end_time = max(gmt)) %>%
-	bind_cols(select(the.ce, c(midoc.stn,CE,total.t.min))) %>%
+	bind_cols(select(the.ce, c(midoc.stn,CE,total.t.min, max.dep, min.dep, mid.dep))) %>%
   mutate(ce_duration = (unclass(end_time) -  unclass(start_time))/60) %>% mutate(t.check=ce_duration - total.t.min)
   	if(i == 1){
-  		if(exists("swept")) rm(swept)
   		swept.ce <- swept.tmp
   	}
   	if(i > 1) swept.ce <- bind_rows(swept.ce, swept.tmp)
 }
 
-# check once cod-end summaries are done that the totals across CE1--6 are the same as the station totals
-
-# speeds: a lot of stations are still showing way higher speeds than we wanted... need to correct for current
 if(!skip.plots) ggplot(swept.ce, aes(x=CE, y=mean_grnd_spd)) + geom_point() +facet_wrap(~midoc.stn)
-
-# # use scanmar data as a first check
-# scanmar <- scanmar %>% mutate(tv = sqrt(trawl_speed_y^2 + trawl_speed_x^2))
-# tz(scanmar$time) <- "gmt"
 
 # for(i in 1:nrow(ce.se)){
 # 	the.ce<- ce.se[i,]
@@ -293,7 +293,13 @@ mdd %>% ggplot(aes(x = datetime, y = -Pressure..dbar.)) + geom_path() + geom_tex
 
 swept.stn %>% select(midoc.stn, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% filter(!is.na(midoc.stn)) %>% arrange(start_time) %>% saveRDS("../derived data/midoc_stations_checked.rds")
 
-swept.ce %>% select(midoc.stn,CE, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd) %>% saveRDS("../derived data/midoc_cod_ends_checked.rds")
+# swept volumes are trackdistm * 180
+swept.ce$swept_m3<- swept.ce$trackdistm*180
+
+# looking at this:
+swept.ce %>% ggplot(aes(x=as.character(CE), y=swept_m3)) + geom_boxplot()
+
+swept.ce %>% select(midoc.stn,CE, start_time, end_time, lat_start, lon_start, lat_end, lon_end, trackdistm, mean_grnd_spd, min.dep, max.dep, mid.dep, swept_m3) %>% saveRDS("../derived data/midoc_cod_ends_checked.rds")
 
 # final checking
 

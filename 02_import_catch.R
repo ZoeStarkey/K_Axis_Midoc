@@ -7,75 +7,16 @@
   # codend_fish_biomass.rds
   # codend_taxa_biomass.rds
 
-## TODO finish this:
 # cod.end depths and volumes
-
-# for converting to biomass per unit area
-# checks in '01_import_net_logger_and_voyage_track.R' indicated that precise calculations of volumes swept wouldn't be possible, so assume 3.5 kt to calculate volumes
-
-# 3.5 knots = 1.80056 m/s; mouth of net is nominally 180 m2
-# so calculation will be 188 m^2 * 1.80056 m/s * time s to give swept volumes in m3
-# durations for cod-end 6 are often somewhat longer as the net was at the surface for a while; but not fishing - manually set these to 30 min
-
-# There was a switch from 100 min for CE1 to 90 min at MIDOC 14 (miodc 12 was 100 min; MIDOC 14 onward were 90 min )
-	# Apart from exceptions (midoc 10, 13, ) volumes will be:
-	# CE2--6: 188 m^2 * 1.80056 m/s * 1800 s = 609309.5
-	# CE1 (stations 01 -- 12) : 188 m^2 * 1.80056 m/s * 6000 s = 2031032
-	# CE1 (stations 14 -- 40) : 1827929
-# ** this is conservative for CE1, as the ship typically went faster at the beginning of deployments while net was flying down **
-
-# exclude midoc 33 - twisted bridle
-
-function(x){
-	ce1vol100 <- 2031032
-	ce1vol90 <- 1827929
-	ce2_6vol <- 609309.5
-
-	x$depth_mid_m <- NA
-	x$swept_m3 <- NA
-	# stations 1:12; CE1s have swept vol for 100 min at 3.5 kt
-	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(1:12) & x$cod.end=="1",]$swept_m3 <- ce1vol100
-	# stations 14:40; CE1s have swept vol for 90 min at 3.5 kt
-	x[as.numeric(substr(x$midoc.stn,6,7))%in%c(14:40) & x$cod.end=="1",]$swept_m3 <- ce1vol90
-	x[x$cod.end=="1",]
-
-	# CE 2--6 have 30 min at 3.5 kt; other than exceptions 
-		# MIDOC09 and 12: CE 5 & 6 combined ==> depth.mid = 200; time = 60 min
-		x[x$cod.end%in%as.character(c(2:6)) & ((midoc.stn%in% c("MIDOC08","MIDOC09","MIDOC12")) == F),]$swept_m3 <- ce2_6vol
-		x[x$cod.end%in%as.character(c(2:4)) & midoc.stn%in% c("MIDOC09","MIDOC12"),]$swept_m3 <- ce2_6vol
-		x[x$cod.end== "5" & midoc.stn%in% c("MIDOC09","MIDOC12"),]$swept_m3 <- ce2_6vol*2
-
-	# mid depths are
-
-	x[x$midoc.stn=="MIDOC08",]$swept_m3 <- ce1vol100 + 5*ce2_6vol
-	x[x$cod.end== "5" & midoc.stn%in% c("MIDOC09","MIDOC12"),]$depth.mid <- 200
-	x[x$midoc.stn=="MIDOC08",]$depth_mid_m <- 500
-
-
-	
-
-	# MIDOC 2: cod ends 2 and 3 were both at 1200 - 1000 m, 4 was 900 - 600, 5 was 600 - 200, 6 was usual 200 - surface
-	x[x$midoc.stn=="MIDOC02" & as.character(x$cod.end)%in%c("2","3"),]$depth <- 1100
-	x 
-	
-
-	
-
-
-	x$g_per_m3 <- x$biomass.g/x$swept_m3
-
-	})
-}
-
 
 library("tidyverse")
 library(lubridate)
 library(readxl)
 Sys.setenv(TZ='GMT')
 
-#f <- "/Users/rowan/GitHub/K_axis_midoc/derived data"
-f <- "/Users/dougt/GitHub/K_axis_midoc/derived data"
-setwd(f)
+usr <- Sys.info()["user"]
+d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/derived data")
+setwd(d)
 
 
 mdd <- readRDS("midoc_logger_checked.rds")
@@ -86,11 +27,11 @@ nav <- readRDS("nav_reduced.rds")
 # import from excel
 		# directory with data
 		#the.dir <- "/Users/rowan/GitHub/K_axis_midoc/source data/"
-		the.dir <- "/Users/dougt/GitHub/K_axis_midoc/source data/"
+		d <- paste0("/Users/", usr, "/GitHub/K_axis_midoc/source data/")
 
 		# latest excel workbook
-		the.wb <- "k_axis_IYGPT_field_data_8Nov2017.xlsx"
-		f <- paste0(the.dir, the.wb)
+		the.wb <- "k_axis_IYGPT_field_data_1Jun2018.xlsx"
+		f <- paste0(d, the.wb)
 		
 		# read
 			# sample data
@@ -244,10 +185,14 @@ nav <- readRDS("nav_reduced.rds")
 			mutate(bm = sum(wt.g, na.rm=T)) %>%
 			mutate(pbm = bm/tbm) %>%
 			distinct(pbm, .keep_all = T) %>% # keeps unique values of pbm for each combination of station, cod.end, tax.grp; retains all columns
-			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm)
+			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm) %>% ungroup()
 			# not sure why slice(1) doesn't work here.
 
-	saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
+	# adjust biomass to per unit volume
+	ce.se$cod.end <- as.character(ce.se$CE) # names differ; for easier matching
+	bm.codends <- bm.codends %>% left_join(select(ce.se, midoc.stn, cod.end, swept_m3)) %>% mutate(bm_g_m3 = tbm/swept_m3)
+
+saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
 
 	# fish only
 	fbm <- SD %>% filter(tax.grp %in% "fish") %>% group_by(midoc.stn,cod.end) %>% mutate(tbm=sum(wt.g, na.rm=T))
