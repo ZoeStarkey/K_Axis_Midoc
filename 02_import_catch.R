@@ -190,7 +190,7 @@ nav <- readRDS("nav_reduced.rds")
 
 	# adjust biomass to per unit volume
 	ce.se$cod.end <- as.character(ce.se$CE) # names differ; for easier matching
-	bm.codends <- bm.codends %>% left_join(select(ce.se, midoc.stn, cod.end, swept_m3)) %>% mutate(bm_g_m3 = tbm/swept_m3)
+	bm.codends <- bm.codends %>% left_join(select(ce.se, midoc.stn, cod.end, swept_m3)) %>% mutate(bm_g_m3 = bm/swept_m3)
 
 saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
 

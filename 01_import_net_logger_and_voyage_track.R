@@ -46,7 +46,10 @@ skip.plots <- T # flag to skip plots if just regenerating outputs
 # first location from each station
 
 # setwd("/Users/dougt/GitHub/K_axis_midoc/source data")
-setwd("/Users/rowan/GitHub/K_axis_midoc/source data")
+usr <- Sys.info()["user"]
+d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/source data")
+setwd(d)
+
 mdd <- readRDS("midoc_raw.rds")
 mdd <- mdd%>% arrange(datetime)
 
@@ -282,7 +285,7 @@ text(md.crep$start_time[1:40], yj, labels=substr(md.crep$midoc.stn,6,7))
 abline(v=md.crep$start_sunset, col="dark blue")
 abline(v=md.crep$start_sunrise, col="goldenrod")
 lines(mdd$datetime, -mdd$Pressure..dbar.)
-# lines up with existing classification
+# lines up with existing classification: md_crep can be used 
 
 maxds <- mdd %>% group_by(midoc.stn) %>% arrange(-Pressure..dbar.) %>% dplyr::slice(1) %>% ungroup()
 
