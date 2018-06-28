@@ -58,8 +58,9 @@ km <- inner_join(km, tmp); rm(tmp)
 km$DNC.col <- NA
 km$DNC.col <- ifelse(km$DNC.visual=="D", "yellow", ifelse(km$DNC.visual=="N", "dark blue", ifelse(km$DNC.visual=="NC", "orange", "violet")))
 # just non-problem stations
-km <- km[km$midoc.stn%in%c("TRIAL","MIDOC08","MIDOC10","MIDOC13")==F,]
-km <- ll2prj(km, loncol="LONGITUDE", latcol="LATITUDE")
+km <- km[km$midoc.stn%in%c("TRIAL","MIDOC08","MIDOC10","MIDOC13","MIDOC33")==F,]
+km$pcol <- ifelse(km$midoc.stn%in%c("MIDOC02","MIDOC12"),"grey","black")
+km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
 
 ##TODO: make grey circles around 2, 12 and 33: cannot be included in quantitative comparisons
 
@@ -145,14 +146,14 @@ points(ktr[1:66,], type="l", lwd=1)
 
 # points(km, pch=19, col="green") # all placed midoc went in water
 # points(km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,], pch=19, col="green") # things where
-points(km, pch=21, bg=(km$DNC.col), cex=2)
-TeachingDemos::shadowtext(coordinates(km), lab=as.character(km$midoc.n), cex=.5, col="black", bg="white")
+points(km, pch=21, bg=(km$DNC.col), cex=1.8, col=km$pcol)
+TeachingDemos::shadowtext(coordinates(km), lab=as.character(km$midoc.n), cex=.5, col=km$pcol, bg="white")
 # can use bg=grDevices::adjustcolor(km$DNC.col, alpha=.6)
 
 g1labs <- graticule_labels(lons=c(150, 120,90,60), xline=180, yline=-55, proj=projection(prj))
-TeachingDemos::shadowtext(coordinates(g1labs[g1labs$islon, ]), lab=parse(text=g1labs$lab[g1labs$islon]), pos=3, cex=0.8, col="gray30", bg="white")
+TeachingDemos::shadowtext(coordinates(g1labs[g1labs$islon, ]), lab=parse(text=g1labs$lab[g1labs$islon]), cex=0.8, col="gray30", bg="white")
 g2labs <- graticule_labels(lats=c(-40, -50,-60,-70), , xline=95, yline=-50, proj=projection(prj))
-TeachingDemos::shadowtext(coordinates(g2labs[!g2labs$islon, ]), lab=parse(text=g2labs$lab[!g2labs$islon]), pos=1, cex=0.8,col="gray30", , bg="white")
+TeachingDemos::shadowtext(coordinates(g2labs[!g2labs$islon, ]), lab=parse(text=g2labs$lab[!g2labs$islon]), pos=3, cex=0.8,col="gray30", , bg="white")
 
 
 TeachingDemos::shadowtext(coordinates(glabs[1:9,]), lab=glabs$lab[1:9], family="Times", cex=0.8, col="black", bg="white")

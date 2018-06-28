@@ -212,15 +212,13 @@ saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
 	geom_bar() +
 	theme_bw() +
 	facet_wrap(~midoc.stn)
-	ggsave("biomass_by_fish_grp090216.pdf")
 
 	# proportions
 	ggplot(data=fp.d, aes(x=cod.end, weight=pbm, fill=fish.grp, facets=midoc.stn), geom="bar", ylab="% biomass") +
 	geom_bar() +
 	theme_bw() +
 	facet_wrap(~midoc.stn)
-	ggsave("proportion_biomass_by_coarse_taxonomic_grp190216.pdf")
-
+	
 
 ###### 
 ##

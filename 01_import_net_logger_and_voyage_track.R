@@ -85,7 +85,7 @@ md.se <- mdd %>% group_by(midoc.stn) %>% summarise(t.start=first(datetime), t.en
 # nav %>% filter(gmt > as_datetime("2016-01-31 19:00:00") & gmt < as_datetime("2016-01-31 20:00:00")) %>% ggplot(aes(x=gmt, y=SHIP_SPD_OVER_GROUND_KNOT)) + geom_point() + geom_vline(xintercept=as_datetime("2016-01-31 18:54:00")) + geom_vline(xintercept=as_datetime("2016-01-31 19:36:00")) 
 #   # looks right for start and end
 #   # can also use this to roughly assign "up component" of haul as starting at 19:12
-# TODO: come back and check this once time difference issue has been sorted. These times for midoc 13 should be pushed forward by 11 hours for comparison with vessel records.
+
   
 # manually plug in for midoc 13
 md.se$t.start <-as.character(md.se$t.start)
@@ -127,7 +127,6 @@ nav %>% filter(as_datetime("2016-01-24 00:00:00", tz="GMT")< gmt &  gmt < as_dat
 # nav %>% filter(gmt > as_datetime("2016-01-31 19:00:00") & gmt < as_datetime("2016-01-31 20:00:00")) %>% ggplot(aes(x=gmt, y=SHIP_SPD_OVER_GROUND_KNOT)) + geom_point() + geom_vline(xintercept=as_datetime("2016-01-31 18:54:00")) + geom_vline(xintercept=as_datetime("2016-01-31 19:36:00")) 
 # 	# looks right for start and end
 # 	# can also use this to roughly assign "up component" of haul as starting at 19:12
-# TODO: come back and check this once time difference issue has been sorted. These times for midoc 13 should be pushed forward by 11 hours for comparison with vessel records.
 	
 # manually plug in for midoc 13
 md.se$t.start <-as.character(md.se$t.start)
