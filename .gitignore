@@ -1,3 +1,6 @@
+# midoc acoustic files (too big to store in repository)
+/source data/midoc_acoustic/
+
 # excel temporary files
 ~$*
 
