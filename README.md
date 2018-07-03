@@ -16,8 +16,10 @@ Repository for data, data processing scripts and analysis scripts for midwater t
 - '/KPS_symposium_extended_abstract/KPS_EA_models.R'
 
 ### Scripts specific to paper for Deep Sea Research Special Issue
+- coming soon
 
 ## Dependencies
 - '/source data/midoc_acoustic/' is omitted from git repository due to its size; accessible [here](https://www.dropbox.com/sh/m2ozo4oxbrwsvwe/AACwVxMETeDggcz68QMCu2i_a?dl=0) 
 
 ## TODO
+- documented in individual scripts for now
