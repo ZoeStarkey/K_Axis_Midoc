@@ -18,6 +18,40 @@ Repository for data, data processing scripts and analysis scripts for midwater t
 ### Scripts specific to paper for Deep Sea Research Special Issue
 - coming soon
 
+## key outputs and column definitions
+'midoc_stations_envdata' is produced as a 'master table' with many key variables for analyses of midoc data. Column definitions for this file are in the table below
+
+|          Column          |                Definition                |
+|--------------------------|------------------------------------------|
+| midoc.stn                |                                          |
+| start_time               |                                          |
+| end_time                 |                                          |
+| lat_start                |                                          |
+| lon_start                |                                          |
+| lat_end                  |                                          |
+| lon_end                  |                                          |
+| trackdistm               | great circle distance along voyage track |
+| mean_grnd_spd            | mean ship speed for tow                  |
+| midoc.n                  |                                          |
+| no.problems              |                                          |
+| zone.notes               |                                          |
+| DNC.visual               |                                          |
+| notes for DNC comparison |                                          |
+| zone                     |                                          |
+| Tmin                     |                                          |
+| Tmin_depth               |                                          |
+| Tmax                     |                                          |
+| SML                      |                                          |
+| Smax                     |                                          |
+| O2_min                   |                                          |
+| days_since_melt          |                                          |
+| distance_to_ice_m        |                                          |
+| distance_to_edge_m       |                                          |
+| sea_ice_conc             |                                          |
+| chl_rs                   |                                          |
+| intChl                   |                                          |
+
+
 ## Dependencies
 - '/source data/midoc_acoustic/' is omitted from git repository due to its size; accessible [here](https://www.dropbox.com/sh/m2ozo4oxbrwsvwe/AACwVxMETeDggcz68QMCu2i_a?dl=0) 
 
