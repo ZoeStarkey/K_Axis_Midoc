@@ -254,10 +254,6 @@ ggplot(mdd[substr(mdd$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),
 	geom_text(data=mds[substr(mds$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),], aes(x=datetime, y=500, label=substr(midoc.stn,6,7), col="red"))
 # all makes sense
 
-# checks above indicated that precise calculations of volumes swept wouldn't be possible, so assume 3.5 kt to calculate volumes
-# 3.5 knots = 1.80056 m/s; mouth of net is nominally 180 m2
-# so calculation will be 188 m^2 * 1.80056 m/s * time s to give swept volumes in m3
-# durations for cod-end 6 are often somewhat longer as the net was at the surface for a while; but not fishing - manually set these to 30 min
 # There was a switch from 100 min for CE1 to 90 min at MIDOC 14 (miodc 12 was 100 min; MIDOC 14 onward were 90 min )
 	# Apart from exceptions (midoc 10, 13) volumes will be:
 	# CE2--6: 188 m^2 * 1.80056 m/s * 1800 s = 609309.5
