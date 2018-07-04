@@ -37,7 +37,7 @@ Repository for data, data processing scripts and analysis scripts for midwater t
 | midoc.n                  | midoc deployment number                                                                                                                                                                 |
 | no.problems              | flag indicating whether deployment was 'clean' (no problems with codends firing etc)                                                                                                    |
 | zone.notes               | notes on assignment of oceanographic zone                                                                                                                                               |
-| DNC.visual               | Day/Night/crepuscular cateogry (assigned by visually from plot with sunrise/sunset times overlaid on tows)                                                                              |
+| DNC.visual               | Day/Night/crepuscular category (assigned by visually from plot with sunrise/sunset times overlaid on tows)                                                                              |
 | notes for DNC comparison | notes for day/night/crepuscular categorization                                                                                                                                          |
 | zone                     | oceanographic zone                                                                                                                                                                      |
 | Tmin                     | water column minimum temperature (oceanographic variable from Sophie Bestley)                                                                                                           |
@@ -70,7 +70,7 @@ Repository for data, data processing scripts and analysis scripts for midwater t
 | min.dep       | minimum depth of net for codend                                                            |
 | max.dep       | maximum depth of net for codend                                                            |
 | mid.dep       | mid depth for codend                                                                       |
-| swept_m3      | volume swept in cubic metres, calcuated as trackdistm * 188 (nominal area of mouth of net) |
+| swept_m3      | volume swept in cubic metres, calculated as trackdistm * 188 (nominal area of mouth of net) |
 
 
 ## Dependencies
