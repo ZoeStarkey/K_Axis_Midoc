@@ -114,7 +114,6 @@ ce.pa
 saveRDS(ce.pa, "./derived data/midoc_cod-end_fish_presence_absence.rds")
 
 
-
 # size distributions
 calc_frequency_distribution = function(input_data, the.brks=seq(-4,4,length.out=50), bw.adj=1){
     tmp_hist = hist(input_data, plot=FALSE, breaks=the.brks)

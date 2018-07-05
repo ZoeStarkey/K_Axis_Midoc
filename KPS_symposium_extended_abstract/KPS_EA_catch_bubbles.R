@@ -10,6 +10,8 @@ setwd(d)
 mds   <- readRDS("midoc_stations_checked.rds")
 md.ce <- readRDS("midoc_cod_ends_checked.rds")
 ktr <- readRDS("nav_reduced.rds")
+ced <- tibble(cod.end=as.character(c(2:6)), depth=seq(900,100,by=-200))
+mde  <- readRDS("midoc_stations_envdata.rda")
 
 md.crep<- read_csv("../source data/midoc_crepuscular.csv")
 
@@ -57,7 +59,6 @@ ggplot(ktr, aes(x=LONGITUDE, y=LATITUDE)) + geom_path(col="grey") +
   theme_bw() + xlab("longitude") + ylab("latitude") +
   ggsave(paste0(pdir,"/KPS_EA_catch_biomass_bubbles.pdf"), height=4, width=7)
 
-ced <- tibble(cod.end=as.character(c(2:6)), depth=seq(900,100,by=-200))
 
 # alternative plot showing proportions at depth
 bm.tax %>% 
@@ -71,3 +72,9 @@ ggplot(aes(weight=pbm, x=cod.end,fill=tax.grp), xlab = "cod end", ylab = "propor
   guides(fill=guide_legend(title="group")) +
   xlab("cod end") + ylab("proportion of total catch (by weight)") +
   ggsave(paste0(pdir,"/KPS_EA_catch_weight_proportions.pdf"), height=7, width=8)
+
+# plot of biomass per cod-end and TOD
+bm.tax %>% filter(tax.grp=="fish", midoc.stn%in%naf==F, cod.end%in%as.character(c(2:6))) %>%
+  inner_join(ced) %>% inner_join(select(mde, midoc.stn, DNC.visual)) %>% 
+  group_by(midoc.stn, cod.end, DNC.visual) %>% summarise(su)
+
