@@ -19,7 +19,7 @@ setwd(d)
 	colnames(fl)<- c("midoc.stn", "cod.end", "n.in.photo", "photo.label", "SL.mm", "sample.label", "taxon", "tax.group", "taxon.uncertain", "notes", "measured.by")
 
 	# taxon lookup key
-	tk <- read_excel(f, sheet = "taxon lookup")
+	tk <- read_xlsx(f, sheet = "taxon lookup")
 			
 # processing and checks
 	# merge/simplify taxa into fish.groups
@@ -50,8 +50,36 @@ fl[fl$midoc.stn%in%c("33","34","35","36","37","38","39","40"),]$midoc.stn <- pas
 # site-level
 
 # list of species present at each site
+
+# there are gaps that need to be filled for MIDOC 1 (cod-ends 2:6) and MIDOC 21 (cod-ends 2 & 3) as there were no photos for these
+# do these first, so that they can be slotted in to the full dataset before expanding to complete records
+		# latest excel workbook
+		f2 <- paste0(d, "/source data/k_axis_IYGPT_field_data_5Jul2018.xlsx")
+		SD <- read_xlsx(f2, sheet = 3)
+		tk2 <- read_xlsx(f2, sheet = 5)
+		colnames(tk2)<- c("orig.tax","tax.grp1","tax.grp2")
+		# update taxon key cateories to match photo data
+		tk2$tax.grp2<- gsub("Bathylagiids", "Bathylagidae",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("cyclothone", "Gonostomatidae",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("Cyclothone", "Gonostomatidae",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("melamphid", "Melamphidae",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("Macrurids", "Macrouridae",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("Protomyctophum sp", "Protomyctophum",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub(" sp.", "",tk2$tax.grp2)
+		tk2$tax.grp2<- gsub("Other myctophid", "",tk2$tax.grp2)
+
+		SD$fgroup <- tk2$tax.grp2[match(SD$taxon, tk2$orig.tax)]
+
+	pa.m <- SD %>% filter(!is.na(fgroup), fgroup%in%c("mixed/other fish","NA")==F, cod.end%in%as.character(c(1:6))) %>%
+					filter((midoc.stn == "MIDOC01" & cod.end %in% as.character(2:6)) | (midoc.stn == "MIDOC21" & cod.end%in%as.character(1:6))) %>%
+					select(midoc.stn, fgroup) %>% distinct() 
+
+# everything else, from photos
 md.pa <- fl %>% filter(!is.na(fgroup), fgroup%in%c("squid","other fish", "larval fish")==F, cod.end%in%as.character(c(1:6))) %>%
-				select(midoc.stn, fgroup) %>% distinct() %>% mutate(PA=1) %>%
+				select(midoc.stn, fgroup) %>% 
+				# slot in the missing records from above here
+				bind_rows(pa.m) %>%
+				distinct() %>% mutate(PA=1) %>%
 				complete(midoc.stn, nesting(fgroup))
 md.pa[is.na(md.pa$PA),]$PA <- 0
 md.pa
@@ -69,8 +97,16 @@ saveRDS(md.pa, "./derived data/midoc_fish_presence_absence.rds")
 # this is no different -- no extra species
 
 # for cod-ends
+	# again, do the missing cod-ends first
+	ce.pa.m <- SD %>% filter(!is.na(fgroup), fgroup%in%c("mixed/other fish","NA")==F, cod.end%in%as.character(c(1:6))) %>%
+					filter((midoc.stn == "MIDOC01" & cod.end %in% as.character(2:6)) | (midoc.stn == "MIDOC21" & cod.end%in%as.character(1:6))) %>%
+					select(midoc.stn, cod.end, fgroup) %>% distinct() 
+
 ce.pa <- fl %>% filter(!is.na(fgroup), fgroup%in%c("squid","other fish", "larval fish")==F, cod.end%in%as.character(c(1:6))) %>%
-				select(midoc.stn, cod.end,fgroup) %>% distinct() %>% mutate(PA=1) %>%
+				select(midoc.stn, cod.end,fgroup) %>%
+				bind_rows(ce.pa.m) %>%
+				arrange(midoc.stn, cod.end, fgroup) %>%
+				distinct() %>% mutate(PA=1) %>%
 				complete(midoc.stn, cod.end,nesting(fgroup))
 ce.pa[is.na(ce.pa$PA),]$PA <- 0
 ce.pa

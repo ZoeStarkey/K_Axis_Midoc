@@ -30,7 +30,7 @@ nav <- readRDS("nav_reduced.rds")
 		d <- paste0("/Users/", usr, "/GitHub/K_axis_midoc/source data/")
 
 		# latest excel workbook
-		the.wb <- "k_axis_IYGPT_field_data_1Jun2018.xlsx"
+		the.wb <- "k_axis_IYGPT_field_data_5Jul2018.xlsx"
 		f <- paste0(d, the.wb)
 		
 		# read

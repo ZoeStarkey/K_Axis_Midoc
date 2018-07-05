@@ -13,3 +13,11 @@
 ## k_axis_IYGPT_field_data_1Jun2018.xlsx
 ### changes relative to previous verison (k_axis_IYGPT_field_data_8Nov2017.xlsx)
 - Entered weights for sample data from stations 30 and 31 that were missing (from field logbook)
+
+## MIDOC_fish_photo_measuring_4Jul2018.xlsx
+### changes relative to previous version (k_axis_IYGPT_field_data_8Nov2017.xlsx)
+- filled in missing species IDs for fish in midoc 5 (all electrona)
+
+## k_axis_IYGPT_field_data_5Jul2018.xlsx
+### changes relative to previous verison (k_axis_IYGPT_field_data_1Jun2018.xlsx)
+- A couple of entries in 'include in count column' that should have been in notes moved into notes coulmn, as throwing warnings on read_xlsx
