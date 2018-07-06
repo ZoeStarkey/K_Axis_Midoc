@@ -15,7 +15,11 @@ library(rgeos)
 library(rgdal)
 library(dplyr)
 library(readr)
-setwd("/Users/dougt/GitHub/K_axis_midoc/KPS_symposium_extended_abstract")
+
+usr <- Sys.info()["user"]
+d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/KPS_symposium_extended_abstract")
+setwd(d)
+
 
 # projection
 prj<- "+proj=laea +lat_0=-60 +lon_0=75 +datum=WGS84 +ellps=WGS84 +no_defs +towgs84=0,0,0"
@@ -42,10 +46,9 @@ wp  <- spTransform(crop(countriesHigh, ras.ext2), CRS(prj))
 kos <- readRDS("../source data/k_axis_oceanog_summ.Rda")
 kos <- ll2prj(kos, loncol="longitude", latcol="latidue")
 
-ktr <- read_csv("../source data/v3_201516030_waypoints_dec.csv")
+ktr <- readRDS("../derived data/nav_reduced.rds")
 colnames(ktr) <- c("wp","lat","lon","wp.grp")
-ktr <- ktr[-1,]
-ktr <- ll2prj(ktr)
+ktr <- ll2prj(ktr, loncol="LONGITUDE", latcol="LATITUDE")
 
 km <- readRDS("../derived data/midoc_stations_checked.rds")
 km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
@@ -140,7 +143,7 @@ plot(keepOnlyMostComplexLine(rasterToContour(pin, lev = 15)),add = TRUE, lty=1, 
 
 plot(wp, add=T, col="darkgrey", border=F)
 plot(graticule(lons = xx, lats = yy,  proj = prj), add=T, lty=2, col="gray40")
-points(ktr[1:66,], type="l", lwd=1)
+points(ktr, type="l", lwd=1)
 # can add large points for midoc stations by un-commenting line below
 #points(kos, pch=19, col="gray20", cex=0.6)
 

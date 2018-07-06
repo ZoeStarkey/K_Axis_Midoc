@@ -65,13 +65,47 @@ bm.tax %>%
   filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>% inner_join(ced) %>%
   ggplot(aes(x=pbm, y=-depth,color=tax.grp)) +geom_point() + facet_wrap(~midoc.stn) +theme_bw()
 
+ced$cdepth <- as.character(ced$depth)
+
 bm.tax %>% 
   filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians","mixed krill and salps","mixed/other gelatinous"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>%
-  mutate(midoc.stn = substr(midoc.stn, 6,8)) %>%
-ggplot(aes(weight=pbm, x=cod.end,fill=tax.grp), xlab = "cod end", ylab = "proportion of total biomass") +geom_bar() + facet_wrap(~midoc.stn) +theme_bw() +coord_flip() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  mutate(midoc.stn = substr(midoc.stn, 6,8)) %>% inner_join(ced) %>%
+ggplot(aes(weight=pbm, x=reorder(depth, desc(depth)),fill=tax.grp), xlab = "cod end", ylab = "proportion of total biomass") +geom_bar() + facet_wrap(~midoc.stn, ncol = 4) +theme_bw() +coord_flip()  + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   guides(fill=guide_legend(title="group")) +
   xlab("cod end") + ylab("proportion of total catch (by weight)") +
-  ggsave(paste0(pdir,"/KPS_EA_catch_weight_proportions.pdf"), height=7, width=8)
+  ggsave(paste0(pdir,"/KPS_EA_catch_weight_proportions.pdf"), height=5, width=8)
+
+
+# plots of average proportion biomass (box)
+
+cols<- c("yellow","violet","dark blue","orange")
+dcols <- c("goldenrod","violetred","navyblue","darkorange2")
+
+pd <- bm.tax %>% 
+   filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>% inner_join(ced) %>% inner_join(select(md.crep, midoc.stn, DNC.visual)) %>% group_by(tax.grp, cod.end, DNC.visual) 
+
+ce2p <- pd %>% filter(cod.end==2) %>%  ggplot(aes(x=tax.grp, y=pbm, fill=DNC.visual, col=DNC.visual)) + geom_violin() + scale_fill_manual(name="", values=cols) +scale_colour_manual(name="", values=dcols) + theme_bw() +xlab("") + ylab("") + ggtitle("900 m")+ theme(plot.title = element_text(size=10))
+
+ce3p <- pd %>% filter(cod.end==3) %>%  ggplot(aes(x=tax.grp, y=pbm, fill=DNC.visual, col=DNC.visual)) + geom_boxplot() + scale_fill_manual(name="", values=cols) +scale_colour_manual(name="", values=dcols) + theme_bw() +xlab("") + ylab("") + ggtitle("700 m")+ theme(plot.title = element_text(size=10))
+
+ce4p <- pd %>% filter(cod.end==4) %>%  ggplot(aes(x=tax.grp, y=pbm, fill=DNC.visual, col=DNC.visual)) + geom_boxplot() + scale_fill_manual(name="", values=cols) +scale_colour_manual(name="", values=dcols) + theme_bw() +xlab("") + ylab("proportion of biomass") + ggtitle("500 m")+ theme(plot.title = element_text(size=10))
+
+ce5p <- pd %>% filter(cod.end==5) %>%  ggplot(aes(x=tax.grp, y=pbm, fill=DNC.visual, col=DNC.visual)) + geom_boxplot() + scale_fill_manual(name="", values=cols) +scale_colour_manual(name="", values=dcols) + theme_bw() +xlab("") + ylab("") + ggtitle("300 m") + theme(plot.title = element_text(size=10))
+
+ce6p <- pd %>% filter(cod.end==6) %>%  ggplot(aes(x=tax.grp, y=pbm, fill=DNC.visual, col=DNC.visual)) + geom_boxplot() + scale_fill_manual(name="", values=cols) +scale_colour_manual(name="", values=dcols) + theme_bw() +xlab("") + ylab("") + ggtitle("100 m") +  theme(plot.title = element_text(size=10))   
+
+ggarrange(ce6p+rremove("x.text"), ce5p+rremove("x.text"), ce4p+rremove("x.text"), ce3p+rremove("x.text"), ce2p, common.legend=T, ncol=1, nrow=5)
+
+ggsave(paste0(pdir,"/KPS_EA_catch_proportions_dnc_depth.pdf"), height=8.25, width=4.75)
+
+
+# could also do this wigh ggboxplot...
+pd <- bm.tax %>% 
+  filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>% inner_join(ced) %>% inner_join(select(md.crep, midoc.stn, DNC.visual)) %>%
+    group_by(tax.grp, cod.end, DNC.visual) %>% filter(cod.end==2) %>%  ggboxplot(x="tax.grp", y="pbm", fill="DNC.visual")
+
+
+
 
 # plot of biomass per cod-end and TOD
 bm.tax %>% filter(tax.grp=="fish", midoc.stn%in%naf==F, cod.end%in%as.character(c(2:6))) %>%
