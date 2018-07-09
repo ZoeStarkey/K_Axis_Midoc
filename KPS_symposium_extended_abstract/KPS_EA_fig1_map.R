@@ -47,7 +47,7 @@ kos <- readRDS("../source data/k_axis_oceanog_summ.Rda")
 kos <- ll2prj(kos, loncol="longitude", latcol="latidue")
 
 ktr <- readRDS("../derived data/nav_reduced.rds")
-colnames(ktr) <- c("wp","lat","lon","wp.grp")
+# colnames(ktr) <- c("wp","lat","lon","wp.grp")
 ktr <- ll2prj(ktr, loncol="LONGITUDE", latcol="LATITUDE")
 
 km <- readRDS("../derived data/midoc_stations_checked.rds")
@@ -61,8 +61,8 @@ km <- inner_join(km, tmp); rm(tmp)
 km$DNC.col <- NA
 km$DNC.col <- ifelse(km$DNC.visual=="D", "yellow", ifelse(km$DNC.visual=="N", "dark blue", ifelse(km$DNC.visual=="NC", "orange", "violet")))
 # just non-problem stations
-km <- km[km$midoc.stn%in%c("TRIAL","MIDOC08","MIDOC10","MIDOC13","MIDOC33")==F,]
-km$pcol <- ifelse(km$midoc.stn%in%c("MIDOC02","MIDOC12"),"grey","black")
+km <- km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10", "MIDOC12","MIDOC13","MIDOC33")==F,]
+km$pcol <- "black"
 km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
 
 ##TODO: make grey circles around 2, 12 and 33: cannot be included in quantitative comparisons

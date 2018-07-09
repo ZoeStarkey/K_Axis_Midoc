@@ -13,13 +13,13 @@ mda <- readRDS("./derived data/midoc_acoustic_sums.rda")
 
 # biomass of taxa:
 bm.tax <- readRDS("./derived data/codend_taxa_biomass.rds")
-bm.tax <- mda %>% ungroup() %>% select(sum_NASC, midoc.stn, cod.end) %>% inner_join(bm.tax) %>%
-	inner_join(km)
+bm.ac <- mda %>% ungroup() %>% select(sum_NASC, midoc.stn, cod.end) %>% inner_join(bm.tax) %>%
+	inner_join(md)
 
 # biomass plots
 	# first cut with ggplot
 	# total biomass
-	p.d<- bm.tax %>% filter(cod.end%in%"front.of.net"==F & midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC3")==F) %>%
+	p.d<- bm.ac %>% filter(cod.end%in%"front.of.net"==F & midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC3")==F) %>%
 	filter(tax.grp%in%"NA"==F)
 	ggplot(data=p.d, aes(x=cod.end, weight=bm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="biomass") +
 	geom_bar() +
@@ -29,13 +29,13 @@ bm.tax <- mda %>% ungroup() %>% select(sum_NASC, midoc.stn, cod.end) %>% inner_j
 	theme(axis.text.x = element_text(angle = 90, hjust = 1))
 	# ggsave("biomass_by_coarse_taxonomic_grp190216.pdf")
 
-	# proportions
-	ggplot(data=p.d, aes(x=cod.end, weight=pbm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="% biomass") +
-	geom_bar() +
-	theme_bw() +
-	facet_wrap(~midoc.stn) +
-	coord_flip() +
-	theme(axis.text.x = element_text(angle = 90, hjust = 1))
+	# # proportions
+	# ggplot(data=p.d, aes(x=cod.end, weight=pbm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="% biomass") +
+	# geom_bar() +
+	# theme_bw() +
+	# facet_wrap(~midoc.stn) +
+	# coord_flip() +
+	# theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 	#ggsave("proportion_biomass_by_coarse_taxonomic_grp190216.pdf")
 

@@ -44,15 +44,22 @@ ggplot(ktr, aes(x=LONGITUDE, y=LATITUDE), main=title) +
 # plotbm2(bm.salps, "salps.pdf", "salps")
 # plotbm2(bm.jelly, "jelly.pdf","cnidarians")
 
+# this was incorrect; need to do density of sums, not sums of densities
+# bm.tax2<- bm.tax %>% filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>% 
+#  ungroup() %>% group_by(midoc.stn, tax.grp) %>% summarize(bm_g_m3_total = sum(bm_g_m3, na.rm=T)) %>% inner_join(mds) %>% inner_join(md.crep) 
 
-bm.tax2<- bm.tax %>% filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F) %>%
- ungroup() %>% group_by(midoc.stn, tax.grp) %>% summarize(bm_g_m3_total = sum(bm_g_m3, na.rm=T)) %>% inner_join(mds) %>% inner_join(md.crep) 
+# sanity check: is sum of density different to density of sum
+md.swept <-  bm.tax %>% filter(midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>%  select(midoc.stn, cod.end, swept_m3) %>% distinct() %>% group_by(midoc.stn) %>% summarise(swept_total = sum(swept_m3))
+
+bm.tax2 <-  bm.tax %>% filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>%
+ ungroup() %>% group_by(midoc.stn, tax.grp) %>% summarize(bm_total = sum(bm, na.rm=T)) %>% inner_join(mds) %>% inner_join(md.crep) %>% inner_join(md.swept) %>% mutate(bm_dens = bm_total/swept_total)
+
 
 pdir <- paste0("/Users/", usr, "/GitHub/K_axis_midoc/KPS_symposium_extended_abstract")
 
 # this is the plot for the KPSII extended abstract
 ggplot(ktr, aes(x=LONGITUDE, y=LATITUDE)) + geom_path(col="grey") +
-  geom_point(data=bm.tax2, aes(y=lat_start, x=lon_start, color=DNC.visual, size=bm_g_m3_total), alpha=.7) +
+  geom_point(data=bm.tax2, aes(y=lat_start, x=lon_start, color=DNC.visual, size=bm_dens), alpha=.7) +
   # geom_text(data=bm.tax2, aes(x=lon_start-1, y=lat_start, label=substr(midoc.stn,6,7),hjust=-0.5),cex=3, colour="dark grey")+
   scale_size(name=expression(paste("biomass (",g/m^3,")"))) + scale_colour_manual(name="", values=c("yellow","violet","dark blue","orange"), label=c("day","sunrise","night","sunset")) +
   facet_wrap(~tax.grp) +
@@ -60,13 +67,7 @@ ggplot(ktr, aes(x=LONGITUDE, y=LATITUDE)) + geom_path(col="grey") +
   ggsave(paste0(pdir,"/KPS_EA_catch_biomass_bubbles.pdf"), height=4, width=7)
 
 
-# alternative plot showing proportions at depth
-bm.tax %>% 
-  filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>% inner_join(ced) %>%
-  ggplot(aes(x=pbm, y=-depth,color=tax.grp)) +geom_point() + facet_wrap(~midoc.stn) +theme_bw()
-
-ced$cdepth <- as.character(ced$depth)
-
+# proportions
 bm.tax %>% 
   filter(tax.grp%in%c("fish", "cephalopods","krill","salps","cnidarians","mixed krill and salps","mixed/other gelatinous"), midoc.stn%in%naf==F, cod.end %in% as.character(c(2:6))) %>%
   mutate(midoc.stn = substr(midoc.stn, 6,8)) %>% inner_join(ced) %>%
@@ -110,5 +111,5 @@ pd <- bm.tax %>%
 # plot of biomass per cod-end and TOD
 bm.tax %>% filter(tax.grp=="fish", midoc.stn%in%naf==F, cod.end%in%as.character(c(2:6))) %>%
   inner_join(ced) %>% inner_join(select(mde, midoc.stn, DNC.visual)) %>% 
-  group_by(midoc.stn, cod.end, DNC.visual) %>% summarise(su)
+  group_by(midoc.stn, cod.end, DNC.visual) 
 
