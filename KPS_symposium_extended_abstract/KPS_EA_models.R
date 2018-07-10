@@ -6,6 +6,7 @@ setwd(d)
 
 # master table with station data and environmental data
 md <- readRDS("./derived data/midoc_stations_envdata.rda")
+ced <- tibble(cod.end=as.character(c(2:6)), depth=seq(900,100,by=-200))
 
 # acoustic data
 mda <- readRDS("./derived data/midoc_acoustic_sums.rda")
@@ -16,18 +17,22 @@ bm.tax <- readRDS("./derived data/codend_taxa_biomass.rds")
 bm.ac <- mda %>% ungroup() %>% select(sum_NASC, midoc.stn, cod.end) %>% inner_join(bm.tax) %>%
 	inner_join(md)
 
+pdir <- paste0("/Users/", usr, "/GitHub/K_axis_midoc/KPS_symposium_extended_abstract")
 # biomass plots
 	# first cut with ggplot
 	# total biomass
-	p.d<- bm.ac %>% filter(cod.end%in%"front.of.net"==F & midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC3")==F) %>%
-	filter(tax.grp%in%"NA"==F)
-	ggplot(data=p.d, aes(x=cod.end, weight=bm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="biomass") +
-	geom_bar() +
-	theme_bw() +
-	coord_flip() +
-	facet_wrap(~midoc.stn) +
-	theme(axis.text.x = element_text(angle = 90, hjust = 1))
-	# ggsave("biomass_by_coarse_taxonomic_grp190216.pdf")
+	naf <- c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")
+	p.d<- bm.ac %>% filter(cod.end %in% as.character(c(2:6)) & midoc.stn%in%naf==F) %>%
+	filter(tax.grp%in%"NA"==F) %>% inner_join(ced)
+
+
+	# ggplot(data=p.d, aes(x=cod.end, weight=bm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="biomass") +
+	# geom_bar() +
+	# theme_bw() +
+	# coord_flip() +
+	# facet_wrap(~midoc.stn) +
+	# theme(axis.text.x = element_text(angle = 90, hjust = 1))
+	# # ggsave("biomass_by_coarse_taxonomic_grp190216.pdf")
 
 	# # proportions
 	# ggplot(data=p.d, aes(x=cod.end, weight=pbm, fill=tax.grp, facets=midoc.stn), geom="bar", ylab="% biomass") +
@@ -41,37 +46,58 @@ bm.ac <- mda %>% ungroup() %>% select(sum_NASC, midoc.stn, cod.end) %>% inner_jo
 
 
 # NASC vs. biomass
-ggplot(p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps")), 
-	aes(y=bm, x=sum_NASC, color=DNC.visual)) +
+	# for correlation
+	rsqs<- p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps")) %>%
+ 	group_by(tax.grp, depth) %>% do(fit=lm(bm_g_m3 ~ sum_NASC, data=.)) %>% summarize(depth=depth,tax.grp=tax.grp, rsq=round(summary(fit)$r.squared, digits=2))
+
+	p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps")) %>%
+	ggplot(aes(y=bm_g_m3, x=sum_NASC, color=DNC.visual)) +
 	geom_point() +
-	facet_grid(cod.end ~ tax.grp) +
+	scale_colour_manual(name="", values=c("yellow2","violet","dark blue","orange"), label=c("day","sunrise","night","sunset")) +
+	facet_grid(depth ~ tax.grp) +
 	scale_x_log10() + scale_y_log10() +
-	geom_smooth(method='lm', aes(color=NA)) +
-	theme_bw()
+	geom_smooth(method='lm', aes(y=bm_g_m3, x=sum_NASC), colour="dark grey") +
+	geom_text(data=rsqs, mapping = aes(x=1, y=1e-1, label=rsq), color="dark grey", size=4) +
+	theme_bw() +
+	xlab("total acoustic backscatter (NASC)") + ylab(expression(paste("biomass (",g/m^3,")"))) +
+	ggsave(paste0(pdir,"/nasc_biomass_plot.pdf"), height=5.5, width=7)
 
 # Biomass vs. chlorophyll
-ggplot(p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps"),bm<1e5), 
-	aes(y=bm, x=chl, colour=DNC.visual)) +
+# remotely sensed
+ggplot(p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps")), 
+	aes(y=bm_g_m3, x=chl_rs, colour=DNC.visual)) +
 	geom_point() +
+	scale_x_log10() + scale_y_log10() +
+	scale_colour_manual(name="", values=c("yellow","violet","dark blue","orange"), label=c("day","sunrise","night","sunset")) +
 	facet_grid(cod.end ~ tax.grp) +
-#	scale_x_log10() + scale_y_log10() +
-	geom_smooth(method='lm',aes(color=NA)) +
+	geom_smooth(method='lm',color="dark grey") +
 	theme_bw()
 
+# in situ
+ggplot(p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","salps")), 
+	aes(y=bm_g_m3, x=intChl, colour=DNC.visual)) +
+	geom_point() +
+	scale_x_log10() + scale_y_log10() +
+	scale_colour_manual(name="", values=c("yellow","violet","dark blue","orange"), label=c("day","sunrise","night","sunset")) +
+	facet_grid(cod.end ~ tax.grp) +
+	geom_smooth(method='lm',color="dark grey") +
+	theme_bw()
+
+# really interesting: strong relationships with salps at surface and depth for in-situ chlorophyll; some association for fish
+
 ## Pairs plots!
-	bm.wide <- bm.tax %>% spread(key=tax.grp, value=bm, fill=0)
-	library(GGally)
-	
-	# different taxa
-	bm.wide %>% select(fish, cnidarians, krill, salps, cephalopods) %>% ggpairs() +
-	## not very informative 
+	bm.wide <-  p.d %>% group_by(midoc.stn, tax.grp) %>% summarise(bm_g_m3=(sum(bm, na.rm=T))/sum(swept_m3, na.rm=T)) %>% inner_join(md) %>% spread(key=tax.grp, value=bm_g_m3, fill=0)
+	library(GGally)	
+
+	# GOING ON FROM HERE
+	# move select from below to inner-join step above
 
 	# for each taxon, a splom of env predictors vs. biomass
-	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl, Tmin_depth, DNC.visual, fish) %>% ggpairs() 
-	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl, Tmin_depth, cnidarians) %>% ggpairs() 
-	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl, Tmin_depth, krill) %>% ggpairs() 
-	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl, Tmin_depth, salps) %>% ggpairs() 
-	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl, Tmin_depth, cephalopods) %>% ggpairs() 
+	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl_rs, intChl, Tmin_depth, DNC.visual, fish) %>% ggpairs() 
+	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl_rs, intChl, Tmin_depth, cnidarians) %>% ggpairs() 
+	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl_rs, intChl, Tmin_depth, krill) %>% ggpairs() 
+	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl_rs, intChl, Tmin_depth, salps) %>% ggpairs() 
+	bm.wide %>% select(days_since_melt, distance_to_ice_m, chl_rs, intChl, Tmin_depth, cephalopods) %>% ggpairs() 
 
 	# can add colour to select and ., mapping=ggplot2::aes(colour = cod.end) to plot statement but ugly
 ## fish! models
