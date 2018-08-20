@@ -114,6 +114,15 @@ ce.pa
 saveRDS(ce.pa, "./derived data/midoc_cod-end_fish_presence_absence.rds")
 
 
+# try size distributions quickly with geom_density
+# TODO: get this working, or update joint plot to show facets for depths
+tst<- fl %>% filter(!is.na(fgroup), fgroup%in%c("squid")==F, cod.end%in%as.character(c(1:6))) %>%
+                 select(midoc.stn, cod.end,fgroup, SL.mm) %>%
+                 mutate(SL.mm = as.character(SL.mm))
+grps<- c("Bathylagidae","Electrona","Gymnoscopelus","Krefftichthys anderssoni","Paralepididae","Protomyctophum","squid")
+tst[tst$fgroup%in%grps==F,]$fgroup <- "other fish"
+ggplot(tst, aes(SL.mm, col=fgroup)) + geom_density() + facet_grid(.~cod.end)
+
 # size distributions
 calc_frequency_distribution = function(input_data, the.brks=seq(-4,4,length.out=50), bw.adj=1){
     tmp_hist = hist(input_data, plot=FALSE, breaks=the.brks)

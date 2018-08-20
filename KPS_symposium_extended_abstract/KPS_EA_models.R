@@ -86,10 +86,14 @@ ggplot(p.d %>% filter(tax.grp %in% c("cephalopods","cnidarians","fish","krill","
 # really interesting: strong relationships with salps at surface and depth for in-situ chlorophyll; some association for fish
 
 ## Pairs plots!
-	bm.wide <-  p.d %>% group_by(midoc.stn, tax.grp) %>% summarise(bm_g_m3=(sum(bm, na.rm=T))/sum(swept_m3, na.rm=T)) %>% inner_join(md) %>% spread(key=tax.grp, value=bm_g_m3, fill=0)
+	fbm.wide <-  p.d %>% filter(tax.grp=="fish") %>% group_by(midoc.stn) %>% summarise(bm_g_m3=(sum(bm, na.rm=T))/sum(swept_m3, na.rm=T)) %>% inner_join(md) %>% spread(midoc.stn,value=bm_g_m3, fill=0)
 	library(GGally)	
 
-	# GOING ON FROM HERE
+	# TODO:
+	# GOING ON FROM HERE FOR DSRII paper
+	# change name of this file to KPS_EA_cacht_acoustic
+	# start new script for DSRII, move env predictor stuff to this new script
+
 	# move select from below to inner-join step above
 
 	# for each taxon, a splom of env predictors vs. biomass
