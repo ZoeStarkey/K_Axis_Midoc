@@ -37,7 +37,8 @@ setwd(d)
 # 	# KX16-MIDOC09_020.jpg
 # 	# KX16-MIDOC14_033.jpg
 	
-
+# SL as numeric
+fl$SL.mm <- as.numeric(fl$SL.mm)
 
 # fl[fl$SL.mm>300,] ##  electrona and gymno with impossible measurements
 # # from the following photos
@@ -123,6 +124,8 @@ grps<- c("Bathylagidae","Electrona","Gymnoscopelus","Krefftichthys anderssoni","
 tst[tst$fgroup%in%grps==F,]$fgroup <- "other fish"
 ggplot(tst, aes(SL.mm, col=fgroup)) + geom_density() + facet_grid(.~cod.end)
 
+
+
 # size distributions
 calc_frequency_distribution = function(input_data, the.brks=seq(-4,4,length.out=50), bw.adj=1){
     tmp_hist = hist(input_data, plot=FALSE, breaks=the.brks)
@@ -133,6 +136,19 @@ calc_frequency_distribution = function(input_data, the.brks=seq(-4,4,length.out=
   }
 
 
+# sizes for guoping electrona ageing MS
+sub<- fl %>% filter(fgroup=="Electrona", midoc.stn %in% c("MIDOC02", "MIDOC08", "MIDOC15"), cod.end %in% as.character(1:6))
+
+# plot just for these - does it look like there are multiple species?
+ggplot(sub, aes(SL.mm)) + geom_histogram() + facet_grid(midoc.stn~., scales="free_y")
+ggplot(sub, aes(SL.mm, col=midoc.stn)) + geom_density()
+ggplot(sub, aes(SL.mm)) + geom_density() + facet_grid(midoc.stn~cod.end)
+
+
+sub %>% group_by(midoc.stn) %>% summarize(ml = mean(SL.mm, na.rm=T), sdl = sd(SL.mm,na.rm=t))
+
+
+# plot for size distribution across all catch
 cols<- paste0(brewer.pal(7,"Set2"),99)
 # cols<- brewer.pal(7,"Set2")
 grps<- c("Bathylagidae","Electrona","Gymnoscopelus","Krefftichthys anderssoni","Paralepididae","Protomyctophum","squid")
