@@ -74,8 +74,11 @@ nav <- readRDS("nav_reduced.rds")
 		# convert all kg weights to g
 		# and exclude biomass for trays from calculations (from early shots where trays rather than discards were weighed)
 			SD$wt.g[is.na(SD$wt.g)]<- as.numeric(SD[is.na(SD$wt.g),]$wt.kg)*1000
-			SD$wt.g <- as.numeric(SD$wt.g)*SD$include.in.total
-	
+ 			SD$wt.g<- as.numeric(SD$wt.g)
+ 			SD[(SD$wt.g==0 & as.numeric(SD$wt.kg) > 0 & (is.na(SD$wt.kg)==F)),]$wt.g <- as.numeric(SD[(SD$wt.g==0 & as.numeric(SD$wt.kg) > 0 & (is.na(SD$wt.kg)==F)),]$wt.kg)*1000
+ 			SD$wt.g <- SD$wt.g*SD$include.in.total		
+
+
 	# create full IDs for individuals that were just given numbers to speed data entry
 			# these are rows 
 		ind<- !(grepl("MIDOC", SD$sample.id))&(SD$midoc.stn!="TRIAL")&!(grepl("CE", SD$sample.id)) # index for relevant rows
