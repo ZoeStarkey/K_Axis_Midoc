@@ -2,6 +2,7 @@
 # bubble plots of catch, for inclusion in extended abstract for Kerguelen Plateau symposium
 
 library(tidyverse)
+library(ggpubr)
 
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/derived data")
