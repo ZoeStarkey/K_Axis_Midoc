@@ -150,7 +150,8 @@ points(ktr, type="l", lwd=1)
 # points(km, pch=19, col="green") # all placed midoc went in water
 # points(km[km$midoc.stn%in%c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")==F,], pch=19, col="green") # things where
 points(km, pch=21, bg=(km$DNC.col), cex=1.8, col=km$pcol)
-TeachingDemos::shadowtext(coordinates(km), lab=as.character(km$midoc.n), cex=.5, col=km$pcol, bg="white")
+# TeachingDemos::shadowtext(coordinates(km), lab=as.character(km$midoc.n), cex=.5, col=km$pcol, bg="white")
+text(coordinates(km), lab=as.character(km$midoc.n), cex=.5)
 # can use bg=grDevices::adjustcolor(km$DNC.col, alpha=.6)
 
 g1labs <- graticule_labels(lons=c(150, 120,90,60), xline=180, yline=-55, proj=projection(prj))

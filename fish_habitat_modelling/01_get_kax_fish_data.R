@@ -8,6 +8,10 @@ setwd(d)
 
 fbm <- readRDS("../derived data/codend_fish_biomass.rds")
 
+
+# biomasses below need to be in densities
+
+
 # biomass for Kreffichthys type myctos
 kbm <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end%in%c(as.character(2:6))) %>%
 			   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T))
