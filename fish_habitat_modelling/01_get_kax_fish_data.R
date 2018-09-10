@@ -39,7 +39,9 @@ p3<- ggplot(data=ce, aes(group=CE, y=-max.dep, x=CE)) + geom_boxplot()
 
 ggpubr::ggarange(c(p1,p2,p3), ncol=1)
 
-# because there are hauls where 
+# because there are hauls where the the max depth doesn't align well with the cod-end number; better to re-assign depth bins manually
+
+# double check of the problem midoc stations to bear in mind
 
 #
 # 2) Biomass and abundance for epipelagic (0-200 m)

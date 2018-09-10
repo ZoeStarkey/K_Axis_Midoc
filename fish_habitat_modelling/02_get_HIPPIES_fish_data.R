@@ -12,4 +12,4 @@ hfd <- read_csv("../source data/HIPPIES DB/Fish Data.csv")
 # haul table
 hh <- read_csv("../source data/HIPPIES DB/Fish Data.csv")
 
-#
+# species list table... check if this aligns properly
