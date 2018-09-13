@@ -49,6 +49,8 @@ ggpubr::ggarange(c(p1,p2,p3), ncol=1)
 
 # biomasses below need to be in densities
 	swept.epi <- ce %>% filter(CE==6) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	# note that a hard cut-off of 200m max depth limits this to only 2 stations
+	# the mean for max depth of CE6 is 207.5, and max is 216 - ok to just retain all.
 
 	# biomass for Kreffichthys type myctos
 	kbm.epi <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end == "6" %>%
