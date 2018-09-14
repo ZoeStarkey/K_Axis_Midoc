@@ -53,20 +53,25 @@ ggpubr::ggarange(c(p1,p2,p3), ncol=1)
 	# the mean for max depth of CE6 is 207.5, and max is 216 - ok to just retain all.
 
 	# biomass for Kreffichthys type myctos
-	kbm.epi <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end == "6" %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	kbm.epi <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end == "6") %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.epi) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3) %>% arrange(midoc.stn)
+	kbm.epi[is.na(kbm.epi$bm_m3),]$bm_m3<- 0
+	kbm.epi[is.na(kbm.epi$n_m3),]$n_m3<- 0
 	saveRDS(kbm.epi, "kreff_grp_bm_epi.RDS")
 
 	# biomass for other myctos (primarily electrona and gymno)
-	egbm.epi <- fbm %>% filter(fish.grp%in%c("Electrona sp.", "Gymnoscopelus sp.","unidientified/other myctophid"), cod.end == "6" %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	egbm.epi <- fbm %>% filter(fish.grp%in%c("Electrona sp.", "Gymnoscopelus sp.","unidientified/other myctophid"), cod.end == "6") %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.epi) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3) %>% arrange(midoc.stn)
+	egbm.epi[is.na(egbm.epi$bm_m3),]$bm_m3<- 0
+	egbm.epi[is.na(egbm.epi$n_m3),]$n_m3<- 0
 	saveRDS(egbm.epi, "ele_gymno_grp_bm_epi.RDS")
 
 	# biomass for bathylagiids
-	bbm.epi <- fbm %>% filter(fish.grp%in%c("Bathylagiids"), cod.end == "6" %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	bbm.epi <- fbm %>% filter(fish.grp%in%c("Bathylagiids"), cod.end == "6") %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.epi) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3) %>% arrange(midoc.stn)
+	bbm.epi[is.na(bbm.epi$bm_m3),]$bm_m3<- 0
+	bbm.epi[is.na(bbm.epi$n_m3),]$n_m3<- 0
 	saveRDS(bbm.epi, "bathy_grp_bm_epi.RDS")
-
 
 
 #
@@ -74,24 +79,55 @@ ggpubr::ggarange(c(p1,p2,p3), ncol=1)
 #
 
 # biomasses below need to be in densities
-	swept.meso <- ce %>% filter(CE%in%c(2:5)) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	swept.meso <- ce %>% filter(CE%in%c(4:5)) %>% filter(max.dep<650) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	# code end classifications for depth are OK, apart from MIDOC02, where CE4 went to 948m
 
 	# biomass for Kreffichthys type myctos
-	kbm.meso <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end %in% c(as.character(2:5)) %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	kbm.meso <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end %in% c(as.character(2:5))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.meso) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	kbm.meso[is.na(kbm.meso$bm_m3),]$bm_m3<- 0
+	kbm.meso[is.na(kbm.meso$n_m3),]$n_m3<- 0
 	saveRDS(kbm.meso, "kreff_grp_bm_meso.RDS")
 
 	# biomass for other myctos (primarily electrona and gymno)
-	egbm.meso <- fbm %>% filter(fish.grp%in%c("Electrona sp.", "Gymnoscopelus sp.","unidientified/other myctophid"), cod.end %in% c(as.character(2:5)) %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	egbm.meso <- fbm %>% filter(fish.grp%in%c("Electrona sp.", "Gymnoscopelus sp.","unidientified/other myctophid"), cod.end %in% c(as.character(2:5))) %>%  filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.meso) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	
+	egbm.meso[is.na(egbm.meso$bm_m3),]$bm_m3<- 0
+	egbm.meso[is.na(egbm.meso$n_m3),]$n_m3<- 0
 	saveRDS(egbm.meso, "ele_gymno_grp_bm_meso.RDS")
 
 	# biomass for bathylagiids
-	bbm.meso <- fbm %>% filter(fish.grp%in%c("Bathylagiids"), cod.end %in% c(as.character(2:5)) %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	bbm.meso <- fbm %>% filter(fish.grp%in%c("Bathylagiids"), cod.end %in% c(as.character(2:5))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.meso) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	bbm.meso[is.na(bbm.meso$bm_m3),]$bm_m3<- 0
+	bbm.meso[is.na(bbm.meso$n_m3),]$n_m3<- 0
 	saveRDS(bbm.meso, "bathy_grp_bm_meso.RDS")
 
 
 #
 # 4) Biomass and abundance for upper bathypelagic (600-1000 m)
 #
+swept.ubathy <- ce %>% filter(CE%in%c(2:3)) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+
+	# biomass for Kreffichthys type myctos
+	kbm.ubathy <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end %in% c(as.character(2:3))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	kbm.ubathy[is.na(kbm.ubathy$bm_m3),]$bm_m3<- 0
+	kbm.ubathy[is.na(kbm.ubathy$n_m3),]$n_m3<- 0
+	saveRDS(kbm.ubathy, "kreff_grp_bm_ubathy.RDS")
+
+	# biomass for other myctos (primarily electrona and gymno)
+	egbm.ubathy <- fbm %>% filter(fish.grp%in%c("Electrona sp.", "Gymnoscopelus sp.","unidientified/other myctophid"), cod.end %in% c(as.character(2:3))) %>%  filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	
+	egbm.ubathy[is.na(egbm.ubathy$bm_m3),]$bm_m3<- 0
+	egbm.ubathy[is.na(egbm.ubathy$n_m3),]$n_m3<- 0
+	saveRDS(egbm.ubathy, "ele_gymno_grp_bm_ubathy.RDS")
+
+	# biomass for bathylagiids
+	bbm.ubathy <- fbm %>% filter(fish.grp%in%c("Bathylagiids"), cod.end %in% c(as.character(2:3))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	bbm.ubathy[is.na(bbm.ubathy$bm_m3),]$bm_m3<- 0
+	bbm.ubathy[is.na(bbm.ubathy$n_m3),]$n_m3<- 0
+	saveRDS(bbm.ubathy, "bathy_grp_bm_ubathy.RDS")
