@@ -64,7 +64,7 @@ hmd <- hfd %>% filter(`Gear Type`==35)
 
 	hp_bm_layer <- hmd %>% group_by(HaulID, sp, depth.strat) %>% summarise(bm_sp_tot=sum(`Weight (g)`))
 	
-	# going forward: check that there's just one unique swept value for each combination of depth strat and haul - a sanity check of number of rows  * distance / first value or something along those lines
+	# going forward: check that there's just one unique swept value for each combination of depth strat and haul - a sanity check of number of rows  * distance / first value or something along those lines 
 	layer_swept <- hmd %>% group_by(HaulID,depth.strat) %>% summarise(swept=)
 	
 	# correct to densities
