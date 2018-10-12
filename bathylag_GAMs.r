@@ -118,4 +118,7 @@ t2
 
 ##top model is SSHa
 summary(m1.6)
+summary(m2.1)$dev.expl
 summary(m1.6)$dev.expl
+
+save(m1.6, file="~/kaxis/fish_habitat_modelling/bathy_gam.RData")

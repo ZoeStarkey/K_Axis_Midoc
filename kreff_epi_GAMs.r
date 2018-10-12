@@ -185,6 +185,7 @@ summary(m3.8)$dev.expl
 ####top model is DSM+ssh
 summary(m2.5)
 summary(m2.5)$dev.expl
+save(m2.5, file="~/kaxis/fish_habitat_modelling/kref_epi_gam.Rdata")
 
 
 

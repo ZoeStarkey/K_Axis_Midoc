@@ -112,3 +112,6 @@ t2
 
 #Adding a second trerm doesn't improve the model
 #top model is m1.6 - ssha
+summary(m1.6)
+summary(m1.6)$dev.expl
+save(m1.6, file="~/kaxis/fish_habitat_modelling/bathy_ubathy_gam.Rdata")

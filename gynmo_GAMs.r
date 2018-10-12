@@ -180,4 +180,7 @@ summary(m3.5)$dev.expl
 
 
 ####top model is DSM+sstg+ssha
+save(m3.5, file="~/kaxis/fish_habitat_modelling/gymno_gam.Rdata")
+
+
 

@@ -80,6 +80,9 @@ m.chl<- mean(readchla(m$dates, xylim=extent(mras), algorithm  = "johnson"), na.r
 mchl <- resample(m.chl, mras, method = "bilinear")##Fit to k-axis grid
 plot(mchl)
 
+#################################################################
+##read in time since melt
+readderivice(m$dates, time.resolution = c("daily"), product = c("time_since_melt"), xylim = extent(mras))
 ################################################################
 ## make a stack of all envornmental layers
 env.stck <- stack(stat, msst, msstg, mssh, mssha, vssha, mwind, mcurr, mice, mchl)

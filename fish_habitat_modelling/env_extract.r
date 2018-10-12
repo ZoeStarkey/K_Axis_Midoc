@@ -13,6 +13,8 @@ coordinates(m1) <- c("lon_start", "lat_start")
 projection(m1) <- "+proj=longlat +datum=WGS84"
 projection(env.stck) <- "+proj=longlat +datum=WGS84"
 
+saveRDS(env.stk, file="~/kaxis/fish_habitat_modelling/env_stk.rds")
+
 ##exctract varaibles and add to the station data
 m1$bathy <- extract(env.stck$bathy, m1, method="bilinear")
 m1$bath_g <- extract(env.stck$bath_g, m1, method="bilinear")

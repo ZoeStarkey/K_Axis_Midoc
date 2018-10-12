@@ -167,7 +167,7 @@ t3
 ##top moldel is m2.6
 summary(m2.6)
 summary(m2.6)$dev.expl
-
+save(m2.6, file="~/kaxis/fish_habitat_modelling/kref_ubathy_gam.Rdata")
 
 
 
