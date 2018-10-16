@@ -81,7 +81,7 @@ plot(mchl)
 
 dsm <- mean(readderivice(unique(m$dates), time.resolution = c("daily"), product = c("time_since_melt")), na.rm=TRUE)
 mdsm<- projectRaster(dsm, mras)
-mdsm[mdsm > (364*1)] <- 364*1 ##remove locations where ice has not been present for a year (or 2)
+#mdsm[mdsm > (364*1)] <- 364*1 ##remove locations where ice has not been present for a year (or 2)
 plot(mdsm)
 
 #################################################################
