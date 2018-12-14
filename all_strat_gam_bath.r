@@ -54,7 +54,7 @@ mb1 <- gam(bathy_b2~s(sol_pos, bs="cs", by = strat)+
                    s(ssh_s, bs="cs", by = strat)+
 #                   s(curr_s, bs="cs", by=strat),
                    s(dtie_s, bs="cs", by = strat), 
-                   family="nb", select=TRUE, data=p)
+                   family="nb", select=TRUE, data=p[p$strat !="epi",])
 AICc(m.null)
 AICc(mb1)
 summary(mb1)
@@ -67,11 +67,11 @@ bc <- rasterToContour(env_data[["bathy"]])
 vnames <- c("bathy", "ssh", "dtie")
 v <- env_data[[which(names(env_data) %in% vnames)]]
 vd <- as.data.frame(v, xy=T)
-ndat_epi <- data.frame(bathy_s=scale(vd$bathy, center=T, scale=T),
-                   ssh_s=scale(vd$ssh, center=T, scale=T),
-                   dtie_s=scale(vd$dtie, center=T, scale=T),
-                   sol_pos=16,
-                   strat="epi")
+#ndat_epi <- data.frame(bathy_s=scale(vd$bathy, center=T, scale=T),
+#                   ssh_s=scale(vd$ssh, center=T, scale=T),
+#                   dtie_s=scale(vd$dtie, center=T, scale=T),
+#                   sol_pos=16,
+#                   strat="epi")
 ndat_meso <- data.frame(bathy_s=scale(vd$bathy, center=T, scale=T),
                        ssh_s=scale(vd$ssh, center=T, scale=T),
                        dtie_s=scale(vd$dtie, center=T, scale=T),
@@ -82,27 +82,27 @@ ndat_ubathy <- data.frame(bathy_s=scale(vd$bathy, center=T, scale=T),
                        dtie_s=scale(vd$dtie, center=T, scale=T),
                        sol_pos=16,
                        strat="ubathy")
-vd$pred_epi <- predict(mb1, ndat_epi)
+#vd$pred_epi <- predict(mb1, ndat_epi)
 vd$pred_meso <- predict(mb1, ndat_meso)
 vd$pred_ubathy <- predict(mb1, ndat_ubathy)
 
 pdf("~/kaxis/fish_habitat_modelling/bathy_preds.pdf", paper="a4r", height=7.4, width=9.8)
 par(mfrow=c(2,2), mar=c(3,4,3,6))
 
-bath_epi_pred <- setValues(env_data[[1]],as.vector(vd$pred_epi))
-mn <- format(cellStats(bath_epi_pred, mean, na.rm=T), digits=2)
-tit <- paste("Bathylagids: Epi ",mn  )
-plot(bath_epi_pred, col=viridis(100), zlim=c(2.6, 5.5), axes=F, main=tit)
-plot(f3$finished$geometry[1:5], add=T,col="grey",lwd=3,lty=5) #SBdy
-plot(bc, add=T)
-points(p$lon_start, p$lat_start, cex=1.0, col="red")
-degAxis(1)
-degAxis(2, las=2)
+#bath_epi_pred <- setValues(env_data[[1]],as.vector(vd$pred_epi))
+#mn <- format(cellStats(bath_epi_pred, mean, na.rm=T), digits=2)
+#tit <- paste("Bathylagids: Epi ",mn  )
+#plot(bath_epi_pred, col=viridis(100), zlim=c(2.6, 5.5), axes=F, main=tit)
+#plot(f3$finished$geometry[1:5], add=T,col="grey",lwd=3,lty=5) #SBdy
+#plot(bc, add=T)
+#points(p$lon_start, p$lat_start, cex=1.0, col="red")
+#degAxis(1)
+#degAxis(2, las=2)
 
 bath_meso_pred <- setValues(env_data[[1]],as.vector(vd$pred_meso))
 mn <- format(cellStats(bath_meso_pred, mean, na.rm=T), digits=2)
 tit <- paste("Bathylagids: Meso ",mn  )
-plot(bath_meso_pred, col=viridis(100), zlim=c(2.6, 5.5), axes=F, main=tit)
+plot(bath_meso_pred, col=viridis(100), zlim=c(6, 8), axes=F, main=tit)
 plot(f3$finished$geometry[1:5], add=T,col="grey",lwd=3,lty=5) #SBdy
 plot(bc, add=T)
 points(p$lon_start, p$lat_start, cex=1.0, col="red")
@@ -112,14 +112,16 @@ degAxis(2, las=2)
 bath_ubathy_pred <- setValues(env_data[[1]],as.vector(vd$pred_ubathy))
 mn <- format(cellStats(bath_ubathy_pred, mean, na.rm=T), digits=2)
 tit <- paste("Bathylagids: Ubathy ",mn  )
-plot(bath_ubathy_pred, col=viridis(100), zlim=c(2.6, 5.5), axes=F, main=tit)
+plot(bath_ubathy_pred, col=viridis(100), zlim=c(6, 8), axes=F, main=tit)
 plot(f3$finished$geometry[1:5], add=T,col="grey",lwd=3,lty=5) #SBdy
 plot(bc, add=T)
 points(p$lon_start, p$lat_start, cex=1.0, col="red")
 degAxis(1)
 degAxis(2, las=2)
 
-bath_tot_pred <- sum(bath_epi_pred, bath_meso_pred, bath_ubathy_pred)
+#bath_tot_pred <- sum(bath_epi_pred, bath_meso_pred, bath_ubathy_pred)
+bath_tot_pred <- sum(bath_meso_pred, bath_ubathy_pred)
+
 mn <- format(cellStats(bath_tot_pred, mean, na.rm=T), digits=2)
 tit <- paste("Bathylagids: Total Biomass ",mn  )
 plot(bath_tot_pred, col=viridis(100), axes=F, main=tit)
@@ -131,5 +133,5 @@ degAxis(2, las=2)
 dev.off()
 
 
-save(mb1, bath_epi_pred, bath_meso_pred, bath_ubathy_pred, bath_tot_pred, file="~/kaxis/fish_habitat_modelling/gam_fit_bath_all_strata.Rdata")
+save(mb1, bath_meso_pred, bath_ubathy_pred, bath_tot_pred, file="~/kaxis/fish_habitat_modelling/gam_fit_bath_all_strata.Rdata")
 

@@ -17,13 +17,13 @@ prey <- merge(kreff_grp_bm_meso[,c("midoc.stn", "n_m3", "bm_m3")],
 prey <- merge(prey, 
               ele_gymno_grp_bm_meso[,c("midoc.stn", "n_m3", "bm_m3")], 
               by.x="midoc.stn", by.y="midoc.stn", all.x=T)
-names(prey) <- c("midoc.stn", "kref_b", "kref_n", "bathy_b", "bathy_n", "gymno_b", "gymno_n")
+names(prey) <- c("midoc.stn", "kref_n", "kref_b", "bathy_n", "bathy_b", "gymno_n", "gymno_b")
 
 ##merge with environmental data
 prenv <- merge(stat_e, prey, by.x="midoc.stn", by.y="midoc.stn", all.x=T)
 
 ##drop stations with no prey data
-prenv <- prenv[!is.na(prenv$kref_b),]
+prenv <- prenv[!is.na(prenv$kref_n),]
 
 
 #Add solar angle
