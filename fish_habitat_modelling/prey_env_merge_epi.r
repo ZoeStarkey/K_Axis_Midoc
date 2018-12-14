@@ -8,7 +8,7 @@ ele_gymno_grp_bm_epi <- readRDS("~/kaxis/fish_habitat_modelling/ele_gymno_grp_bm
 bathy_grp_bm_epi <- readRDS("~/kaxis/fish_habitat_modelling/bathy_grp_bm_epi.RDS")
 
 ##merge the environmental data sets
-stat_e <- merge(station_env, station_e[,c("midoc.stn","chl_rs", "days_since_melt", "distance_to_edge_m")], by.x="midoc.stn", by.y="midoc.stn", all.x=T)
+stat_e <- merge(station_env, station_e[,c("midoc.stn","chl_rs")], by.x="midoc.stn", by.y="midoc.stn", all.x=T)
 
 ##merge the indiv prey datset sequentially (diff number of row in dataframes)
 prey <- merge(kreff_grp_bm_epi[,c("midoc.stn", "n_m3", "bm_m3")], 
@@ -24,5 +24,14 @@ prenv <- merge(stat_e, prey, by.x="midoc.stn", by.y="midoc.stn", all.x=T)
 
 ##drop stations with no prey data
 prenv <- prenv[!is.na(prenv$kref_b),]
+
+#Add solar angle
+source("~/kaxis/fish_habitat_modelling/DNid.R")
+dat <- prenv[,c("dates", "lon_start", "lat_start")]
+names(dat) <- c("date", "lon", "lat")
+dat$date <- as.POSIXct(dat$date)
+x <- DNid(dat)
+prenv$sol_pos <- x$sol_pos
+prenv$diel <- x$diel
 
 saveRDS(prenv, file="~/kaxis/fish_habitat_modelling/prey_env_epi.rds")

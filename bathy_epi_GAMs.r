@@ -170,3 +170,5 @@ t3
 #top model is DSM+ssh
 summary(m2.5)
 summary(m2.5)$dev.expl
+
+save(m2.5, file="~/kaxis/fish_habitat_modelling/bathy_epi_gam.Rdata")

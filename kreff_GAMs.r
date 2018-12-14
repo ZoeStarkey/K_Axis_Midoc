@@ -110,7 +110,10 @@ t2 <- data.frame(env=c("null",
 t2 <- t2[order(t2$AICc),]
 t2$delta <- c(0, diff(t2$AICc))
 t2
-summary(m2.6)
+
+summary(m1.5)$dev.exp
+summary(m2.6)$dev.exp
+
 par(mfrow=c(2,2))
 gam.check(m2.6)
 plot(m2.6, scale=0, page=1)
@@ -120,38 +123,5 @@ plot(m2.6, scale=0, page=1)
 summary(m1.5)
 summary(m1.5)$dev.expl
 
-#####################################################################
-
-##three terms
-m3.1 <- gam(kref_b~s(ssha, k=8, bs="cs")+
-                   s(bathy, k=8, bs="cs")+
-                   s(bath_g, k=8, bs="cs"), family="nb", data=p)
-m3.2 <- gam(kref_b~s(ssha, k=8, bs="cs")+
-                   s(bathy, k=8, bs="cs")+
-                   s(sst), family="nb", data=p)
-m3.3 <- gam(kref_b~s(ssha, k=8, bs="cs")+
-                   s(bathy, k=8, bs="cs")+
-                   s(sstg, k=8, bs="cs"), family="nb", data=p)
-m3.4 <- gam(kref_b~s(ssha, k=8, bs="cs")+
-                   s(bathy, k=8, bs="cs")+
-                   s(vssha, k=8, bs="cs"), family="nb", data=p)
-
-##calculate AICc
-t3 <- data.frame(env=c("null",
-                       "ssha+bathy+bath_g", 
-                       "ssha+bathy+sst", 
-                       "ssha+bathy+sstg", 
-                       "ssha+bathy+vssha"), 
-                 AICc=c(AICc(m.null), AICc(m3.1), AICc(m3.2), AICc(m3.3), AICc(m3.4)))
-t3 <- t3[order(t3$AICc),]
-t3$delta <- c(0, diff(t3$AICc))
-t3
-summary(m3.4)
-par(mfrow=c(2,2))
-gam.check(m2.1)
-plot(m2.1, scale=0, page=1)
-
-summary(m2.1)
-
-####top model is 2.1
+save(m1.5, file="~/kaxis/fish_habitat_modelling/kref_gam.Rdata")
 

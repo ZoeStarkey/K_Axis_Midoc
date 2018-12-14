@@ -114,3 +114,4 @@ t2
 ##top model is m1.11 - dtie
 summary(m1.11)
 summary(m1.11)$dev.expl
+save(m1.11, file="~/kaxis/fish_habitat_modelling/gymno_epi_gam.Rdata")

@@ -122,5 +122,6 @@ summary(m2.1)$dev.expl
 summary(m1.5)
 summary(m1.5)$dev.expl
 
+save(m1.5, file="~/kaxis/fish_habitat_modelling/kref_meso_gam.Rdata")
 
 

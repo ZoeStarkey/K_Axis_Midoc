@@ -1,4 +1,4 @@
-##run preiminasy GAMs on non-depth structured prey data
+##run preiminary GAMs on non-depth structured prey data
 ##uses "prey_env"
 rm(list=ls(all=TRUE))
 library(raster)
@@ -66,4 +66,7 @@ t1 <- t1[order(t1$AICc),]
 t1$delta <- c(0, diff(t1$AICc))
 t1
 
-##no term is particullry significant...
+##no term is particularly significant...
+
+save(m.null, file="~/kaxis/fish_habitat_modelling/bathy_meso_gam.Rdata")
+

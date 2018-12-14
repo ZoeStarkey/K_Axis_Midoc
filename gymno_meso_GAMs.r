@@ -114,3 +114,5 @@ t2
 ##top model is m1.9 - days since melt
 summary(m1.9)
 summary(m1.9)$dev.expl
+
+save(m1.9, file="~/kaxis/fish_habitat_modelling/gymno_meso_gam.Rdata")

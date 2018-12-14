@@ -20,7 +20,7 @@ m$dates <- strftime(m$start_time, "%Y-%m-%d", tz="UMT")
 
 ##############################################################
 ##read in the SST 
-sst <- readsst(m$dates, xylim=extent(mras), lon180 = FALSE) #uses the extent of the original, un-projected trip grid
+sst <- readsst(unique(m$dates), xylim=extent(mras), lon180 = FALSE) #uses the extent of the original, un-projected trip grid
 m.sst <- mean(sst)
 msst <- resample(m.sst, mras, method = "bilinear") ##Fit to k-axis grid
 plot(msst)
@@ -33,14 +33,14 @@ plot(msstg)
 
 ###################################################################
 ##read in the SSHa
-ssh <-readssh(m$dates, xylim=extent(mras), ssha=F, lon180 = FALSE)
+ssh <-readssh(unique(m$dates), xylim=extent(mras), ssha=F, lon180 = FALSE)
 mssh <- mean(ssh, na.rm=T)
 mssh <- resample(mssh, mras, method = "bilinear")##Fit to k-axis grid
 plot(mssh)
 
 ###################################################################
 ##read in the SSHa
-ssha <-readssh(m$dates, xylim=extent(mras), ssha=T, lon180 = FALSE)
+ssha <-readssh(unique(m$dates), xylim=extent(mras), ssha=T, lon180 = FALSE)
 mssha <- mean(ssha, na.rm=T)
 mssha <- resample(mssha, mras, method = "bilinear")##Fit to k-axis grid
 plot(mssha)
@@ -53,36 +53,57 @@ plot(vssha)
 
 ###################################################
 ##read in the wind
-wind <- mean(readwind(m$dates, xylim=extent(mras), magonly = TRUE, lon180 = FALSE), na.rm=T)
+wind <- mean(readwind(unique(m$dates), xylim=extent(mras), magonly = TRUE, lon180 = FALSE), na.rm=T)
 mwind <- resample(wind, mras, method = "bilinear")##Fit to k-axis grid
 plot(mwind)
 
 ##################################################################
 ##read in the currents
-m.curr <- mean(readcurr(m$dates, xylim=extent(mras), magonly = TRUE, lon180 = FALSE ), na.rm=T)
+m.curr <- mean(readcurr(unique(m$dates), xylim=extent(mras), magonly = TRUE, lon180 = FALSE ), na.rm=T)
 mcurr <- resample(m.curr, mras, method = "bilinear")##Fit to k-axis grid
 plot(mcurr)
 
 ##################################################################
 ##read in the ice
-ice <- mean(readice(m$dates), na.rm=T)
-rd3points <-  rasterToPoints(mras, spatial = TRUE)
-mice <- extract(ice, rd3points, method = "bilinear")##Fit to k-axis grid
-mice <- setValues(mras, mice)
-mice <- projectRaster(mice, crs=projection(mras)) 
+ice <- mean(readice(unique(m$dates)), na.rm=T)
+mice <- projectRaster(ice, mras) 
 mice[mice==0] <- NA
-mice <- resample(mice, mras, method = "bilinear")##Fit to k-axis grid
 plot(mice)
 
 ##################################################################
 ##read in the chla
-m.chl<- mean(readchla(m$dates, xylim=extent(mras), algorithm  = "johnson"), na.rm=T)
+m.chl<- mean(readchla(unique(m$dates), xylim=extent(mras), algorithm  = "johnson"), na.rm=T)
 mchl <- resample(m.chl, mras, method = "bilinear")##Fit to k-axis grid
 plot(mchl)
 
+#################################################################
+##read in time since melt
+
+dsm <- mean(readderivice(unique(m$dates), time.resolution = c("daily"), product = c("time_since_melt")), na.rm=TRUE)
+mdsm<- projectRaster(dsm, mras)
+#mdsm[mdsm > (364*1)] <- 364*1 ##remove locations where ice has not been present for a year (or 2)
+plot(mdsm)
+
+#################################################################
+##read in distance ot ice edge
+  readDTIE <- function(date) {
+    out <- lapply(1:length(date), function(i){
+      cat(sprintf('\nprocessing %d of %d\n',i,length(date))); flush.console()
+      dist <- distance_to_ice_edge(unique(date[i]), threshold = 15)
+      tmp <- list(file=dist)
+    })
+    out
+  } 
+
+d <- readDTIE(unique(m$dates))
+tmp <- lapply(d, function(x) x$file)
+dtie <- do.call(stack, tmp) 
+dtie <- mean(dtie, na.rm=TRUE)
+mdtie<- projectRaster(dtie, mras)
+plot(mdtie)
 ################################################################
 ## make a stack of all envornmental layers
-env.stck <- stack(stat, msst, msstg, mssh, mssha, vssha, mwind, mcurr, mice, mchl)
-names(env.stck) <- c("bathy", "bath_g", "v_vel500", "sst", "sstg", "ssh", "ssha", "vssha", "wind", "curr", "ice", "chl")
+env.stck <- stack(stat, msst, msstg, mssh, mssha, vssha, mwind, mcurr, mice, mchl, mdsm, mdtie)
+names(env.stck) <- c("bathy", "bath_g", "v_vel500", "sst", "sstg", "ssh", "ssha", "vssha", "wind", "curr", "ice", "chl", "dsm", "dtie")
 
 saveRDS(env.stck, file="~/kaxis/fish_habitat_modelling/env_data.rds")

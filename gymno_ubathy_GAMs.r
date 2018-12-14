@@ -66,3 +66,4 @@ t1 <- t1[order(t1$AICc),]
 t1$delta <- c(0, diff(t1$AICc))
 t1
 ##no relationship
+save(m.null, file="~/kaxis/fish_habitat_modelling/gymno_ubathy_gam.Rdata")
