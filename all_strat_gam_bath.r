@@ -30,9 +30,14 @@ prenv$dtie_s<- scale(prenv$dtie, center=T, scale=T)
 
 ##examine environmental data for inter-correrlations
 p <- data.frame(prenv)
-m <- cor(p[,c(33:36)])
+m <- cor(p[,c(11,16, 19, 22)])
 m
-corrplot(m, method = "circle", cl.pos = "n")
+pdf("~/kaxis/fish_habitat_modelling/corr_mat.pdf", paper="a4r", height=4.4, width=9.8)
+par(mfrow=c(1,1), oma=c(1,1,1,1))
+corrplot(m, type = "upper", tl.pos="d")
+corrplot(m, add = TRUE, type = "lower", method = "number",
+         col = "black", diag = FALSE, tl.pos = "n", cl.pos = "n")
+dev.off()
 
 #Examine distribution of response variables
 par(mfrow=c(1,1))
