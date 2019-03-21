@@ -4,9 +4,8 @@
 \usepackage{natbib}
 \usepackage{textcomp}
 \usepackage{hyperref}
-\usepackage{longtable,booktabs}
-\usepackage{rotating}
 \usepackage{lineno}
+\usepackage{graphicx}
 \usepackage[tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm]{geometry}
 
 \begin{document}
@@ -28,7 +27,7 @@ Rowan Trebilco\textsuperscript{1*},
 Andrea Walters\textsuperscript{1,2},
 Mark Hindell\textsuperscript{1,2},
 Jess Melbourne-Thomas\textsuperscript{3},
-Sophie Bestley\textsuperscript{4},
+Sophie Bestley\textsuperscript{2},
 Martin Cox\textsuperscript{3},
 Sven Gastauer\textsuperscript{1},
 Andrew Constable\textsuperscript{3}
@@ -37,7 +36,7 @@ Andrew Constable\textsuperscript{3}
 \textsuperscript{1} Antarcitc Climate \& Ecosystems CRC, University of Tasmania, Australia\\
 \textsuperscript{2} Institute of Marine and Antarctic Studies, University of Tasmania\\ 
 \textsuperscript{3} Australian Antarctic Division, Kingston, Tasmania\\ 
-\textsuperscript{4} CSIRO Oceans \& Atmosphere, Hobart, Tasmania
+% \textsuperscript{4} CSIRO Oceans \& Atmosphere, Hobart, Tasmania
 
 \textsuperscript{*}Corresponding author:\\
 Antarctic Climate and Ecosystems CRC\\
@@ -52,10 +51,17 @@ email:rowan.trebilco@utas.edu.au\\
 \section{Introduction}
 \linenumbers
 
-The fish, cephalopods, crustaceans, salps, jellies and other macrozooplankton that inhabit the upper 1000 m of the open oceans (hereafter collectively termed micronekton) represent a key area of uncertainty in our understanding of the structure and function of marine ecosystems worldwide (St. John, Young, IMBER).
-These groups provide the pathways by which energy and biomass makes its way from primary producers to large consumers at higher trophic-levels (including marine mammals, seabirds, and commercially important fishes), and they collectively dominate the total abundance and biomass of complex metazoan life in the ocean (PNAS biomass paper; Irigoien).
-However,  
-Particularly true in the southern ocean
+The fishes, cephalopods, crustaceans, salps, cnidarians and other macrozooplankton that inhabit the upper 1000 m of the open oceans (hereafter collectively termed micronekton) represent a key area of uncertainty in our understanding of the structure and function of marine ecosystems worldwide \citep{StJohn:2016cr,Young:2015}.
+These mid trophic-level groups support the passage of energy and biomass from primary producers to large consumers at higher trophic-levels (including marine mammals, seabirds, and commercially important fishes), and they collectively dominate the total abundance and biomass of complex metazoan life in the ocean \cite{BarOn:2018bj,Irigoien:2014}.
+Despite increasing recognition of the importance of micronekton, major gaps remain in our understanding of the ecology of these groups; notably regarding their distribution, abundance, biomass and trophodynamics \cite{Young:2015,Newman:SOOS_CWP,Davison:2015fq}. 
+This is in large part because of the difficulties of sampling and observing the mid-water zone, but also because observations have been patchy in space and time \cite{Kaartvedt:2012ji,Newman:SOOS_CWP}.
+
+In the Southern Ocean, micronekton support wildlife populations including whales, penguins, seals, and seabirds, valuable fisheries (both directly in the case of krill, and indirectly as the main prey of toothfish) ... important role in carbon export
+
+Attention has focused on top 200 m
+Lack of information regarding both the distribution of mesopelagic or
+
+These challenges for 
 
 Previous studies of micronekton have mainly focused
 
@@ -63,9 +69,6 @@ The
 K-axis as a region of particular interest to Australia
 
 This study: an overview of mesopelagic community structure
-
-
-
 
 Previous studies have focused on distributions and associations of individual taxa and/or functional groups. 
 While of great value for ... biogeography... 
@@ -112,7 +115,7 @@ TODO: say something more here
 Results fig 1: bubble plots of catch per station
 	TODO: add SB oceanographic zones
 
-Results fig 2: 
+Results fig 2: ,
 
 \section{Discussion}
 
@@ -123,13 +126,21 @@ Biomass density from night RMT8 and RMT25 hauls was 3.04g/1000m3 (Collins et al 
 From RMT25 catches, density per m2 in stratum of 0-1000m has ranged from ~1.6 to 15 gm.m-2 (Collins et al 2008, Chindova 1987, Filin et al. 1990, Kozlov et al 1990)
 
 
+- particularly fishy stations: 15, 23,27 (28 deep, 3 shallow)
+
+- big krill site was Midoc 8. 275 kg of krill all in CE1. Total swept volume for all 6 cod ends at this site was 4466791; for density of 0.062 g/m3.
+
+Collins 2012:
+"Bathylagids were patchily distributed, but were abundant in the lower mesopelagic zone (4400 m) and are potentially significant zooplankton consumers"
+"The ecological role of the bathylagids is poorly known but, given the abundance of this family, studies of their role as both predator and prey should be a high priority."
+
 \section{Acknowledgements}
 Data presented here were collected on the RV Aurora Australis as part of the Kerguelen Axis ecosystem study. This study was carried out under the Australian Antarctic Science Program (AAS project 4344) with funding and logistical support from the Australian Antarctic Division, Department of Energy and Environment, and with support of the Antarctic Gateway Partnership (Project ID SR140300001) Australia and the Australian Governments Cooperative Research Centres Programme, through the Antarctic Climate and Ecosystems CRC. We thank the Science Technical Support Team of the Australian Antarctic Division and the master and crew of the Aurora Australis for their hard work and professionalism.  RT was supported by the RJL Hawke Postdoctoral Fellowship (AAS 4366).
 
 \section{References}
-\renewcommand\refname{}
-\bibliographystyle{./bib/mee} 
-\renewcommand{\section}[2]{}
-\bibliography{./bib/biblio.bib}
+% \renewcommand\refname{}
+\bibliographystyle{mee} 
+% \renewcommand{\section}[2]{}
+\bibliography{jshort,KAX_biblio}
 
 \end{document}
