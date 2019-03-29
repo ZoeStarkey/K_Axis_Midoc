@@ -42,6 +42,12 @@ ggplot(all_bm, aes(y=bm_m3, strat_m)) +
 		theme_light() +
 		theme(strip.text = element_text(face = "italic")) +
 		labs(x="depth (m)",y= expression("biomass (g."~m^-3*")"))
+
 ggsave("biomass_boxplots.pdf", height=2.6, width=7)
 
-# histograms for size range in each depth zone
+# Figure 2
+# Day-night vertical distributions (means and standard deviations) of biomass-dominant fish of the genera (a) Krefftichthys, (b) Protomyctophum, (c) Electrona, (d) Gymnoscopelus and (e) Bathylagus for the three depth strata during the summer period (January-February) of Kerguelen-Axis program
+
+
+# Figure 4
+# Fig. 4. Percentage occurrence of midwater fish taxa in all net hauls (gray line) and in Myctophid and Bathylagid samples kept for GAMs (blackline) for the southern Kerguelen Plateau in the Indian sector of the Southern Ocean.
