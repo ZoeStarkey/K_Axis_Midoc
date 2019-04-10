@@ -14,7 +14,7 @@ setwd(d)
 		
 # readMIDOC_fish_photo_measuring_9Oct2017.xlsx
 	# sample data
-	f <- "./source data/MIDOC_fish_photo_measuring_9Oct2017.xlsx"
+	f <- "./source data/MIDOC_fish_photo_measuring_9Apr2019.xlsx"
 	fl <- read_xlsx(f)
 	colnames(fl)<- c("midoc.stn", "cod.end", "n.in.photo", "photo.label", "SL.mm", "sample.label", "taxon", "tax.group", "taxon.uncertain", "notes", "measured.by")
 
@@ -24,6 +24,10 @@ setwd(d)
 # processing and checks
 	# merge/simplify taxa into fish.groups
 	fl$fgroup <- tk$fish_group[match(fl$taxon, tk$recorded)]
+
+# check for taxa that need to be added to the key
+# (these were fixed in 9-April-2019)
+fl %>% filter(is.na(fgroup)) %>% distinct(taxon) %>% data.frame()	
 
 # # checking sizes
 # hist(fl$SL.mm) # shows quite a few fish seem to have unrealistic sizes			
@@ -84,6 +88,8 @@ md.pa <- fl %>% filter(!is.na(fgroup), fgroup%in%c("squid","other fish", "larval
 				complete(midoc.stn, nesting(fgroup))
 md.pa[is.na(md.pa$PA),]$PA <- 0
 md.pa
+
+# gonostomatidae were not counted in most photos; add stations to
 
 # join this with station data
 md.pa <- readRDS("./derived data/midoc_stations_checked.rds") %>% select(midoc.stn, start_time, lat_start, lon_start) %>% inner_join(md.pa)
