@@ -13,7 +13,7 @@ bathy_grp_bm_epi$strat<- "epi"
 bathy_grp_bm_meso$strat<-"meso"
 bathy_grp_bm_ubathy$strat<-"ubathy"
 bathy_bm<- bind_rows(bathy_grp_bm_epi,bathy_grp_bm_meso,bathy_grp_bm_ubathy)
-bathy_bm$taxon <- "Bathylagus"
+bathy_bm$taxon <- "Bathylagidae"
 
 ele_gymno_grp_bm_epi<- readRDS("ele_gymno_grp_bm_epi.RDS")
 ele_gymno_grp_bm_meso<- readRDS("ele_gymno_grp_bm_meso.RDS")
@@ -22,7 +22,7 @@ ele_gymno_grp_bm_epi$strat<- "epi"
 ele_gymno_grp_bm_meso$strat<- "meso"
 ele_gymno_grp_bm_ubathy$strat<- "ubathy"
 eg_bm<- bind_rows(ele_gymno_grp_bm_epi,ele_gymno_grp_bm_meso,ele_gymno_grp_bm_ubathy)
-eg_bm$taxon <- "Electrona and Gymnoscopelus"
+eg_bm$taxon <- "Electrona \n& Gymnoscopelus"
 
 kreff_grp_bm_epi<- readRDS("kreff_grp_bm_epi.RDS")
 kreff_grp_bm_meso<- readRDS("kreff_grp_bm_meso.RDS")
@@ -31,9 +31,12 @@ kreff_grp_bm_epi$strat<- "epi"
 kreff_grp_bm_meso$strat<- "meso"
 kreff_grp_bm_ubathy$strat<- "ubathy"
 kreff_bm<- bind_rows(kreff_grp_bm_epi,kreff_grp_bm_meso,kreff_grp_bm_ubathy)
-kreff_bm$taxon <- "Krefftichthys"
+kreff_bm$taxon <- "Krefftichthys \n& Protomyctophum"
 
 all_bm <- bind_rows(kreff_bm, eg_bm, bathy_bm)
+
+all_bm <- all_bm %>% mutate(guild=ifelse(taxon=="Krefftichthys \n& Protomyctophum","copepod specialists", ifelse(taxon=="Bathylagidae", "gelatinous/zooplankton feeders","zooplankton generalists")))
+
 
 all_bm$strat_m<-  NA_character_
 all_bm$strat_m[all_bm$strat=="epi"]<- "0--200"
@@ -57,13 +60,30 @@ ggplot(all_bm, aes(y=bm_m3, strat_m)) +
 	stn <- readRDS("../derived data/midoc_stations_envdata.rda")
 	all_bm$DNC <- stn$DNC.visual[match(all_bm$midoc.stn, stn$midoc.stn)]
 	all_bm$DNC2<- factor(gsub("\\wC","N", all_bm$DNC))
-	all_bm <- all_bm %>% mutate(taxon=fct_rev(taxon))
+	all_bm <- all_bm %>% mutate(taxon=fct_rev(taxon), strat_m=fct_rev(factor(strat_m))) 
+
+	# if wanting to add text on panels for "day" vs night, could come back to this if time
+	# as per: https://stackoverflow.com/questions/11889625/annotating-text-on-individual-facet-in-ggplot2
+	# a bit time comsuming as it requires building up each factor
+	# ann_text <- data.frame(taxon = "Krefftichthys",
+	# 	bm_m3=10e-3,
+	# 	strat_m=factor(1, levels=c("0--200", "",
+	# 	label = c("night","day"), 
+	# 	DNC2=factor()
+	# 	)
+
+	# ideally the facet labels would have the trophic guild descriptions... but this doesn't work well. Below gets part way there but alignment is fucked
+	# levels(all_bm$taxon)<- c(
+	# 	"Krefftichthys \n& Protomyctophum"=expression(paste(italic("Krefftichthys \n& Protomyctophum"), "\ncopepod specialist")),
+	# 	"Electrona \n& Gymnoscopelus"=expression(paste(italic("Electrona \n& Gymnoscopelus"), "\nzooplankton generalists")),
+	# 	"Bathylagidae"=expression(paste(italic("Bathylagidae"),"gelatinous/zooplankton feeders"))
+	# 	)
 
 	depth_boxplots<- function(x){
-		ggplot(x, aes(y=log(bm_m3,10), x=fct_rev(factor(strat_m)), fill=DNC2)) + 
+		ggplot(x, aes(y=log(bm_m3,10), x=strat_m, fill=DNC2)) + 
 		scale_fill_manual(name="", values=c("grey90","grey40")) +
 		geom_boxplot(position=position_dodge(width=.9)) +
-		facet_grid(taxon~.) +
+		facet_grid(taxon~., labeller=labeller(type=label_parsed)) +
 		coord_flip() +
 		theme_light() +
 		theme(strip.text = element_text(face = "italic")) +
@@ -72,7 +92,7 @@ ggplot(all_bm, aes(y=bm_m3, strat_m)) +
 		theme(legend.position = "none")
 	} 
 	depth_boxplots(all_bm)
-	ggsave("fig2_tax_grps_daynight_depth_boxplots.pdf", height=6,width=2.5)
+	ggsave("fig2_tax_grps_daynight_depth_boxplots.pdf", height=5,width=3)
   
 # version disaggregated to individual species
 	fbm <- readRDS("../derived data/codend_fish_biomass.rds")
