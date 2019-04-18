@@ -3,23 +3,71 @@
 
 library(tidyverse)
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/fish_habitat_modelling")
+d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/derived data")
 setwd(d)
 
-# TODO: what's the equivalent data file to codend_fish_biomass for all taxa?
-# fbm <- readRDS("../derived data/codend_fish_biomass.rds")
-ce <- readRDS("../derived data/midoc_cod_ends_checked.rds")
 
+mds   <- readRDS("midoc_stations_checked.rds")
+ce <- readRDS("midoc_cod_ends_checked.rds")
+ktr <- readRDS("nav_reduced.rds")
+ced <- tibble(cod.end=as.character(c(2:6)), depth=seq(900,100,by=-200))
+mde  <- readRDS("midoc_stations_envdata.rda")
+md.crep<- read_csv("../source data/midoc_crepuscular.csv")
+bm.tax <- readRDS("codend_taxa_biomass.rds")
+
+swept <- ce %>% filter(CE>1) %>% group_by(midoc.stn) %>% summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+
+naf <- c("TRIAL","MIDOC02","MIDOC08","MIDOC10","MIDOC12","MIDOC13","MIDOC33")
 
 #
 # 1) Full water-column biomass and abundance (sum across cod-ends 2:6)
 #
+bm.stn.tax <- bm.tax %>% filter(cod.end%in%c(as.character(2:6))) %>%
+				 group_by(midoc.stn, tax.grp) %>% 
+				 mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% 
+				 summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>%
+				 inner_join(swept)
 
+#
+# 2) Biomass and abundance for layers
+#
+	# epipelagic
+	swept.epi <- ce %>% filter(CE==6) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
 
+	txbm.epi <- bm.tax %>% filter(cod.end%in%c(as.character(2:6))) %>%
+				 group_by(midoc.stn, tax.grp) %>% 
+				 mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% 
+				 summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>%
+				 right_join(swept.epi) %>% 
+				 mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3) %>% arrange(midoc.stn)
+	txbm.epi[is.na(txbm.epi$bm_m3),]$bm_m3<- 0
+	txbm.epi[is.na(txbm.epi$n_m3),]$n_m3<- 0
+	txbm.epi$d.strat <- "epipelagic"
+	
+	# upper mesopelagic
+	swept.meso <- ce %>% filter(CE%in%c(4:5)) %>% filter(max.dep<650) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	# code end classifications for depth are OK, apart from MIDOC02, where CE4 went to 948m
+	
+	txbm.meso <- bm.tax %>% filter(cod.end %in% c(as.character(2:5))) %>%
+				filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				group_by(midoc.stn, tax.grp) %>% 
+				mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>%
+				summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>%
+				right_join(swept.meso) %>%
+				mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3) %>% arrange(midoc.stn)
+	
+	txbm.meso[is.na(txbm.meso$bm_m3),]$bm_m3<- 0
+	txbm.meso[is.na(txbm.meso$n_m3),]$n_m3<- 0
+	txbm.meso$d.strat <- "upper mesopelagic"
 
-swept <- ce %>% filter(CE>1) %>% group_by(midoc.stn) %>% summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	# lower mesopelagic/upper bathypelagic
+	swept.ubathy <- ce %>% filter(CE%in%c(2:3)) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
+	
+	txbm.ubathy <- bm.tax %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end %in% c(as.character(2:3))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	txbm.ubathy[is.na(txbm.ubathy$bm_m3),]$bm_m3<- 0
+	txbm.ubathy[is.na(txbm.ubathy$n_m3),]$n_m3<- 0
+	txbm.meso$d.strat <- "upper mesopelagic"
 
+	txbm <- binds_rows(txbm.epi, txbm.meso,txbm.ubathy)
 
-mdbm <- fbm %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end%in%c(as.character(2:6))) %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(wt.g, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% inner_join(swept) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
-	saveRDS(kbm, "kreff_grp_bm.RDS")

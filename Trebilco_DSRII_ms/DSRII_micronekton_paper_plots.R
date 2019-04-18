@@ -45,7 +45,7 @@ setwd(d)
 # Plan for analysis:
 	# group into same depth strata as used in Walters fish habitat modelling
 	# epipelagic; upper and lower mesopelagic
-	# this allows inclusion of 
+	# this allows inclusion of stations where cod-ends went to the wrong depths
 	# also aligns with seapodym etc.
 
 

@@ -188,7 +188,7 @@ nav <- readRDS("nav_reduced.rds")
 			mutate(bm = sum(wt.g, na.rm=T)) %>%
 			mutate(pbm = bm/tbm) %>%
 			distinct(pbm, .keep_all = T) %>% # keeps unique values of pbm for each combination of station, cod.end, tax.grp; retains all columns
-			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm) %>% ungroup()
+			select(midoc.stn, cod.end, tax.grp, fish.grp, tbm, bm, pbm, n.individuals, include.in.total) %>% ungroup()
 			# not sure why slice(1) doesn't work here.
 
 	# adjust biomass to per unit volume
