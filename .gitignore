@@ -59,6 +59,7 @@ vignettes/*.pdf
 *.cb
 *.cb2
 .*.lb
+*.latexmk
 
 ## Intermediate documents:
 *.dvi

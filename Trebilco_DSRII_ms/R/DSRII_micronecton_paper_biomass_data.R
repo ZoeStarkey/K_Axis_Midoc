@@ -72,7 +72,7 @@ saveRDS(bm.stn.tax, "../Trebilco_DSRII_ms/DSRII_station_biomass_abundance_data.R
 				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(bm, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
 	txbm.ubathy[is.na(txbm.ubathy$bm_m3),]$bm_m3<- 0
 	txbm.ubathy[is.na(txbm.ubathy$n_m3),]$n_m3<- 0
-	txbm.meso$d.strat <- "lower mesopelagic"
+	txbm.meso$d.strat <- "upper mesopelagic"
 
 	txbm <- bind_rows(txbm.epi, txbm.meso,txbm.ubathy)
 

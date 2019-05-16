@@ -168,16 +168,23 @@ for(i in 1:nrow(md.se)){
 # several stations had unexpectedly long tracks and fast surface speeds... need to figure out why this is -- hopefully cod-end results will shed light on it.
 
 # split by cod-end
-ce.se <- mdd %>% group_by(midoc.stn,status) %>% summarise(t.start=first(datetime), t.end=last(datetime), max.dep = max(CTD.Press..dbar.), min.dep = min(CTD.Press..dbar.)) %>% mutate(total.t.min=difftime(t.end,t.start)) %>% mutate(total.t.min=as.numeric(total.t.min, units="hours")*60)
+ce.se <- mdd %>% group_by(midoc.stn,status) %>% summarise(t.start=first(datetime), t.end=last(datetime), max.dep = max(CTD.Press..dbar.), min.dep = min(CTD.Press..dbar.)) %>% mutate(total.t.min=difftime(t.end,t.start)) %>% mutate(total.t.min=as.numeric(total.t.min, units="hours")*60) %>% ungroup()
 
-ce.se <- ce.se %>% group_by(midoc.stn, status) %>% mutate(mid.dep=median(c(max.dep,min.dep)))
+ce.se <- ce.se %>% group_by(midoc.stn, status) %>% mutate(mid.dep=median(c(max.dep,min.dep))) %>% ungroup()
 
 # convert "status" to codend numbers
 ce.key <- data.frame(status=c("logging", "net1", "net2", "net3","net4","net5"), CE=as.character(c(1:6)))
 ce.se$CE <- as.numeric(ce.key$CE[match(ce.se$status,ce.key$status)])
 rm(ce.key)
+# this does not work for stn 10, where the status was logging, but all catch is CE6 (top 200m)
+ce.se[ce.se$midoc.stn=="MIDOC10",]$CE <- 6
+# midoc08 also needs to be manually collected: all catch in single codend
+# set end time to 2016-01-30 04:23:01 - full station
+ce.se[ce.se$midoc.stn=="MIDOC08"&ce.se$CE==1,]$t.end<-as_datetime("2016-01-30 04:23:01")
+ce.se <- ce.se[(ce.se$midoc.stn=="MIDOC08"&ce.se$CE>1)==F,]
 
-# these are all straight-forward apart from MIDOC5 -- where the midoc file does not have any "status" records. Can still roughly assign the cod-ends to the depth profile to calculate volumes swept (all cod-ends had roughly normal catch); program was for 100 min for CE1 then 30 min for each subsequent CE.
+# these are all straight-forward apart from MIDOC5 and 12
+# for 5 the midoc file does not have any "status" records. Can still roughly assign the cod-ends to the depth profile to calculate volumes swept (all cod-ends had roughly normal catch); program was for 100 min for CE1 then 30 min for each subsequent CE.
 # this record starts at 09:39, so subsequent CE starts should be 11:19; 11:49; 12:19; 12:49. 
 md5t <- as_datetime(c("2016-01-27 09:39:00","2016-01-27 11:19:00","2016-01-27 11:49:00","2016-01-27 12:19:00","2016-01-27 12:49:00","2016-01-27 13:19:00","2016-01-27 13:49:00" ), tz="gmt")
 # plotting to check:
@@ -201,6 +208,24 @@ ce.se <- ce.se %>% filter(midoc.stn!="MIDOC05") %>% bind_rows(md5) %>% arrange(t
 
 # manually setting CE6 to 30 min so that retrieval isn't included in volume calculations
 ce.se<- ce.se %>% filter(CE==6) %>% mutate(t.end = t.start + minutes(30)) %>% bind_rows(.,filter(ce.se, CE<6)) %>% arrange(t.start)
+
+# midoc12 also needs to be manually corrected; ce5&6 are combined
+# call this CE7
+md12.7<- tbl_df(data.frame(
+  midoc.stn = "MIDOC12",
+  status = NA,
+  t.start = as_datetime("2016-01-30 03:06:11"),
+  t.end = as_datetime("2016-01-30 04:23:01"),
+  max.dep = 406,
+  min.dep = 0,
+  mid.dep = 200,
+  total.t.min = 60,
+  CE = 7, stringsAsFactors = F
+))
+
+ce.se <- ce.se[(ce.se$midoc.stn=="MIDOC12"&ce.se$CE>4)==F,] 
+ce.se <- ce.se %>% bind_rows(md12.7) %>% arrange(t.start)
+
 
 for(i in 1:nrow(ce.se)){
 	the.ce<- ce.se[i,]
