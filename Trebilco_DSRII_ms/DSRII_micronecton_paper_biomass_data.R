@@ -68,11 +68,9 @@ saveRDS(bm.stn.tax, "../Trebilco_DSRII_ms/DSRII_station_biomass_abundance_data.R
 	# lower mesopelagic/upper bathypelagic
 	swept.ubathy <- ce %>% filter(CE%in%c(2:3)) %>% group_by(midoc.stn) %>%  summarise(swept_stn_m3 = sum(swept_m3, na.rm=T))
 	
-	txbm.ubathy <- bm.tax %>% filter(fish.grp%in%c("Kreffichthys andersonii","Protomyctophum sp"), cod.end %in% c(as.character(2:3))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
-				   group_by(midoc.stn) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(bm, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
-	txbm.ubathy[is.na(txbm.ubathy$bm_m3),]$bm_m3<- 0
-	txbm.ubathy[is.na(txbm.ubathy$n_m3),]$n_m3<- 0
-	txbm.meso$d.strat <- "lower mesopelagic"
+	txbm.ubathy <- bm.tax %>% filter(cod.end %in% c(as.character(2:3))) %>% filter((midoc.stn=="MIDOC02" & cod.end=="4")==F) %>%
+				   group_by(midoc.stn, tax.grp) %>% mutate(n.individuals=as.numeric(n.individuals)*include.in.total) %>% summarise(bm.g=sum(bm, na.rm=T), n=sum(as.numeric(n.individuals), na.rm=T)) %>% right_join(swept.ubathy) %>% mutate(n_m3=n/swept_stn_m3, bm_m3=bm.g/swept_stn_m3)
+	txbm.ubathy$d.strat <- "lower mesopelagic"
 
 	txbm <- bind_rows(txbm.epi, txbm.meso,txbm.ubathy)
 
