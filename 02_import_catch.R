@@ -15,7 +15,7 @@ library(readxl)
 Sys.setenv(TZ='GMT')
 
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/derived data")
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data Analysis/K_axis_midoc/derived data")
 setwd(d)
 
 
@@ -27,7 +27,7 @@ nav <- readRDS("nav_reduced.rds")
 # import from excel
 		# directory with data
 		#the.dir <- "/Users/rowan/GitHub/K_axis_midoc/source data/"
-		d <- paste0("/Users/", usr, "/GitHub/K_axis_midoc/source data/")
+		d <- paste0("/Users/", usr, "/Desktop/Honours/Data Analysis/K_axis_midoc/source data/")
 
 		# latest excel workbook
 		the.wb <- "k_axis_IYGPT_field_data_5Jul2018.xlsx"
@@ -230,7 +230,11 @@ saveRDS(bm.codends, "../derived data/codend_taxa_biomass.rds")
 ######	
 
 # quick diagnostic for biomass: total biomass (sum of sample data) vs. codend wet weights... what's the difference
-	bm.tots<- ddply(bm.gd, .(midoc.stn,cod.end), summarise, bm=sum(bm))
+	library(dplyr)
+	bm.tots <- bm.gd %>%
+	  group_by(midoc.stn, cod.end) %>%
+	  summarize(bm = sum(bm))
+	#bm.tots<- ddply(bm.gd, .(midoc.stn,cod.end), summarise, bm=sum(bm))
 	bm.tots$MCE <- paste0(bm.tots$midoc.stn, bm.tots$cod.end)
 	CD$MCE<- paste0(CD$midoc.station.id, CD$cod.end)
 	bm.tots$CE.tot<-  CD$catch.wt.tot[match(bm.tots$MCE, CD$MCE)]

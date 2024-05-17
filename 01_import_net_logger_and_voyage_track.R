@@ -47,8 +47,10 @@ skip.plots <- T # flag to skip plots if just regenerating outputs
 
 # setwd("/Users/dougt/GitHub/K_axis_midoc/source data")
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/source data")
+d <- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/source data")
 setwd(d)
+dir.exists(d)
+
 
 mdd <- readRDS("midoc_raw.rds")
 mdd <- mdd%>% arrange(datetime)
@@ -288,7 +290,23 @@ ggplot(mdd[substr(mdd$midoc.stn,6,7) %in% c("08","09","10","11","12","13","14"),
 # Crepuscular classifications
 # library()
 # overall for the midoc
-md.crep <- swept.stn  %>% select(midoc.stn, lat_start, lon_start, lat_end, lon_end, start_time, end_time) %>% mutate(shot.time = as.interval(start_time, end_time), 
+colnames(swept.stn)
+library(sp)
+install.packages("suncalc")
+library(suncalc)
+###GPT###
+md.crep <- swept.stn  %>% 
+  select(midoc.stn, lat_start, lon_start, lat_end, lon_end, start_time, end_time) %>% 
+  mutate(
+    shot.time = as.interval(start_time, end_time),
+    start_day = day(start_time),
+    end_day = day(end_time),
+    start_sunset = suncalc::getSunlightTimes(as.Date(start_time), lat_start, lon_start)$sunset,
+    start_sunrise = suncalc::getSunlightTimes(as.Date(start_time), lat_start, lon_start)$sunrise,
+    end_sunset = suncalc::getSunlightTimes(as.Date(end_time), lat_end, lon_end)$sunset,
+    end_sunrise = suncalc::getSunlightTimes(as.Date(end_time), lat_end, lon_end)$sunrise
+  )
+#md.crep <- swept.stn  %>% select(midoc.stn, lat_start, lon_start, lat_end, lon_end, start_time, end_time) %>% mutate(shot.time = as.interval(start_time, end_time), 
          start_day = day(start_time),
          end_day = day(end_time),
          start_sunset  =  sunset(start_time, lon_start, lat_start),
@@ -336,3 +354,4 @@ ggplot(nav %>% sample_frac(0.01) %>% arrange(gmt), aes(x=LONGITUDE, y=LATITUDE))
   geom_point(data=ce.se, aes(x=lon_start, y=lat_start), col="yellow", cex=.7 ) +
   geom_text(data=ce.se, aes(x=lon_start, y=lat_start, label=substr(midoc.stn, 6,7)), vjust=1)
 }
+
