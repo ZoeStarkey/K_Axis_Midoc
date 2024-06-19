@@ -1,0 +1,116 @@
+"Date","ErrNumber","ErrDescription","CausedBy","ReplicationStatus"
+11/05/2003 15:18:29,2164,"You can't disable a control while it has the focus.@@@1@5250@1","FishData NewFish","NotReplicated"
+11/05/2003 15:19:34,2164,"You can't disable a control while it has the focus.@@@1@5250@1","FishData NewFish","NotReplicated"
+25/06/2003 11:14:56,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:14:59,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:15:46,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:17:19,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:17:22,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:30:12,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:30:13,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:37:13,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:37:19,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:37:21,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:58:17,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:58:18,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:59:47,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 11:59:49,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:05:12,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:05:57,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:06:00,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:07:57,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:07:58,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:09:03,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:09:04,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:11:36,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 12:11:38,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:00:59,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:01:00,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:01:28,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:01:32,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:02:31,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:02:31,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:02:37,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:02:40,13,"Type mismatch","Haul ControlColours","NotReplicated"
+25/06/2003 13:03:10,13,"Type mismatch","Haul ControlColours","NotReplicated"
+6/08/2003 17:38:14,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+6/11/2003 13:47:09,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+6/11/2003 13:50:59,8012,"The device is not open","FishData Form bResetPorts","NotReplicated"
+19/12/2003 1:26:47,3022,"The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship.  Change the data in the field or fields that contain duplicate data, remove the index, or redefine the index to permit duplicate entries and try again.@@@2@5003022@2","Haul bCurrentHaul","NotReplicated"
+19/12/2003 1:26:59,3022,"The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship.  Change the data in the field or fields that contain duplicate data, remove the index, or redefine the index to permit duplicate entries and try again.@@@2@5003022@2","Haul bCurrentHaul","NotReplicated"
+19/12/2003 2:54:37,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 2:55:08,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:33:26,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:33:42,8018,"Operation valid only when the port is open","FishData Tare Pols","NotReplicated"
+19/12/2003 13:33:44,8018,"Operation valid only when the port is open","FishData Form Error Polling Pols","NotReplicated"
+19/12/2003 13:33:59,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:34:48,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:35:35,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:46:40,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+19/12/2003 13:46:47,8018,"Operation valid only when the port is open","FishData Form Error Polling Pols","NotReplicated"
+19/12/2003 15:54:45,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+19/12/2003 15:55:01,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+29/03/2004 12:23:06,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+29/03/2004 14:40:49,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+4/11/2004 15:17:00,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+5/11/2004 17:18:53,8050,"Do you want to save changes to the design of |?@@@13@@2","Catchcomp Form Form_error","NotReplicated"
+8/11/2004 11:51:56,8002,"Invalid port number","FishData CantOpenScale","NotReplicated"
+7/12/2004 14:34:41,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+7/12/2004 15:56:36,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+4/01/2004 12:39:19,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+6/01/2004 13:49:58,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+6/01/2004 14:25:49,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+7/01/2004 4:59:38,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+11/01/2004 8:09:05,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+11/01/2004 8:09:27,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+11/01/2004 8:13:04,3022,"The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship.  Change the data in the field or fields that contain duplicate data, remove the index, or redefine the index to permit duplicate entries and try again.@@@2@5003022@2","Haul bCurrentHaul","NotReplicated"
+11/01/2004 8:13:10,3022,"The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship.  Change the data in the field or fields that contain duplicate data, remove the index, or redefine the index to permit duplicate entries and try again.@@@2@5003022@2","Haul bCurrentHaul","NotReplicated"
+11/01/2004 8:19:20,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+11/01/2004 9:10:26,8005,"Port already open","FishData CantOpenScale","NotReplicated"
+12/01/2004 1:31:59,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+12/01/2004 3:25:11,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+14/01/2004 10:02:44,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+14/01/2004 12:30:36,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+15/01/2004 10:35:54,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+15/01/2004 14:35:54,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+16/01/2004 2:44:46,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+17/01/2004 7:58:49,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+17/01/2004 12:24:39,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+18/01/2004 8:10:18,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+19/01/2004 14:19:15,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+20/01/2004 7:58:05,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+20/01/2004 9:18:12,2169,"You can't save this record at this time.@HIPPIES Fishlog  may have encountered an error while trying to save a record.
+If you close this object now, the data changes you made will be lost.
+Do you want to close the database object anyway?@@19@@2","Catchcomp Form Form_error","NotReplicated"
+20/01/2004 11:49:55,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+20/01/2004 13:26:51,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+21/01/2004 8:15:31,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+21/01/2004 9:08:04,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+21/01/2004 11:07:40,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+27/01/2004 13:34:36,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+4/05/2005 16:14:45,2046,"The command or action 'ShowAllRecords' isn't available now.@* You may be in a read-only database or an unconverted database from an earlier version of HIPPIES Fishlog .
+* The type of object the action applies to isn't currently selected or isn't in the active view.@Use only those commands and macro actions that are currently available for this database.@1@@1","FishData Form Close","NotReplicated"
+27/05/2005 16:16:56,3343,"Unrecognized database format 'C:\Documents and Settings\tim_lam\My Documents\HIPPIES FISHLOG 2000b.mdb'.","AutoExec Module","NotReplicated"
