@@ -8,24 +8,110 @@ library(ggtext)
 
 #setting up directory 
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/KPS_symposium_extended_abstract")
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
 setwd(d)
 dir.exists(d)
 
-#Setting up km 
-km <- readRDS("../derived data/midoc_stations_checked.rds")
-km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
-tmp <- read_csv("../source data/midoc_stations_zones.csv")
-km <- inner_join(km, tmp); rm(tmp)
-tmp <- read_csv(("../source data/midoc_crepuscular.csv"))
-km <- inner_join(km, tmp); rm(tmp)
-tmp <- readRDS("../derived data/codend_taxa_biomass.rds")
-km <- inner_join(km, tmp); rm(tmp)
-file_path <- "../derived data/midoc_stations_envdata.rda" #adding zone
-md <- readRDS(file_path)
 
-#putting km as a dataframe
+#Setting up km 
+km <- readRDS("./derived data/midoc_stations_checked.rds")
+km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
+tmp <- read_csv("./source data/midoc_stations_zones.csv")
+km <- inner_join(km, tmp); rm(tmp)
+tmp <- read_csv(("./source data/midoc_crepuscular.csv"))
+km <- inner_join(km, tmp); rm(tmp)
+tmp <- readRDS("./derived data/codend_taxa_biomass.rds")
+km <- inner_join(km, tmp); rm(tmp)
+file_path <- "./derived data/midoc_stations_envdata.rda" #adding zone
+tmp <- readRDS(file_path)
+km <- inner_join(km, tmp); rm(tmp)
+
+#making km a dataframe
 km_df <- as.data.frame(km)
+
+
+
+###PLOTTING### CHLA + TOTAL BIOMASS
+ggplot(km_df, aes(x = intChl, y = bm_g_m3)) +
+  geom_point() +
+  labs(title = "Scatterplot of Total Biomass ",
+       x = "Integrated chlorophyll (check units)",
+       y = expression(paste("Total Biomass g m"^"-3"))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+
+
+# Creating function for total bm and environmental variables 
+TBM_scatter <- function(data, x_var, y_var = "bm_g_m3", x_label = NULL, y_label = NULL, title = NULL) {
+  # Default labels if not provided
+  if (is.null(x_label)) x_label <- x_var
+  if (is.null(y_label)) y_label <- expression(paste("Total Biomass g m"^"-3"))
+  if (is.null(title)) title <- paste("Scatterplot of Total Biomass vs", x_label)
+  
+  # Create the plot
+  p <- ggplot(data, aes_string(x = x_var, y = y_var)) +
+    geom_point() +
+    labs(title = title,
+         x = x_label,
+         y = y_label) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+  return(p)
+}
+
+
+#Environmental factors 
+plot_Tmin <- TBM_scatter(km_df, "Tmin", x_label = "Minimum Temperature (°C)")
+print(plot_Tmin)
+
+plot_Tmin_depth <- TBM_scatter(km_df, "Tmin_depth", x_label = "Depth of Minimum Temperature (m)")
+print(plot_Tmin_depth)
+
+plot_Tmax <- TBM_scatter(km_df, "Tmax", x_label = "Maximum Temperature (°C)")
+print(plot_Tmax)
+
+plot_SML <- TBM_scatter(km_df, "SML", x_label = "Mixed Layer Salinity")
+print(plot_SML)
+
+plot_Smax <- TBM_scatter(km_df, "Smax", x_label = "Maximum Salinity")
+print(plot_Smax)
+
+plot_O2_min <- TBM_scatter(km_df, "O2_min", x_label = "Minimum Oxygen (µmol kg^-1)")
+print(plot_O2_min)
+
+plot_days_since_melt <- TBM_scatter(km_df, "days_since_melt", x_label = "Days Since Melt")
+print(plot_days_since_melt)
+
+plot_distance_ice <- TBM_scatter(km_df, "distance_to_ice_m", x_label = "Distance to Ice (m)")
+print(plot_distance) ##### COME BACK TO ##### 
+
+plot_distance_edge <- TBM_scatter(km_df, "distance_to_edge_m", x_label = "Distance to Edge (m)")
+print(plot_distance) ##### COME BACK TO ##### 
+
+plot_sea_ice_conc <- TBM_scatter(km_df, "sea_ice_conc", x_label = "Sea Ice Concentration (%)")
+print(plot_sea_ice_conc)
+
+plot_chl_rs <- TBM_scatter(km_df, "chl_rs", x_label = "Chlorophyll (check units)")
+print(plot_chl_rs)
+
+
+plot_intChl <- TBM_scatter(km_df, "intChl", x_label = "Integrated chlorophyll (check units)") 
+print(plot_intChl)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ###PLOTTING####
