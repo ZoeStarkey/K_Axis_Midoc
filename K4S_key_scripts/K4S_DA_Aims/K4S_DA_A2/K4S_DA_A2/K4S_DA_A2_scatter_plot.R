@@ -2,6 +2,7 @@ library(ggplot2)
 library(readr)
 library(dplyr)
 library(ggtext)
+library(oce)
 
 
 ####SETTING UP#####
@@ -28,6 +29,66 @@ km <- inner_join(km, tmp); rm(tmp)
 
 #making km a dataframe
 km_df <- as.data.frame(km)
+
+##LOADING ENVIRONMENTAL DATA
+# Load SST data
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_anim_GHRSST.RData")
+sst <- sstGHR
+rm(sstGHR)
+
+km_df$SST <- NA
+
+for (idate in 1:length(dts)) {
+  print(paste(idate, "of", length(dts)))
+  thisdate <- dts[idate]
+  
+  # Get the SST data for the current date
+  tmp <- sst[[idate]]; tmp <- tmp - 273.15
+  
+  # Set SST plot limits
+  sstmax <- 5
+  sstmin <- -1.5
+  tmp[tmp > sstmax] <- sstmax
+  tmp[tmp < sstmin] <- sstmin
+  
+  # Extract SST values for biomass data points
+  km_df$SST <- extract(tmp, as(km_sf, "Spatial"))
+}
+
+#load CHLA
+# Load your raster data
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_CHLA_VoyagePeriod.RData")
+R <- R_voy_jf
+q1 <- 0.05
+q2 <- 10
+R[R > q2] <- q2
+R[R < q1] <- q1
+R <- log(R)
+zz <- c(0.05, 0.1, 0.25, 0.5, 1, 2.5, 5,7.5)
+log_zz <- log(zz)
+
+# Convert raster to data frame
+R_df <- as.data.frame(R, xy = TRUE)
+colnames(R_df) <- c("x", "y", "value")
+
+# Check CRS of the raster and km_sf
+raster_crs <- crs(R)
+km_sf_crs <- st_crs(km_sf)
+
+# If they do not match, transform the CRS of km_sf
+if (km_sf_crs != raster_crs) {
+  km_sf <- st_transform(km_sf, crs = raster_crs)
+}
+
+# Initialize a column to store CHLA values
+km_sf$CHLA <- NA
+
+# Extract CHLA values for biomass data points
+km_sf$CHLA <- extract(R, as(km_sf, "Spatial"))
+
+km_df <- as.data.frame(st_drop_geometry(km_sf))
+
+#Load TSM 
 
 
 
@@ -77,7 +138,7 @@ print(plot_SML)
 plot_Smax <- TBM_scatter(km_df, "Smax", x_label = "Maximum Salinity")
 print(plot_Smax)
 
-plot_O2_min <- TBM_scatter(km_df, "O2_min", x_label = "Minimum Oxygen (µmol kg^-1)")
+plot_O2_min <- TBM_scatter(km_df, "O2_min", x_label = "Minimum Oxygen")
 print(plot_O2_min)
 
 plot_days_since_melt <- TBM_scatter(km_df, "days_since_melt", x_label = "Days Since Melt")
@@ -95,19 +156,34 @@ print(plot_sea_ice_conc)
 plot_chl_rs <- TBM_scatter(km_df, "chl_rs", x_label = "Chlorophyll (check units)")
 print(plot_chl_rs)
 
-
 plot_intChl <- TBM_scatter(km_df, "intChl", x_label = "Integrated chlorophyll (check units)") 
 print(plot_intChl)
 
+plot_SST <- TBM_scatter(km_df, "SST", x_label = "Sea Surface Temperature (°C)")
+print(plot_SST)
+
+plot_CHLA <- TBM_scatter(km_sf, "CHLA", x_label = "Chlorophyll-a (log-transformed)")
+print(plot_CHLA)
 
 
+#Integrating lunar phase 
+# Create a function to get the lunar phase for a specific date and location using oce 
+get_lunar_phase <- function(date, lat, lon) {
+  moon_data <- moonAngle(as.POSIXct(date, tz = "Indian/Kerguelen"), longitude = lon, latitude = lat)
+  lunar_phase <- moon_data$illuminatedFraction
+  return(lunar_phase)
+}
 
+# Apply the function to each row in the dataframe
+km_df <- km_df %>%
+  mutate(
+    start_time = as.POSIXct(start_time, tz = "Indian/Kerguelen"),  # Convert start_time to POSIXct
+    lunar_phase = mapply(get_lunar_phase, start_time, lat_start, lon_start)
+  )
 
-
-
-
-
-
+#plotting lunar phase
+plot_lunar_phase <- TBM_scatter(km_df, "lunar_phase", x_label = "Lunar Phase")
+print(plot_lunar_phase)
 
 
 
