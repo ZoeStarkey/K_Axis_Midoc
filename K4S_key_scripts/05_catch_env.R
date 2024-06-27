@@ -4,9 +4,9 @@
 
 library(tidyverse) 
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/GitHub/K_axis_midoc/")
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
 setwd(d)
-
+dir.exists(d)
 
 # station data
 km <- readRDS("./derived data/midoc_stations_checked.rds") 
