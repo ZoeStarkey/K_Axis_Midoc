@@ -103,7 +103,10 @@ ice_df <- as.data.frame(rasterToPoints(icefile_proj))
 
 # Replace 0 values with NA
 ice_df[ice_df$layer == 0, "layer"] <- NA
-ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 >= 20, ]
+
+ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
+
+
 
 
 
@@ -143,10 +146,15 @@ cols1 <- ryb(56); cols1 <- cols1[c(1:22, 24:56)]
 
 # Create ggplot
 ggplot() +
-    geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
+   geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
     scale_fill_gradientn(colours = cols1, limits = c(sstmin, sstmax), na.value = "transparent") +
-    labs(fill = expression(SST ~ (degree * C)))  +
+   labs(fill = expression(SST ~ (degree * C)))  +
 
+  #add ice
+  ggnewscale::new_scale_fill() + 
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+  labs(fill = 'Ice (%)') +
 
   # Add the zoomed-in countries layer
   ggnewscale::new_scale_fill() + 
@@ -171,12 +179,7 @@ ggplot() +
                     transform = "exp",
                     nice.breaks = F) +
   labs(x = "Longitude", y = "Latitude") +
-  
-  #add ice
-  ggnewscale::new_scale_fill() + 
-   geom_raster(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-   scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
-  labs(fill = 'Ice (%)') +
+
   
   #projection
   coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
