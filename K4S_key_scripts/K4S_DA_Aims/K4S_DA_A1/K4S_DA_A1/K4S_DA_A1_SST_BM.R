@@ -11,6 +11,7 @@ library(viridis)
 library(readr)
 library(dplyr)
 library(scales)
+library(orsifronts)
 
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/KPS_symposium_extended_abstract")
@@ -35,6 +36,11 @@ SSHa <- ssha
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_anim_GHRSST.RData")
 sst <- sstGHR
 rm(sstGHR)
+
+#K-Axis frontal features
+dts <- as.POSIXlt(seq(as.Date("2016-01-18"), as.Date("2016-02-18"), by = "1 day"), tz = "UTC")
+bx <- c(60, 95, -70, -51)
+cx <- 0.8;
 
 #idate
 for (idate in 1:length(dts)) { #length(dts)
@@ -64,6 +70,11 @@ data(countriesHigh)
 wp  <- spTransform(crop(countriesHigh, ras.ext2), CRS(prj))
 wp_sf <- st_as_sf(wp)
 
+ras.ext   <- raster(xmn=60, xmx=105, ymn=-70, ymx=-40) #
+wc <- crop(countriesHigh, ras.ext)
+wcp <-spTransform(wc, CRS(prj))
+wcp_sf <- st_as_sf(wcp)
+
 
 # reading
 ktr <- readRDS("../derived data/nav_reduced.rds")
@@ -79,19 +90,29 @@ tmp <- read_csv(("../source data/midoc_crepuscular.csv"))
 km <- inner_join(km, tmp); rm(tmp)
 tmp <- readRDS("../derived data/codend_taxa_biomass.rds")
 km <- inner_join(km, tmp); rm(tmp)
-file_path <- "../derived data/midoc_stations_envdata.rda" #adding zone
-md <- readRDS(file_path)
-#ZS: adding zones to km dataset from md dataset
-km <- merge(km, md[, c("midoc.stn", "zone")], by = "midoc.stn") 
-km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
+
 
 # ADD ICE (leftover from KAXIS_MAPS_2017)
 file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
 icefile <- raster(file_path)
-icefile <- stack(file_path)
-ice_layer <- icefile[[1]]
-ice_layer[ice_layer == 0] <- NA_real_
-ice_df <- as.data.frame(rasterToPoints(ice_layer))
+# Reproject the ice raster to the desired projection
+icefile_proj <- projectRaster(icefile, crs = prj)
+
+# Convert to data frame for plotting
+ice_df <- as.data.frame(rasterToPoints(icefile_proj))
+
+# Replace 0 values with NA
+ice_df[ice_df$layer == 0, "layer"] <- NA
+ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 >= 20, ]
+
+
+
+
+# icefile <- raster(file_path)
+# icefile <- stack(file_path)
+# ice_layer <- icefile[[1]]
+# ice_layer[ice_layer == 0] <- NA_real_
+# ice_df <- as.data.frame(rasterToPoints(ice_layer))
 
 #Aggreating biomass data by midoc stqtion 
 km_sf <- st_as_sf(km)
@@ -119,18 +140,12 @@ colnames(tmp_df) <- c("Longitude", "Latitude", "SST")
 ryb <- colorRampPalette(rev(brewer.pal(11,"RdYlBu")))
 cols1 <- ryb(56); cols1 <- cols1[c(1:22, 24:56)] 
 
-# KAXIS frontal vectors
-dts <- as.POSIXlt(seq(as.Date("2016-01-18"), as.Date("2016-02-18"), by = "1 day"), tz = "UTC")
-bx <- c(60, 95, -70, -51)
-cx <- 0.8;
-
-
 
 # Create ggplot
 ggplot() +
-  geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
-  scale_fill_gradientn(colours = cols1, limits = c(sstmin, sstmax), na.value = "transparent") +
-  labs(fill = expression(SST ~ (degree * C)))  +
+    geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
+    scale_fill_gradientn(colours = cols1, limits = c(sstmin, sstmax), na.value = "transparent") +
+    labs(fill = expression(SST ~ (degree * C)))  +
 
 
   # Add the zoomed-in countries layer
@@ -143,8 +158,12 @@ ggplot() +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
   geom_sf(data = ktr_sf, size = 1) +
   geom_sf(data = km_sf_total, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
-  scale_fill_viridis_c(option = "plasma", name = expression(paste("Total Biomass g m"^"-3")),
-                       breaks = pretty_breaks(5))+ 
+  #scale_fill_viridis_c(option = "plasma", name = expression(paste("Total Biomass g m"^"-3")),
+                   #    breaks = pretty_breaks(5))+ 
+   scale_fill_gradientn(
+     colors = c("white", "grey90", "grey40", "grey20", "black"),
+     name = expression(paste("Total Biomass g m"^"-3")),
+     breaks = pretty_breaks(5)) +
   #scale_size_continuous(name = expression(paste("Total Biomass m"^"-3"))) +
   scale_size_binned(name = expression(paste("Total Biomass g m"^"-3")),
                     range = c(0,10),
@@ -155,12 +174,12 @@ ggplot() +
   
   #add ice
   ggnewscale::new_scale_fill() + 
-  geom_raster(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+   geom_raster(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+   scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
   labs(fill = 'Ice (%)') +
   
   #projection
-  coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 600000)) +
+  coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
   theme(
     legend.position = "right",
     panel.grid = element_line(color = "gray80", linetype = "solid"),
