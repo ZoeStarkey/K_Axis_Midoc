@@ -12,6 +12,8 @@ library(readr)
 library(dplyr)
 library(scales)
 library(orsifronts)
+library(palr)
+
 
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/KPS_symposium_extended_abstract")
@@ -90,7 +92,7 @@ tmp <- read_csv(("../source data/midoc_crepuscular.csv"))
 km <- inner_join(km, tmp); rm(tmp)
 tmp <- readRDS("../derived data/codend_taxa_biomass.rds")
 km <- inner_join(km, tmp); rm(tmp)
-
+km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
 
 # ADD ICE (leftover from KAXIS_MAPS_2017)
 file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
@@ -108,16 +110,8 @@ ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
 
 
 
-
-
-
-# icefile <- raster(file_path)
-# icefile <- stack(file_path)
-# ice_layer <- icefile[[1]]
-# ice_layer[ice_layer == 0] <- NA_real_
-# ice_df <- as.data.frame(rasterToPoints(ice_layer))
-
 #Aggreating biomass data by midoc stqtion 
+
 km_sf <- st_as_sf(km)
 km_sf_total <- km_sf %>% # Aggregate biomass data by midoc station 
   group_by(midoc.stn) %>%
@@ -198,53 +192,53 @@ ggplot() +
 
 
 #individul taxa plot 
-
-
-# Create plot function for each taxon
-create_taxon_plot <- function(km_sf, taxon, save_path, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj, sstmin, sstmax, cols1) {
-  km_taxon <- km_sf %>%
-    filter(tax.grp == taxon)
+# Function to create individual taxa plots
+create_taxa_plot <- function(km, taxa_name, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf) {
+  km_sf <- st_as_sf(km)
   
-  km_sf_total_taxon <- km_taxon %>%
+  # Filter data for the specific taxa group and aggregate biomass
+  km_sf_taxa <- km_sf %>%
+    filter(tax.grp == taxa_name) %>%
     group_by(midoc.stn) %>%
     summarize(
-      total_biomass = sum(bm_g_m3, na.rm = TRUE),
+      taxa_biomass = sum(bm_g_m3, na.rm = TRUE),
       lon_end = first(lon_end),
       lat_end = first(lat_end)
     )
   
-  p <- ggplot() +
+  ggplot() +
     geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
-    scale_fill_gradientn(colours = cols1, limits = c(sstmin, sstmax), na.value = "transparent") +
+    scale_fill_gradientn(colours = cols1, limits = c(-1.5, 5), na.value = "transparent") +
     labs(fill = expression(SST ~ (degree * C))) +
+    
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+    labs(fill = 'Ice (%)') +
     
     # Add the zoomed-in countries layer
     ggnewscale::new_scale_fill() + 
     geom_sf(data = wcp_sf, fill = NA, color = "black") +
-    # Add the ofp layer
     geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
     geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
     annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
     annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
     geom_sf(data = ktr_sf, size = 1) +
-    geom_sf(data = km_sf_total_taxon, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
-    scale_fill_viridis_c(option = "plasma", name = expression(paste("Total Biomass g m"^"-3")),
-                         breaks = pretty_breaks(5)) + 
-    scale_size_binned(name = expression(paste("Total Biomass g m"^"-3")),
+    geom_sf(data = km_sf_taxa, aes(fill = taxa_biomass, size = taxa_biomass), shape = 21, color = "black") +
+    scale_fill_gradientn(
+      colors = c("white", "grey90", "grey40", "grey20", "black"),
+      name = expression(paste(taxa_name, " Biomass g m"^"-3")),
+      breaks = pretty_breaks(5)) +
+    scale_size_binned(name = expression(paste(taxa_name, " Biomass g m"^"-3")),
                       range = c(0, 10),
                       breaks = pretty_breaks(5),
                       transform = "exp",
-                      nice.breaks = F) +
+                      nice.breaks = FALSE) +
     labs(x = "Longitude", y = "Latitude") +
     
-    # Add ice
-    ggnewscale::new_scale_fill() + 
-    geom_raster(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
-    labs(fill = 'Ice (%)') +
-    
     # Projection
-    coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 600000)) +
+    coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
     theme(
       legend.position = "right",
       panel.grid = element_line(color = "gray80", linetype = "solid"),
@@ -257,48 +251,22 @@ create_taxon_plot <- function(km_sf, taxon, save_path, tmp_df, ice_df, wcp_sf, o
     ) +
     guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
            size = guide_legend(title.position = "left", title.hjust = 0.5))
-  
-  # Define the filename
-  filename <- paste(save_path, "/K4S_Plot_A1_SST(", taxon, ").png", sep = "")
-  
-  # Save the plot
-  ggsave(filename = filename, plot = p, width = 8, height = 6, bg = "white")
 }
 
-# Define the save directory
-save_directory <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_SST"
+# Generate and display plots for each taxa group individually
+fish_plot <- create_taxa_plot(km, "fish", tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(fish_plot)
 
+cnidarians_plot <- create_taxa_plot(km, "cnidarians", tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(cnidarians_plot)
 
-# Create plots for each taxon
-taxa_groups <- c("fish", "krill", "cnidarians", "salps", "cephalopods")
+cephalopods_plot <- create_taxa_plot(km, "cephalopods", tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(cephalopods_plot)
 
-for (taxon in taxa_groups) {
-  create_taxon_plot(km_sf, taxon, save_directory, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj, sstmin, sstmax, cols1)
-}
+salps_plot <- create_taxa_plot(km, "salps", tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(salps_plot)
 
-
-
-
-#practice plotting ice 
-
-ggplot(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218)) +
-  geom_raster() +
-  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
-  labs(fill = 'Ice (%)') +
-  theme_minimal() +
-  theme(legend.position = "right") +
-  coord_fixed() +
-  theme(axis.text.x = element_text(size = 8), axis.text.y = element_text(size = 8)) +
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"))
-
-
-print(names(ice_df))
-
-
-plot(ice_cropped,col = palr::bathy_deep_pal(56),add=TRUE,legend=TRUE,zlim=c(0,100),#alpha=0.8,
-     legend.args=list(text='Ice (%)', side=3, font=2, line=1, cex=0.8,adj=0),
-     axis.args=list(cex.axis=0.8)  )
-
-
+krill_plot <- create_taxa_plot(km, "krill", tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(krill_plot)
 
 
