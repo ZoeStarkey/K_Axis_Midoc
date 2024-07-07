@@ -13,6 +13,7 @@ library(dplyr)
 library(scales)
 library(orsifronts)
 library(palr)
+library(raster)
 
 
 usr <- Sys.info()["user"]
@@ -270,3 +271,73 @@ krill_plot <- create_taxa_plot(km, "krill", tmp_df, ice_df, wcp_sf, ofp_sf, wp_s
 print(krill_plot)
 
 
+
+#All other taxa 
+
+# Function to create plot for all taxa except the specified ones
+create_excluded_taxa_plot <- function(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf) {
+  km_sf <- st_as_sf(km)
+  
+  # List of taxa to exclude
+  exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+  
+  # Filter data for taxa not in the exclude list and aggregate biomass
+  km_sf_other <- km_sf %>%
+    filter(!tax.grp %in% exclude_taxa) %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      other_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  ggplot() +
+    geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
+    scale_fill_gradientn(colours = cols1, limits = c(-1.5, 5), na.value = "transparent") +
+    labs(fill = expression(SST ~ (degree * C))) +
+    
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+    labs(fill = 'Ice (%)') +
+    
+    # Add the zoomed-in countries layer
+    ggnewscale::new_scale_fill() + 
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1) +
+    geom_sf(data = km_sf_other, aes(fill = other_biomass, size = other_biomass), shape = 21, color = "black") +
+    scale_fill_gradientn(
+      colors = c("white", "grey90", "grey40", "grey20", "black"),
+      name = expression(paste("Other Taxa Biomass g m"^"-3")),
+      breaks = pretty_breaks(5)) +
+    scale_size_binned(name = expression(paste("Other Taxa Biomass g m"^"-3")),
+                      range = c(0, 10),
+                      breaks = pretty_breaks(5),
+                      transform = "exp",
+                      nice.breaks = FALSE) +
+    labs(x = "Longitude", y = "Latitude") +
+    
+    # Projection
+    coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = NA)
+    ) +
+    guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
+           size = guide_legend(title.position = "left", title.hjust = 0.5))
+}
+
+# Generate and display plot for all other taxa except the specified ones
+excluded_taxa_plot <- create_excluded_taxa_plot(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(excluded_taxa_plot)
