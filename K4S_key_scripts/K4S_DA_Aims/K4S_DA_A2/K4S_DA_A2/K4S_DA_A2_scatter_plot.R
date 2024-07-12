@@ -186,7 +186,7 @@ TBM_scatter <- function(data, x_var, y_var = "bm_g_m3", depth_var = "depth", x_l
   # Default labels if not provided
   if (is.null(x_label)) x_label <- x_var
   if (is.null(y_label)) y_label <- expression(paste("Total Biomass g m"^"-3"))
-  if (is.null(title)) title <- paste("Scatterplot of Total Biomass vs", x_label)
+  if (is.null(title)) title <- paste("Scatterplot of Total Biomass (excluding gelatinous) vs", x_label)
   
 
   p <- ggplot(data_filtered, aes_string(x = x_var, y = y_var, color = depth_var)) +
@@ -242,7 +242,7 @@ print(plot_intChl)
 plot_SST <- TBM_scatter(km_df, "SST", x_label = "Sea Surface Temperature (°C)")
 print(plot_SST)
 
-plot_CHLA <- TBM_scatter(km_df, "CHLA", x_label = "CHLA")
+plot_CHLA <- TBM_scatter(km_df, "CHLA", x_label = "CHLA (Sum)")
 print(plot_CHLA)
 
 
