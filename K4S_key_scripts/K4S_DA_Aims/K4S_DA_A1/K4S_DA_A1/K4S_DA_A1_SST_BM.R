@@ -14,6 +14,7 @@ library(scales)
 library(orsifronts)
 library(palr)
 library(raster)
+library(rgdal)
 
 
 usr <- Sys.info()["user"]
@@ -271,6 +272,8 @@ krill_plot <- create_taxa_plot(km, "krill", tmp_df, ice_df, wcp_sf, ofp_sf, wp_s
 print(krill_plot)
 
 
+#Everything else 
+
 
 #All other taxa 
 
@@ -341,3 +344,6 @@ create_excluded_taxa_plot <- function(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf,
 # Generate and display plot for all other taxa except the specified ones
 excluded_taxa_plot <- create_excluded_taxa_plot(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
 print(excluded_taxa_plot)
+
+
+

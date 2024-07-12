@@ -124,13 +124,15 @@ km_filtered <- km_sf %>%
   filter(tax.grp %in% c("fish", "cephalopods", "krill"))
 
 # Aggregate biomass data by midoc station including only fish, cephalopods, and krill
-km_sf_total <- km_filtered %>%
+km_sf_total <- km_sf%>%
   group_by(midoc.stn) %>%
   summarize(
     total_biomass = sum(bm_g_m3, na.rm = TRUE),
     lon_end = first(lon_end),
     lat_end = first(lat_end)
   )
+
+
 
 
 
@@ -150,8 +152,10 @@ ggplot() +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
   geom_sf(data = ktr_sf, size = 1) +
   geom_sf(data = km_sf_total, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
-  scale_fill_viridis_c(option = "mako", name = expression(paste("Total Biomass m"^"-3")),
-                       breaks = pretty_breaks(5))+ 
+  scale_fill_gradientn(
+    colors = c("white", "grey90", "grey40", "grey20", "black"),
+    name = expression(paste("Total Biomass g m"^"-3")),
+    breaks = pretty_breaks(5)) +
   #scale_size_continuous(name = expression(paste("Total Biomass m"^"-3"))) +
   scale_size_binned(name = expression(paste("Total Biomass m"^"-3")),
                     range = c(0,10),
@@ -257,17 +261,320 @@ for (taxon in taxa_groups) {
 
 
 
-# 
-# km_sf_total <- km_filtered %>%
-#   group_by(midoc.stn) %>%
-#   summarize(
-#     total_biomass = sum(bm_g_m3, na.rm = TRUE),
-#     lon_end = first(lon_end),
-#     lat_end = first(lat_end)
-#   )
-#   
-# 
-# km_filtered <- km_sf %>%
-#   filter(!(tax.grp %in% c("cnidarians", "salps")))
+ggplot() +
+  geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+  scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
+                       limits = c(log(q1), log(q2)),
+                       na.value = "#D3D3D3",
+                       name = expression(paste("Chl-a (mg ", m^-3, ")")))  +
+  
+  # Add ice
+  ggnewscale::new_scale_fill() + 
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+  labs(fill = 'Ice (%)') +
+  theme(legend.title.position = "left",
+        legend.title = element_text(angle = 90)) +
+  
+  
+  ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
+  # Add the zoomed-in countries layer
+  geom_sf(data = wcp_sf, fill = NA, color = "black") +
+  # Add the ofp layer
+  geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+  geom_sf(data = ktr_sf, size = 1) +
+  geom_sf(data = km_sf_total, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
+  #scale_size_continuous(name = expression(paste("Total Biomass m"^"-3"))) +
+  scale_fill_gradientn(
+    colors = c("white", "grey90", "grey40", "grey20", "black"),
+    name = expression(paste("Biomass g m"^"-3")),
+    breaks = pretty_breaks(5)) +
+  scale_size_binned(name = expression(paste("Biomass g m"^"-3")),
+                    range = c(0, 10),
+                    breaks = pretty_breaks(5),
+                    transform = "exp",
+                    nice.breaks = FALSE) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +  theme(
+    legend.position = "right",
+    panel.grid = element_line(color = "gray80", linetype = "solid"),
+    panel.background = element_blank(),
+    legend.key = element_blank(),
+    legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.box.background = element_blank(),
+    legend.byrow = TRUE,
+    strip.background = element_rect(fill = NA)
+  ) +
+  guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
+         size = guide_legend(title.position = "left", title.hjust = 0.5))
+
+
+
+# Create plot function for each taxon
+create_taxon_plot <- function(km_sf, taxon, R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj) {
+  km_taxon <- km_sf %>%
+    filter(tax.grp == taxon)
+  
+  km_sf_total_taxon <- km_taxon %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      total_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  p <- ggplot() +
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    scale_fill_gradientn(
+      colors = ryb, 
+      breaks = log_zz, 
+      labels = sprintf("%.2f", zz),
+      limits = c(log(q1), log(q2)),
+      na.value = "#D3D3D3",
+      name = expression(paste("Chl-a (mg ", m^-3, ")"))
+    ) +
+    
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(
+      colors = palr::bathy_deep_pal(56), 
+      na.value = "transparent", 
+      limits = c(0, 100)
+    ) +
+    labs(fill = 'Ice (%)') +
+    theme(
+      legend.title.position = "left",
+      legend.title = element_text(angle = 90)
+    ) +
+    
+    ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
+    
+    # Add the zoomed-in countries layer
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    
+    # Add the ofp layer
+    geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1) +
+    geom_sf(data = km_sf_total_taxon, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
+    scale_fill_gradientn(
+      colors = c("white", "grey90", "grey40", "grey20", "black"),
+      name = expression(paste("Biomass g m"^"-3")),
+      breaks = pretty_breaks(5)
+    ) +
+    scale_size_binned(
+      name = expression(paste("Biomass g m"^"-3")),
+      range = c(0, 10),
+      breaks = pretty_breaks(5),
+      transform = "exp",
+      nice.breaks = FALSE
+    ) +
+    labs(x = "Longitude", y = "Latitude") +
+    coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = NA)
+    ) +
+    guides(
+      fill = guide_legend(title.position = "left", title.hjust = 0.5),
+      size = guide_legend(title.position = "left", title.hjust = 0.5)
+    )
+  
+  return(p)
+}
+
+# Example usage (assuming you have the required data)
+# Load necessary data
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_curr_big.RData")
+
+# Assuming the data frames `km_sf`, `R_df`, `ryb`, `log_zz`, `zz`, `q1`, `q2`, `ice_df`, `wcp_sf`, `ofp_sf`, `wp_sf`, `ktr_sf`, `prj` are already loaded and defined
+
+# Create and print the fish plot
+fish_plot <- create_taxon_plot(km_sf, "fish", R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj)
+print(fish_plot)
+ceph_plot <- create_taxon_plot(km_sf, "cephalopods", R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj)
+print(ceph_plot)
+krill_plot <- create_taxon_plot(km_sf, "krill", R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj)
+print(krill_plot)
+cnidarian_plot <- create_taxon_plot(km_sf, "cnidarians", R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj)
+print(cnidarian_plot)
+salp_plot <- create_taxon_plot(km_sf, "salps", R_df, ryb, log_zz, zz, q1, q2, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, prj)
+print(salp_plot)
+
+
+
+#All other taxa 
+
+create_excluded_taxa_plot <- function(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf) {
+  km_sf <- st_as_sf(km)
+  
+  # List of taxa to exclude
+  exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+  
+  # Filter data for taxa not in the exclude list and aggregate biomass
+  km_sf_other <- km_sf %>%
+    filter(!tax.grp %in% exclude_taxa) %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      other_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  p <- ggplot() +
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    scale_fill_gradientn(
+      colors = ryb, 
+      breaks = log_zz, 
+      labels = sprintf("%.2f", zz),
+      limits = c(log(q1), log(q2)),
+      na.value = "#D3D3D3",
+      name = expression(paste("Chl-a (mg ", m^-3, ")"))
+    ) +
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+    labs(fill = 'Ice (%)') +
+    
+    # Add the zoomed-in countries layer
+    ggnewscale::new_scale_fill() + 
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1) +
+    geom_sf(data = km_sf_other, aes(fill = other_biomass, size = other_biomass), shape = 21, color = "black") +
+    scale_fill_gradientn(
+      colors = c("white", "grey90", "grey40", "grey20", "black"),
+      name = expression(paste("Other Taxa Biomass g m"^"-3")),
+      breaks = pretty_breaks(5)) +
+    scale_size_binned(name = expression(paste("Other Taxa Biomass g m"^"-3")),
+                      range = c(0, 10),
+                      breaks = pretty_breaks(5),
+                      transform = "exp",
+                      nice.breaks = FALSE) +
+    labs(x = "Longitude", y = "Latitude") +
+    
+    # Projection
+    coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      panel.background = element_blank(),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = NA)
+    ) +
+    guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
+           size = guide_legend(title.position = "left", title.hjust = 0.5))
+}
+
+# Generate and display plot for all other taxa except the specified ones
+excluded_taxa_plot <- create_excluded_taxa_plot(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf)
+print(excluded_taxa_plot)
+
+
+
+# mixed plot 
+create_mixed_plot <- function(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, tsm_e_ll) {
+  km_sf <- st_as_sf(km)
+  
+  # List of taxa to exclude
+  exclude_taxa <- c("krill", "cephalopods", "cnidarians", "salps", "fish")
+  
+  # Filter data for taxa not in the exclude list and aggregate biomass
+  km_sf_mixed <- km_sf %>%
+    filter(!tax.grp %in% exclude_taxa) %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      mixed_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  # Generate the plot using ggplot2
+  p <- ggplot() +
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    scale_fill_gradientn(
+      colors = ryb, 
+      breaks = log_zz, 
+      labels = sprintf("%.2f", zz),
+      limits = c(log(q1), log(q2)),
+      na.value = "#D3D3D3",
+      name = expression(paste("Chl-a (mg ", m^-3, ")"))
+    ) +
+    
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100)) +
+    labs(fill = 'Ice (%)') +
+    
+    # Add the zoomed-in countries layer
+    ggnewscale::new_scale_fill() + 
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1) +
+    geom_sf(data = km_sf_mixed, aes(fill = mixed_biomass, size = mixed_biomass), shape = 21, color = "black") +
+    scale_fill_gradientn(
+      colors = c("white", "grey90", "grey40", "grey20", "black"),
+      name = expression(paste("Mixed Taxa Biomass g m"^"-3")),
+      breaks = scales::pretty_breaks(5)) +
+    scale_size_binned(name = expression(paste("Mixed Taxa Biomass g m"^"-3")),
+                      range = c(0, 10),
+                      breaks = scales::pretty_breaks(5),
+                      transform = "exp",
+                      nice.breaks = FALSE) +
+    labs(x = "Longitude", y = "Latitude") +
+    
+    # Projection
+    coord_sf(crs = st_crs(prj), xlim = c(-550000, 1000000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      panel.background = element_blank(),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = NA)
+    ) +
+    guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
+           size = guide_legend(title.position = "left", title.hjust = 0.5))
+  
+  return(p)
+}
+
+# Generate and display plot for all other taxa except the specified ones
+mixed_taxa_plot <- create_mixed_plot(km, tmp_df, ice_df, wcp_sf, ofp_sf, wp_sf, ktr_sf, tsm_e_ll)
+print(mixed_taxa_plot)
+
+
+
+
+
+
+
 
   
