@@ -175,7 +175,7 @@ km_df$CUR <- NA
 km_df$CUR <- raster::extract(mn_mag_proj, km_sp)
 
 
-# Create a function to get the lunar phase for a specific date and location using oce 
+# Lunar Fraction
 get_lunar_fraction <- function(date, lat, lon) {
   moon_data <- moonAngle(as.POSIXct(date, tz = "Indian/Kerguelen"), longitude = lon, latitude = lat)
   lunar_fraction <- moon_data$illuminatedFraction
@@ -187,6 +187,36 @@ km_df <- km_df %>%
   mutate(
     start_time = as.POSIXct(start_time, tz = "Indian/Kerguelen"),  # Convert start_time to POSIXct
     lunar_fraction = mapply(get_lunar_fraction, start_time, lat_start, lon_start)
+  )
+
+
+# Luanr Phase
+  # get julian date
+get_julian_date <- function(date) {
+  julian_date <- as.numeric(julian(date, origin = as.POSIXct("1970-01-01", tz = "UTC"))) + 2440587.5
+  return(julian_date)
+}
+
+get_moon_phase <- function(date) {
+  julian_date <- get_julian_date(date)
+  D <- julian_date - 2451550.1
+  N <- (D / 29.53058867) %% 1
+  if (N < 0) N <- N + 1  # Ensure N is positive
+  phase <- ifelse(N < 0.25, 0, ifelse(N < 0.5, 1/4, ifelse(N < 0.75, 1/2, 3/4)))
+  return(phase)
+}
+
+
+  # Function to convert start_time to moon phase
+get_lunar_phase <- function(date, lat, lon) {
+  return(get_moon_phase(as.POSIXct(date, tz = "Indian/Kerguelen")))
+}
+
+  # Apply the function to each row in the dataframe
+km_df <- km_df %>%
+  mutate(
+    start_time = as.POSIXct(start_time, tz = "Indian/Kerguelen"),  # Convert start_time to POSIXct
+    moon_phase = mapply(get_lunar_phase, start_time, lat_start, lon_start)
   )
 
 #Solar Angle
@@ -205,6 +235,13 @@ km_df <- km_df %>%
   select(-solar_position) 
 
 
+
+# Define the stations to remove
+abandoned_stations <- c("MIDOC02","MIDOC08", "MIDOC10", "MIDOC12", "MIDOC33")
+
+# Remove the specified stations from km_df
+km_df <- km_df %>%
+  filter(!midoc.stn %in% abandoned_stations)
 
 #PLOTTING
 TBM_scatter_aggregate <- function(data, x_var, y_var = "bm_g_m3", depth_var = "depth", aggregate_func = c("sum", "mean"), x_label = NULL, y_label = NULL, title = NULL) {
@@ -238,7 +275,7 @@ TBM_scatter_aggregate <- function(data, x_var, y_var = "bm_g_m3", depth_var = "d
              y = y_label,
              color = "Depth Bin") +
         theme_minimal() +
-        scale_color_manual(values = c("0-200m" = "#FFD300", "200-400m" = "#CC7722", "400-600m" = "red", "600-800m" = "magenta", "800-1000m" = "purple", "0-1000m" = "darkblue"))
+        scale_color_manual(values = c("0-200m" = "#FFD300", "200-400m" = "#CC7722", "400-600m" = "red", "600-800m" = "magenta", "800-1000m" = "purple", "0-1000m" = "white"))
       plots[["sum"]] <- p
     } else if (func == "mean") {
       p <- ggplot(data_aggregated, aes_string(x = x_var, y = "mean_biomass", color = depth_var, group = depth_var)) +
@@ -248,7 +285,7 @@ TBM_scatter_aggregate <- function(data, x_var, y_var = "bm_g_m3", depth_var = "d
              y = y_label,
              color = "Depth Bin") +
         theme_minimal() +
-        scale_color_manual(values = c("0-200m" = "#FFD300", "200-400m" = "#CC7722", "400-600m" = "red", "600-800m" = "magenta", "800-1000m" = "purple", "0-1000m" = "darkblue"))
+        scale_color_manual(values = c("0-200m" = "#FFD300", "200-400m" = "#CC7722", "400-600m" = "red", "600-800m" = "magenta", "800-1000m" = "purple", "0-1000m" = "white"))
       plots[["mean"]] <- p
     }
   }
@@ -260,7 +297,6 @@ TBM_scatter_aggregate <- function(data, x_var, y_var = "bm_g_m3", depth_var = "d
 # Define the depth bins
 depth_bins <- c("0-1000m", "800-1000m", "600-800m", "400-600m", "200-400m", "0-200m")
 
-# Assuming km is your original data frame and km_df is derived from it
 km_df$depth <- factor(km_df$cod.end, levels = c("1", "2", "3", "4", "5", "6"), labels = depth_bins)
 
 # Create scatter plots for summed and mean biomass
@@ -272,8 +308,20 @@ plot <- TBM_scatter_aggregate(km_df, "Tmin")
 plot <- TBM_scatter_aggregate(km_df, "O2_min")
 plot <- TBM_scatter_aggregate(km_df, "SML")
 plot <- TBM_scatter_aggregate(km_df, "lunar_fraction")
+plot <- TBM_scatter_aggregate(km_df, "moon_phase")
 plot <- TBM_scatter_aggregate(km_df, "altitude")
 
 # Print the plots
 print(plot[["sum"]])
 print(plot[["mean"]])
+
+
+
+
+# Define the taxa groups to exclude
+excluded_taxa <- c("cnidarians", "cephalopods", "fish", "salps", "krill")
+
+# Create the new dataframe
+new_df <- km_df %>%
+  filter(!tax.grp %in% excluded_taxa) %>%
+  select(midoc.stn, tax.grp)
