@@ -133,7 +133,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
   # Calculate the breaks for the environmental variable
   breaks <- seq(min(data[[env_var]], na.rm = TRUE), max(data[[env_var]], na.rm = TRUE), length.out = num_bins + 1)
   
-  # Ensure the breaks are unique by adding a small epsilon if necessary
+  # Ensure the breaks are unique by adding a small epsilon
   epsilon <- 1e-6
   breaks <- unique(c(breaks, breaks[length(breaks)] + epsilon))
   
@@ -152,7 +152,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
     theme_bw() +
     xlab(env_var) +
     ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
-    ggtitle(paste("Boxplot of", dep_var, "excluding gelatinous by Depth Categories and", env_var)) +
+    ggtitle(paste("Boxplot of", dep_var, "Fish by Depth Categories and", env_var)) +
     scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
     guides(fill = guide_legend(reverse = TRUE)) +
     theme(
@@ -165,8 +165,8 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
 
 # Example usage
 # Assuming km_df_filtered is your dataframe and you want to plot for TSM and bm_g_m3
-create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3")
 create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3") 
+create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3")
 create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3")
 create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3")
 create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3")
@@ -237,15 +237,15 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
 # Example usage
 # Assuming km_df_filtered is your dataframe and you want to plot for TSM and bm_g_m3
 # and zoom in with y-axis limits between 0 and 0.01
-create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
-create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
 
 
