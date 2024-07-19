@@ -14,6 +14,121 @@ include_taxa <- c("cephalopods")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
 
+
+
+
+#TSM - unbinned 
+# Remove rows with NA values in TSM
+km_df_filtered <- km_df_filtered %>%
+  filter(!is.na(TSM))
+
+# Plot the data with formatted x-axis labels
+ggplot(km_df_filtered, aes(x = as.factor(TSM), y = bm_g_m3, fill = depth)) +
+  geom_boxplot() +
+  facet_wrap(~ reorder(depth, desc(depth)), ncol = 1, scales = "fixed") +
+  theme_bw() +
+  xlab("TSM") +
+  ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+  ggtitle("Boxplot of Biomass excluding gelatinous by Depth Categories and TSM") +
+  scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  scale_x_discrete(labels = function(x) sprintf("%.1f", as.numeric(as.character(x)))) +
+  theme(
+    strip.text.y = element_text(angle = 0),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  )
+
+
+#zoomed in 
+
+ggplot(km_df_filtered, aes(x = as.factor(TSM), y = bm_g_m3, fill = depth)) +
+  geom_boxplot() +
+  facet_wrap(~ reorder(depth, desc(depth)), ncol = 1, scales = "fixed") +
+  theme_bw() +
+  xlab("TSM") +
+  ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+  ggtitle("Boxplot of Biomass excluding gelatinous by Depth Categories and TSM") +
+  scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  scale_x_discrete(labels = function(x) sprintf("%.1f", as.numeric(as.character(x)))) +
+  coord_cartesian(ylim = c(0, 0.02)) +  # Adjust the y-axis range as needed
+  theme(
+    strip.text.y = element_text(angle = 0),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  )
+
+#TSM - Binned 
+
+# Define the number of bins
+num_bins <- 5
+
+# Calculate the breaks for TSM
+breaks <- seq(min(km_df_filtered$TSM, na.rm = TRUE), max(km_df_filtered$TSM, na.rm = TRUE), length.out = num_bins + 1)
+
+# Ensure the breaks are unique by adding a small epsilon if necessary
+epsilon <- 1e-6
+breaks <- unique(c(breaks, breaks[length(breaks)] + epsilon))
+
+# Create bins for TSM
+km_df_filtered <- km_df_filtered %>%
+  mutate(TSM_binned = cut(TSM, breaks = breaks, include.lowest = TRUE, labels = paste(head(breaks, -1), tail(breaks, -1) - epsilon, sep = " - ")))
+
+# Create bins for TSM with formatted labels
+km_df_filtered <- km_df_filtered %>%
+  mutate(TSM_binned = cut(TSM, breaks = breaks, include.lowest = TRUE, 
+                          labels = paste(sprintf("%.2f", head(breaks, -1)), sprintf("%.2f", tail(breaks, -1)), sep = " - ")))
+
+
+
+ggplot(km_df_filtered, aes(x = TSM_binned, y = bm_g_m3, fill = depth)) +
+  geom_boxplot() +
+  facet_wrap(~ reorder(depth, desc(depth)), ncol = 1, scales = "fixed") +
+  theme_bw() +
+  xlab("TSM") +
+  ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+  ggtitle("Boxplot of Biomass excluding gelatinous by Depth Categories and TSM") +
+  scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    strip.text.y = element_text(angle = 0),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  )
+
+
+#Trying to zoom in 
+ggplot(km_df_filtered, aes(x = TSM_binned, y = bm_g_m3, fill = depth)) +
+  geom_boxplot(outlier.shape = NA) +
+  #geom_jitter(width = 0.2, alpha = 0.2) +  # Add jitter for better visibility of points
+  facet_wrap(~ reorder(depth, desc(depth)), ncol = 1, scales = "fixed") +
+  theme_bw() +
+  xlab("TSM") +
+  ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+  ggtitle("Boxplot of Biomass excluding gelatinous by Depth Categories and TSM") +
+  scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  coord_cartesian(ylim = c(0, 0.01)) +  # Adjust the y-axis range as needed
+
+  theme(
+    strip.text.y = element_text(angle = 0),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #CHLA
 library(dplyr)
 library(ggplot2)
