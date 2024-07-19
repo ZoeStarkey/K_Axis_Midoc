@@ -157,7 +157,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
     guides(fill = guide_legend(reverse = TRUE)) +
     theme(
       strip.text.y = element_text(angle = 0),
-      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+      axis.text.x = element_text(angle = 0)
     )
   
   return(p)
@@ -184,15 +184,68 @@ create_boxplot(km_df_filtered, env_var = "bestley.zone", dep_var = "bm_g_m3")
 print(plot)
 
 
+#BINNED AND ZOOMED 
 
+library(ggplot2)
+library(dplyr)
+library(rlang)
 
+# Define the function
+create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "depth", y_limits = NULL) {
+  # Remove NAs from the specified environmental variable
+  data <- data %>%
+    filter(!is.na(.data[[env_var]]))
+  
+  # Calculate the breaks for the environmental variable
+  breaks <- seq(min(data[[env_var]], na.rm = TRUE), max(data[[env_var]], na.rm = TRUE), length.out = num_bins + 1)
+  
+  # Ensure the breaks are unique by adding a small epsilon if necessary
+  epsilon <- 1e-6
+  breaks <- unique(c(breaks, breaks[length(breaks)] + epsilon))
+  
+  # Create bin labels
+  labels <- paste(sprintf("%.2f", head(breaks, -1)), sprintf("%.2f", tail(breaks, -1)), sep = " - ")
+  
+  # Create bins for the environmental variable
+  data <- data %>%
+    mutate(binned_var = cut(.data[[env_var]], breaks = breaks, include.lowest = TRUE, labels = labels)) %>%
+    filter(!is.na(binned_var))
+  
+  # Create the boxplot
+  p <- ggplot(data, aes(x = binned_var, y = .data[[dep_var]], fill = .data[[depth_col]])) +
+    geom_boxplot(outlier.shape = NA) +
+    facet_wrap(as.formula(paste("~ reorder(", depth_col, ", desc(", depth_col, "))")), ncol = 1, scales = "fixed") +
+    theme_bw() +
+    xlab(env_var) +
+    ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+    ggtitle(paste("Boxplot of", dep_var, "excluding gelatinous by Depth Categories and", env_var)) +
+    scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+    guides(fill = guide_legend(reverse = TRUE)) +
+    theme(
+      strip.text.y = element_text(angle = 0),
+      axis.text.x = element_text(angle = 0))
+    
+  
+  # Apply y-axis limits if provided
+  if (!is.null(y_limits)) {
+    p <- p + coord_cartesian(ylim = y_limits)
+  }
+  
+  return(p)
+}
 
-
-
-
-
-
-
-
+# Example usage
+# Assuming km_df_filtered is your dataframe and you want to plot for TSM and bm_g_m3
+# and zoom in with y-axis limits between 0 and 0.01
+create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
+create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.03))
 
 
