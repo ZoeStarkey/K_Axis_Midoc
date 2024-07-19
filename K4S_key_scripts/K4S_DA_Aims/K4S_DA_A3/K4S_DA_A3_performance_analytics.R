@@ -9,7 +9,7 @@ library(caret)
 # km_sf$TSM <- as.numeric(km_sf$TSM)
 # km_sf$CUR <- as.numeric(km_sf$CUR)
 
-env_vars <- km_df[, c("CHLA", "TSM", "CUR", "SST", "Tmin", "SML", "lunar_fraction")]
+env_vars <- km_df[, c("bm_g_m3", "TSM", "CUR", "SST", "Tmin","O2_min", "SML", "lunar_fraction", "moon_phase", "altitude")]
 env_vars <- env_vars[complete.cases(env_vars), ]
 
 
