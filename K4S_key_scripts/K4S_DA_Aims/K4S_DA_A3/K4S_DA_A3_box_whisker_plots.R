@@ -14,11 +14,11 @@ load("km_df_environmental_variables.Rda")
 km_df_filtered <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
-km_df_filtered <-  km_df_filtered[km_df_filtered$tax.grp %in% exclude_taxa, ]
+km_df_filtered <-  km_df_filtered[!km_df_filtered$tax.grp %in% exclude_taxa, ]
 
 
 
-include_taxa <- c("cephalopods")
+include_taxa <- c("fish")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
 
@@ -152,7 +152,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
     theme_bw() +
     xlab(env_var) +
     ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
-    ggtitle(paste("Boxplot of", dep_var, "Fish by Depth Categories and", env_var)) +
+    ggtitle(paste("Boxplot of", dep_var, " fish by Depth Categories and", env_var)) +
     scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
     guides(fill = guide_legend(reverse = TRUE)) +
     theme(
@@ -163,18 +163,65 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
   return(p)
 }
 
-# Example usage
-# Assuming km_df_filtered is your dataframe and you want to plot for TSM and bm_g_m3
-create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3") 
-create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3")
-create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3")
+
+#Function to saveplot
+save_plot <- function(plot, filename) {
+  ggsave(filename, plot = plot, path = "~/Desktop", width = 15, height = 10)
+}
+
+
+
+#Generate each plot
+plot_chla <- create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3")
+plot_tsm <- create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3")
+plot_cur <- create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3")
+plot_sst <- create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3")
+plot_tmin <- create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3")
+plot_o2_min <- create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3")
+plot_sml <- create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3")
+plot_lunar_fraction <- create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3")
+plot_moon_phase <- create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3")
+plot_altitude <- create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3")
+
+# Save each plot with "no_gelat" filenames
+save_plot(plot_chla, "boxplot_chla_no_gelat.png")
+save_plot(plot_tsm, "boxplot_tsm_no_gelat.png")
+save_plot(plot_cur, "boxplot_cur_no_gelat.png")
+save_plot(plot_sst, "boxplot_sst_no_gelat.png")
+save_plot(plot_tmin, "boxplot_tmin_no_gelat.png")
+save_plot(plot_o2_min, "boxplot_o2_min_no_gelat.png")
+save_plot(plot_sml, "boxplot_sml_no_gelat.png")
+save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_no_gelat.png")
+save_plot(plot_moon_phase, "boxplot_moon_phase_no_gelat.png")
+save_plot(plot_altitude, "boxplot_altitude_no_gelat.png")
+
+# 
+save_plot(plot_chla, "boxplot_chla_ceph.png")
+save_plot(plot_tsm, "boxplot_tsm_ceph.png")
+save_plot(plot_cur, "boxplot_cur_ceph.png")
+save_plot(plot_sst, "boxplot_sst_ceph.png")
+save_plot(plot_tmin, "boxplot_tmin_ceph.png")
+save_plot(plot_o2_min, "boxplot_o2_min_ceph.png")
+save_plot(plot_sml, "boxplot_sml_ceph.png")
+save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_ceph.png")
+save_plot(plot_moon_phase, "boxplot_moon_phase_ceph.png")
+save_plot(plot_altitude, "boxplot_altitude_ceph.png")
+
+#Save each plot with "fish" filenames
+save_plot(plot_chla, "boxplot_chla_fish.png")
+save_plot(plot_tsm, "boxplot_tsm_fish.png")
+save_plot(plot_cur, "boxplot_cur_fish.png")
+save_plot(plot_sst, "boxplot_sst_fish.png")
+save_plot(plot_tmin, "boxplot_tmin_fish.png")
+save_plot(plot_o2_min, "boxplot_o2_min_fish.png")
+save_plot(plot_sml, "boxplot_sml_fish.png")
+save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_fish.png")
+save_plot(plot_moon_phase, "boxplot_moon_phase_fish.png")
+save_plot(plot_altitude, "boxplot_altitude_fish.png")
+
+
+
+
 
 
 # COME BACK TO - categorical data 
@@ -218,7 +265,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
     theme_bw() +
     xlab(env_var) +
     ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
-    ggtitle(paste("Boxplot of", dep_var, "excluding gelatinous by Depth Categories and", env_var)) +
+    ggtitle(paste("Boxplot of", dep_var, "cephalopods by Depth Categories and", env_var)) +
     scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
     guides(fill = guide_legend(reverse = TRUE)) +
     theme(
@@ -237,15 +284,40 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
 # Example usage
 # Assuming km_df_filtered is your dataframe and you want to plot for TSM and bm_g_m3
 # and zoom in with y-axis limits between 0 and 0.01
-create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
-create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_tsm <- create_boxplot(km_df_filtered, env_var = "TSM", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_chla <- create_boxplot(km_df_filtered, env_var = "CHLA", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_cur <- create_boxplot(km_df_filtered, env_var = "CUR", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_sst <- create_boxplot(km_df_filtered, env_var = "SST", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_tmin <- create_boxplot(km_df_filtered, env_var = "Tmin", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_o2_min <- create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_sml <- create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_lunar_fraction <- create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_moon_phase <- create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
+plot_altitude <- create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.001))
 
+
+
+# Save each plot with "no_gelat" filenames
+save_plot(plot_chla, "boxplot_chla_no_gelat.png")
+save_plot(plot_tsm, "boxplot_tsm_no_gelat.png")
+save_plot(plot_cur, "boxplot_cur_no_gelat.png")
+save_plot(plot_sst, "boxplot_sst_no_gelat.png")
+save_plot(plot_tmin, "boxplot_tmin_no_gelat.png")
+save_plot(plot_o2_min, "boxplot_o2_min_no_gelat.png")
+save_plot(plot_sml, "boxplot_sml_no_gelat.png")
+save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_no_gelat.png")
+save_plot(plot_moon_phase, "boxplot_moon_phase_no_gelat.png")
+save_plot(plot_altitude, "boxplot_altitude_no_gelat.png")
+
+# Save each plot with "ceph" filenames
+save_plot(plot_chla, "boxplot_chla_ceph.png")
+save_plot(plot_tsm, "boxplot_tsm_ceph.png")
+save_plot(plot_cur, "boxplot_cur_ceph.png")
+save_plot(plot_sst, "boxplot_sst_ceph.png")
+save_plot(plot_tmin, "boxplot_tmin_ceph.png")
+save_plot(plot_o2_min, "boxplot_o2_min_ceph.png")
+save_plot(plot_sml, "boxplot_sml_ceph.png")
+save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_ceph.png")
+save_plot(plot_moon_phase, "boxplot_moon_phase_ceph.png")
+save_plot(plot_altitude, "boxplot_altitude_ceph.png")
 
