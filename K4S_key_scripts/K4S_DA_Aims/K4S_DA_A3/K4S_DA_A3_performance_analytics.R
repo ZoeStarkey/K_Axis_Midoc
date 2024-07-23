@@ -4,16 +4,20 @@ library(mgcv)
 library(caret)
 
 
-#Convert to numeric 
-# km_sf$CHLA <- as.numeric(km_sf$CHLA)
-# km_sf$TSM <- as.numeric(km_sf$TSM)
-# km_sf$CUR <- as.numeric(km_sf$CUR)
-
-env_vars <- km_df[, c("bm_g_m3", "TSM", "CUR", "SST", "Tmin","O2_min", "SML", "lunar_fraction", "moon_phase", "altitude")]
+\
+#All Taxa
+env_vars <- km_df[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
 env_vars <- env_vars[complete.cases(env_vars), ]
 
 
+#Minus gelatinous
+km_df_filtered <- km_df %>%
+  filter(!is.na(depth) & depth != "0-1000m")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+km_df_filtered <-  km_df_filtered[!km_df_filtered$tax.grp %in% exclude_taxa, ]
 
+env_vars <- km_df_filtered[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
+env_vars <- env_vars[complete.cases(env_vars), ]
 
 
 
