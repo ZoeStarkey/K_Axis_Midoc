@@ -18,7 +18,7 @@ km_df_filtered <-  km_df_filtered[!km_df_filtered$tax.grp %in% exclude_taxa, ]
 
 
 
-include_taxa <- c("fish")
+include_taxa <- c("cephalopods")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
 
@@ -123,12 +123,6 @@ save_plot(plot_altitude, "boxplot_altitude_fish.png")
 
 
 
-
-
-# COME BACK TO - categorical data 
-create_boxplot(km_df_filtered, env_var = "bestley.zone", dep_var = "bm_g_m3")
-
-
 print(plot)
 
 
@@ -195,7 +189,7 @@ plot_sml <- create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3",
 plot_Smax <- create_boxplot(km_df_filtered, env_var = "Smax", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
 plot_lunar_fraction <- create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
 plot_moon_phase <- create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
-plot_altitude <- create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
+plot_altitude <- create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.00))
 
 
 
@@ -223,6 +217,68 @@ save_plot(plot_sml, "boxplot_sml_ceph.png")
 save_plot(plot_lunar_fraction, "boxplot_lunar_fraction_ceph.png")
 save_plot(plot_moon_phase, "boxplot_moon_phase_ceph.png")
 save_plot(plot_altitude, "boxplot_altitude_ceph.png")
+
+
+#ZONES
+
+
+create_boxplot_unbinned <- function(data, env_var, dep_var, depth_col = "depth", y_limits = NULL) {
+  # Remove NAs from the specified environmental variable and the dependent variable
+  data <- data %>%
+    filter(!is.na(.data[[env_var]]), !is.na(.data[[dep_var]]))
+  
+  # Create the boxplot without binning
+  p <- ggplot(data, aes(x = .data[[env_var]], y = .data[[dep_var]], fill = .data[[depth_col]])) +
+    geom_boxplot() +
+    facet_wrap(as.formula(paste("~ reorder(", depth_col, ", desc(", depth_col, "))")), ncol = 1, scales = "fixed") +
+    theme_bw() +
+    xlab(env_var) +
+    ylab(expression(paste("Biomass (g m"^"-3", ")"))) +
+    ggtitle(paste("Boxplot of squid", dep_var, " by Depth Categories and", env_var)) +
+    scale_fill_manual(values = c("0-200m" = "#FFD300", "200-400m" = "red", "400-600m" = "magenta", "600-800m" = "purple", "800-1000m" = "blue")) +
+    guides(fill = guide_legend(reverse = TRUE)) +
+    theme(
+      strip.text.y = element_text(angle = 0),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+  
+  # Add y-axis limits if specified
+  if (!is.null(y_limits)) {
+    p <- p + coord_cartesian(ylim = y_limits)
+  }
+  
+  return(p)
+}
+
+# Example usage with y-axis limits
+create_boxplot_unbinned(data = km_df_filtered, env_var = "bestley.zone", dep_var = "bm_g_m3", y_limits = c(0, 0.0009))
+# print(plot)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #TSM - unbinned 
