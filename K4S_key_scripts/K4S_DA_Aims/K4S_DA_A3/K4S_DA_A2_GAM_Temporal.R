@@ -18,7 +18,7 @@ km_df <- km_df %>%
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
-#summarising the dat a
+#summarising the data 
 km_df_total <- km_df %>%
   group_by(midoc.stn) %>%
   summarize(
@@ -32,18 +32,27 @@ km_df_total <- km_df_total %>%
   mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
 
 #
-m1 <- gam(log(total_biomass) ~ s(start_time),data = km_df_total)
-
+m1 <- gam(log(total_biomass) ~ s(day),data = km_df_total)
+draw(m1, residuals = TRUE) 
+summary(m1)
 
 #Lunar fraction 
 m2 <- gam(log(total_biomass) ~ s(lunar_fraction),data = km_df_total)
 draw(m2, residuals = TRUE) 
-summary(m1)
+summary(m2)
 
+#Solar angle 
+m3 <- gam(log(total_biomass) ~ s(altitude),data = km_df_total)
+draw(m3, residuals = TRUE) 
+summary(m3)
 
-
-
-new_df <- km_df_total %>%
-  select(midoc.stn, start_time, day)
+#Summed data with depth 
+load("km_df_environmental_variables.Rda")
+#remove the 0-1000m
+km_df <- km_df %>%
+  filter(!is.na(depth) & depth != "0-1000m")
+#remove gelatinous 
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
 
