@@ -18,7 +18,7 @@ km_df_filtered <-  km_df_filtered[!km_df_filtered$tax.grp %in% exclude_taxa, ]
 
 
 
-include_taxa <- c("cephalopods")
+include_taxa <- c("fish")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
 
@@ -65,7 +65,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
 
 #Function to saveplot
 save_plot <- function(plot, filename) {
-  ggsave(filename, plot = plot, path = "~/Desktop", width = 15, height = 10)
+  ggsave(filename, plot = plot, path = "~/Desktop", width = 5, height = 10)
 }
 
 
@@ -155,7 +155,7 @@ create_boxplot <- function(data, env_var, dep_var, num_bins = 5, depth_col = "de
   
   # Create the boxplot
   p <- ggplot(data, aes(x = binned_var, y = .data[[dep_var]], fill = .data[[depth_col]])) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot(outliers = FALSE) +
     facet_wrap(as.formula(paste("~ reorder(", depth_col, ", desc(", depth_col, "))")), ncol = 1, scales = "fixed") +
     theme_bw() +
     xlab(env_var) +
@@ -188,7 +188,7 @@ plot_o2_min <- create_boxplot(km_df_filtered, env_var = "O2_min", dep_var = "bm_
 plot_sml <- create_boxplot(km_df_filtered, env_var = "SML", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
 plot_Smax <- create_boxplot(km_df_filtered, env_var = "Smax", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
 plot_lunar_fraction <- create_boxplot(km_df_filtered, env_var = "lunar_fraction", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
-plot_moon_phase <- create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.003))
+plot_moon_phase <- create_boxplot(km_df_filtered, env_var = "moon_phase", dep_var = "bm_g_m3", y_limits = c(0, 0.009))
 plot_altitude <- create_boxplot(km_df_filtered, env_var = "altitude", dep_var = "bm_g_m3", y_limits = c(0, 0.00))
 
 
