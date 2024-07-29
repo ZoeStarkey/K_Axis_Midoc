@@ -23,7 +23,7 @@ exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill 
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
 #summarising the data 
-  #used to work, might not anymore 
+  #didnt work, but now is working again
 km_df_sum <- km_df %>%
   group_by(midoc.stn) %>%
   summarize(
@@ -31,25 +31,25 @@ km_df_sum <- km_df %>%
     across(-bm_g_m3, ~ first(.))
   )
 
-
-km_df_sum <- km_df %>%
-  group_by(midoc.stn) %>%
-  reframe(
-    total_biomass = sum(bm_g_m3, na.rm = TRUE),
-    across(-bm_g_m3, first)
-  )
+#trying reframe 
+# km_df_sum <- km_df %>%
+#   group_by(midoc.stn) %>%
+#   reframe(
+#     total_biomass = sum(bm_g_m3, na.rm = TRUE),
+#     across(-bm_g_m3, first)
+#   )
 
 #Currently working 
-km_df_sum <- km_df %>%
-  group_by(midoc.stn) %>%
-  reframe(
-    total_biomass = sum(bm_g_m3, na.rm = TRUE),
-    start_time = first(start_time),
-    end_time = first(end_time),
-    across(where(is.character), first),
-    across(where(is.logical), first),
-    across(where(is.numeric) & !c(bm_g_m3), first)
-  )
+# km_df_sum <- km_df %>%
+#   group_by(midoc.stn) %>%
+#   reframe(
+#     total_biomass = sum(bm_g_m3, na.rm = TRUE),
+#     start_time = first(start_time),
+#     end_time = first(end_time),
+#     across(where(is.character), first),
+#     across(where(is.logical), first),
+#     across(where(is.numeric) & !c(bm_g_m3), first)
+#   )
 
 # Adding day 
 km_df_sum <- km_df_sum %>%
@@ -65,15 +65,14 @@ m2 <- gam(log(total_biomass) ~ s(lunar_fraction),data = km_df_sum)
 draw(m2, residuals = TRUE) 
 summary(m2)
 
-#Solar angle 
+ #Solar angle 
 m3 <- gam(log(total_biomass) ~ s(altitude),data = km_df_sum)
 draw(m3, residuals = TRUE) 
 summary(m3)
 
 
 
-
-
+ 
 #Summed data with depth 
 load("km_df_environmental_variables.Rda")
 #remove the 0-1000m
