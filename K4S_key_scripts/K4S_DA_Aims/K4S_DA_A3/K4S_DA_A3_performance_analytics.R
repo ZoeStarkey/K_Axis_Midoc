@@ -24,7 +24,17 @@ env_vars <- env_vars[complete.cases(env_vars), ]
 include_taxa <- c("cephalopods", "fish")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
-env_vars <- km_df_filtered[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
+
+include_taxa <- c("cephalopods", "fish")
+km_sf <- km_sf[km_sf$tax.grp %in% include_taxa, ]
+
+
+env_vars <- km_sf[, c("bm_log" , "TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude" )]
 env_vars <- env_vars[complete.cases(env_vars), ]
 
 chart.Correlation(env_vars, histogram=TRUE, pch=19)
+
+km_df_filtered$bm_log <- log(km_df_filtered$bm_g_m3)
+
+
+
