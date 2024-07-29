@@ -10,8 +10,6 @@ library(stars)
 
 library(sp)
 
-
-
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
 setwd(d)
@@ -204,6 +202,11 @@ abandoned_stations <- c("MIDOC02","MIDOC08", "MIDOC10", "MIDOC12", "MIDOC33")
 # Remove the specified stations from km_df
 km_df <- km_df %>%
   filter(!midoc.stn %in% abandoned_stations)
+
+depth_bins <- c("0-1000m", "800-1000m", "600-800m", "400-600m", "200-400m", "0-200m")
+
+km_df$depth <- factor(km_df$cod.end, levels = c("1", "2", "3", "4", "5", "6"), labels = depth_bins)
+
 
 #saving the data_frame 
 save(km_df, file = "km_df_environmental_variables.Rda")
