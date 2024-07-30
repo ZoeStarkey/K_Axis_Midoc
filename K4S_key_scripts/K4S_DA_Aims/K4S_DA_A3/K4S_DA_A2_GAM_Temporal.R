@@ -31,26 +31,6 @@ km_df_sum <- km_df %>%
     across(-bm_g_m3, ~ first(.))
   )
 
-#trying reframe 
-# km_df_sum <- km_df %>%
-#   group_by(midoc.stn) %>%
-#   reframe(
-#     total_biomass = sum(bm_g_m3, na.rm = TRUE),
-#     across(-bm_g_m3, first)
-#   )
-
-#Currently working 
-# km_df_sum <- km_df %>%
-#   group_by(midoc.stn) %>%
-#   reframe(
-#     total_biomass = sum(bm_g_m3, na.rm = TRUE),
-#     start_time = first(start_time),
-#     end_time = first(end_time),
-#     across(where(is.character), first),
-#     across(where(is.logical), first),
-#     across(where(is.numeric) & !c(bm_g_m3), first)
-#   )
-
 # Adding day 
 km_df_sum <- km_df_sum %>%
   mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
