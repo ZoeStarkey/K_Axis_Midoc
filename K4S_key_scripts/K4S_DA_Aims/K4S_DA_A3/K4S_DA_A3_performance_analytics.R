@@ -22,42 +22,56 @@ km_df <- km_df %>%
 km_df$logged_bm <-log(km_df$bm_g_m3)
 
 
-env_vars <- km_df[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
-env_vars <- env_vars[complete.cases(env_vars), ]
+# env_vars <- km_df[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
+# env_vars <- env_vars[complete.cases(env_vars), ]
 
 
-#Minus gelatinous
+#filter out depth 
 km_df_filtered <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
+
+#Minus gelatinous
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 km_df_filtered <-  km_df_filtered[!km_df_filtered$tax.grp %in% exclude_taxa, ]
 
 
 
 #Temporal 
+temporal_vars <- km_df_filtered[,c("logged_bm", "lunar_fraction","altitude","day")]
+temporal_vars <- temporal_vars[complete.cases(temporal_vars), ]
+chart.Correlation(temporal_vars, histogram=TRUE, pch=19)
 
-temporal_variables <- km_df_filtered[,c("logged_bm", "lunar_fraction","altitude","day")]
-temporal_variables <- temporal_variables[complete.cases(temporal_variables), ]
-chart.Correlation(temporal_variables, histogram=TRUE, pch=19)
+#Satellite Data 
+sat_vars <- km_df_filtered[,c("logged_bm", "TSM", "CUR", "SST","CHLA")]
+sat_vars <- sat_vars[complete.cases(sat_vars), ]
+chart.Correlation(sat_vars, histogram=TRUE, pch=19)
 
-
-env_vars <- km_df_filtered[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
+#Environmental insitu
+env_vars <- km_df_filtered[, c("logged_bm", "Tmin", "O2_min", "SML", "Smax")]
 env_vars <- env_vars[complete.cases(env_vars), ]
+chart.Correlation(env_vars, histogram=TRUE, pch=19)
+
+
 
 #just fish and swuid 
 
-include_taxa <- c("cephalopods", "fish")
+include_taxa <- c("cephalopods")
 km_df_filtered <- km_df_filtered[km_df_filtered$tax.grp %in% include_taxa, ]
 
+#Temporal 
+temporal_vars <- km_df_filtered[,c("logged_bm", "lunar_fraction","altitude","day")]
+temporal_vars <- temporal_vars[complete.cases(temporal_vars), ]
+chart.Correlation(temporal_vars, histogram=TRUE, pch=19)
 
-include_taxa <- c("cephalopods", "fish")
-km_sf <- km_sf[km_sf$tax.grp %in% include_taxa, ]
+#Satellite Data 
+sat_vars <- km_df_filtered[,c("logged_bm", "TSM", "CUR", "SST","CHLA")]
+sat_vars <- sat_vars[complete.cases(sat_vars), ]
+chart.Correlation(sat_vars, histogram=TRUE, pch=19)
 
-
-env_vars <- km_sf[, c("bm_log" , "TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude" )]
+#Environmental insitu
+env_vars <- km_df_filtered[, c("logged_bm", "Tmin", "O2_min", "SML", "Smax")]
 env_vars <- env_vars[complete.cases(env_vars), ]
-
-chart.Correlation(temporal_variables, histogram=TRUE, pch=19)
+chart.Correlation(env_vars, histogram=TRUE, pch=19)
 
 
 
