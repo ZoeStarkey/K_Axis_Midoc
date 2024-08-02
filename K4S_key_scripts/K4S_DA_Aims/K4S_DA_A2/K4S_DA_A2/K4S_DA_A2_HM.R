@@ -130,6 +130,8 @@ print(total_biomass_heatmap)
 
 
 
+
+
 #TOTAL BIOMASS - Only key taxa groups
 # Filter in Fish, Cephalopods, and Krill
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
@@ -183,77 +185,89 @@ ggsave(filename = full_output_path, plot = total_biomass_heatmap, width =10, hei
 
 
 #TOTAL BIOMASS - only key groups and time of day
-# Filter in Fish, Cephalopods, and Krill
-# Filter in Fish, Cephalopods, and Krill
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
-
-# Filter the dataframe to exclude the specified taxa and only include non-NA depths
-km_filtered <- km_sf %>%
-  filter(!tax.grp %in% exclude_taxa) %>%
-  filter(!is.na(depth))
-# Select relevant columns from the filtered dataframe
-km_heat <- km_filtered %>%
-  dplyr::select(midoc.stn, depth, bm_g_m3, DNC.visual)
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat, sum)
-
-# Ensure the depth is treated as a factor to maintain the order
-heatmap_data$depth <- factor(heatmap_data$depth, levels = depth_bins)
-
-# Merge the DNC.visual and time_of_day back into the aggregated data
-heatmap_data <- merge(heatmap_data, km_heat[, c("midoc.stn", "DNC.visual")], by = "midoc.stn")
-
-# Create a custom order for midoc.stn based on DNC.visual
-heatmap_data <- heatmap_data[order(factor(heatmap_data$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
-
-# Convert midoc.stn to a factor with levels in the desired order
-heatmap_data$midoc.stn <- factor(heatmap_data$midoc.stn, levels = unique(heatmap_data$midoc.stn))
-
-
-#Removing MIDOC from lable
-label_midoc_stn <- function(x) {
-  sub("MIDOC", "", x)
+create_heatmap_total <- function(data, title, panel_bg_color = "white") {
+  # Filter the dataframe to include only rows where tax.grp matches the specified taxonomic group
+  exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
+  
+  # Filter the dataframe to exclude the specified taxa and only include non-NA depths
+  km_filtered <- km_sf %>%
+    filter(!tax.grp %in% exclude_taxa) %>%
+    filter(!is.na(depth))
+  # Select relevant columns from the filtered dataframe
+  km_heat <- km_filtered[, c("midoc.stn", "depth", "bm_g_m3", "DNC.visual")]
+  
+  # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+  heatmap_data <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat, sum)
+  
+  # Ensure the depth is treated as a factor to maintain the order
+  depth_bins <- c("0-200", "200-400", "400-600", "600-800", "800-1000")
+  heatmap_data$depth <- factor(heatmap_data$depth, levels = depth_bins)
+  
+  # Ensure all combinations of midoc.stn and depth are represented
+  heatmap_data <- heatmap_data %>%
+    complete(midoc.stn, depth, fill = list(bm_g_m3 = NA))
+  
+  # Merge the DNC.visual back into the aggregated data
+  heatmap_data <- merge(heatmap_data, unique(km_heat[, c("midoc.stn", "DNC.visual")]), by = "midoc.stn", all.x = TRUE)
+  
+  # Create a custom order for midoc.stn based on DNC.visual
+  heatmap_data <- heatmap_data[order(factor(heatmap_data$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
+  
+  # Convert midoc.stn to a factor with levels in the desired order
+  heatmap_data$midoc.stn <- factor(heatmap_data$midoc.stn, levels = unique(heatmap_data$midoc.stn))
+  
+  # Create a named vector of HTML-formatted labels for the x-axis
+  label_midoc_stn <- function(x) {
+    sub("MIDOC", "", x)
+  }
+  
+  midoc_labels <- paste0(
+    "<span>",
+    sapply(levels(heatmap_data$midoc.stn), label_midoc_stn),
+    "</span>"
+  )
+  
+  names(midoc_labels) <- levels(heatmap_data$midoc.stn)
+  
+  
+  
+  # Identify NA values in the dataset
+  na_data <- heatmap_data %>% filter(is.na(bm_g_m3))
+  
+  # Create the heatmap using ggplot2
+  ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+    geom_tile(color = "white") + # Use tiles to represent the heatmap, set color for tile borders
+    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") + # Set the gradient colors for the fill and color for NA values
+    geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) + #
+    labs(title = title, x = "Midoc Station", y = "Depth (m)", fill = "Summed Biomass (g/m³)") + # Add labels and title
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 40), size = 14), # Increase distance between x-axis label and axis
+      axis.title.y = element_text(margin = margin(t = 40),size = 14),
+      axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, , color = "black"), # Center x-axis labels over tick marks and increase text size
+      axis.text.y = element_text(size = 12, color = "black"),
+      axis.ticks.x = element_line(linewidth = 0.5), # Add tick marks on x-axis
+      axis.ticks.length = unit(5, "pt"), # Increase y-axis text size and set color to black
+      panel.background = element_rect(fill = panel_bg_color, color = NA), # Set background color for the panel
+      panel.grid = element_blank(), # Remove grid lines
+      legend.position = "right",
+      legend.title = element_text(size = 15), # Increase legend title size
+      legend.text = element_text(size = 12)# Position legend to the right
+    ) + 
+    scale_x_discrete(labels = midoc_labels) +
+    scale_y_discrete(limits = rev(levels(heatmap_data$depth))) +# Apply the custom HTML labels
+    coord_fixed(ratio = 4 )# Fix the aspect ratio
 }
 
-#Create a named vector of HTML-formatted labels for the x-axis
-midoc_labels <- paste0(
-  "<span>",
-  sapply(heatmap_data$midoc.stn, label_midoc_stn),
-  "</span>"
-)
 
-# midoc_labels <- paste0(
-#   "<span style='color:",
-#   ifelse(heatmap_data$DNC.visual == "D", "orange", #orange
-#          ifelse(heatmap_data$DNC.visual == "MC", "violet", #violet
-#                 ifelse(heatmap_data$DNC.visual == "N", "darkblue", "red"))), #darkblue, red
-#   "'>",
-#   sapply(heatmap_data$midoc.stn, label_midoc_stn),
-#   "</span>"
-# )
+# Usage example
 
-# Ensure unique labels for the x-axis
-names(midoc_labels) <- heatmap_data$midoc.stn
-unique_midoc_labels <- midoc_labels[!duplicated(names(midoc_labels))]
 
-# Create the heatmap using ggplot2
-total_biomass_heatmap <- ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_viridis_c(option = "rocket", direction = -1) + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Total Biomass (Excluding Salps and Cnidarians)", x = "Midoc Station", y = "Depth (m) ", fill = "Summed Biomass (g/m³)") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(
-    axis.title.x = element_text(margin = margin(t = 40), size = 15), # Increase distance between x-axis label and axis
-    axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, color = "black"), # Center x-axis labels over tick marks and increase text size
-    axis.text.y = element_text(size = 10, color = "black") # Increase y-axis text size and set color to black
-      # Center x-axis labels over tick marks
-  ) +  # Rotate x-axis labels for better readabilit
-  scale_x_discrete(labels = unique_midoc_labels) 
-  # Apply the custom colored labels
+total_biomass_day_heatmap<- create_heatmap_total(km_sf, "Heat Map of total taxa (Excluding Gelatinous)")
 
-# Print the heatmap
-print(total_biomass_heatmap)
+print(total_biomass_day_heatmap)
+
+#saving
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
 output_filename <- "K4S_Plot_A2_HM_Day_No_Gelat.png"
@@ -262,7 +276,7 @@ full_output_path <- file.path(output_directory, output_filename)
 
 
 # Save the plot
-ggsave(filename = full_output_path, plot = total_biomass_heatmap, width =10, height =, dpi = 300, bg = "white")
+ggsave(filename = full_output_path, plot = total_biomass_heatmap, width =10, height =10, dpi = 300, bg = "white")
 
 
 
@@ -374,16 +388,16 @@ ggsave(filename = full_output_path, plot = cephalopods_heatmap, width =10, heigh
 
 #Combined plots 
 #combined_heatmap <- (fish_heatmap | cephalopods_heatmap)
-combined_heatmap <- fish_heatmap / cephalopods_heatmap
+combined_heatmap <-  total_biomass_day_heatmap / fish_heatmap / cephalopods_heatmap
 # Print the combined plot
 print(combined_heatmap)
 
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
-output_filename <- "K4S_Plot_A2_HM_Day_Fish_Cephalopods.png"
+output_filename <- "K4S_Plot_A2_HM_Day_Fish_Cephalopods_Total.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = combined_heatmap, width =10, height =10, dpi = 300, bg = "white")
+ggsave(filename = full_output_path, plot = combined_heatmap, width =12, height =15, dpi = 500, bg = "white")
 
 
 max(km$bm_g_m3, na.rm = TRUE)
