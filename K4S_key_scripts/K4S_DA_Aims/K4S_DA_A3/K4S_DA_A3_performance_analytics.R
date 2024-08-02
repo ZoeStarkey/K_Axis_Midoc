@@ -2,6 +2,7 @@ library(PerformanceAnalytics)
 library(ggplot2)
 library(mgcv)
 library(caret)
+library(dplyr)
 
 
 \
@@ -16,7 +17,8 @@ load("km_df_environmental_variables.Rda")
 
 #add day 
 km_df <- km_df %>%
-  mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
+  mutate(day = (as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24)))
+
 
 #add log
 km_df$logged_bm <-log(km_df$bm_g_m3)
@@ -24,6 +26,7 @@ km_df$logged_bm <-log(km_df$bm_g_m3)
 
 # env_vars <- km_df[, c("TSM", "CUR", "SST","CHLA", "Tmin", "Tmax", "O2_min", "SML", "Smax", "lunar_fraction", "moon_phase", "altitude")]
 # env_vars <- env_vars[complete.cases(env_vars), ]
+
 
 
 #filter out depth 
