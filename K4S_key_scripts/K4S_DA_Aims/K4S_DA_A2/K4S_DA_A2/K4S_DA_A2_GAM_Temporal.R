@@ -3,7 +3,6 @@ library(mgcv)
 library(gratia)
 library(dplyr)
 
-#linear model
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
 setwd(d)
@@ -102,7 +101,7 @@ load("km_df_environmental_variables.Rda")
 km_df <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
 #remove gelatinous 
-include_taxa <- c("fish")
+include_taxa <- c("cephalopods")
 km_df <-  km_df[km_df$tax.grp %in% include_taxa, ]
 
 # Adding day 
