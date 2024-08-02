@@ -4,12 +4,56 @@ library(dplyr)
 library(ggtext)
 
 ##TOTAL TAXA BIOMASSS##
+#setting up directory 
+usr <- Sys.info()["user"]
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
+setwd(d)
+dir.exists(d)
+
+#projection 
+prj<- "+proj=laea +lat_0=-60 +lon_0=75 +datum=WGS84 +ellps=WGS84 +no_defs +towgs84=0,0,0" #ZS: defines a Lambert Azimuthal Equal Area projection centered at 60 degrees South latitude and 75 degrees East longitude, using the WGS84 datum and ellipsoid, with no datum transformation applied
+ll2prj <- function(dat, proj=prj, loncol="lon", latcol="lat"){
+  coordinates(dat) <- c(loncol, latcol)
+  projection(dat) <- "+proj=longlat +datum=WGS84"
+  dat <- spTransform(dat, CRS(prj))
+  dat
+}
+
+km <- readRDS("./derived data/midoc_stations_checked.rds")
+km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
+tmp <- read_csv("./source data/midoc_stations_zones.csv")
+km <- inner_join(km, tmp); rm(tmp)
+tmp <- read_csv(("./source data/midoc_crepuscular.csv"))
+km <- inner_join(km, tmp); rm(tmp)
+tmp <- readRDS("./derived data/codend_taxa_biomass.rds")
+km <- inner_join(km, tmp); rm(tmp)
+file_path <- "./derived data/midoc_stations_envdata.rda" #adding zone
+tmp <- readRDS(file_path)
+km <- inner_join(km, tmp); rm(tmp)
+
+km$lon_start_orig <- km$lon_start
+km$lat_start_orig <- km$lat_start
+km <- ll2prj(km, loncol="lon_start_orig", latcol="lat_start_orig")
+
+#making km a dataframe
+km_df <- as.data.frame(km)
+#making km a sf
+km_sf <- st_as_sf(km)
 
 # Define the depth ranges for each codend
-depth_bins <- c("0-1000m", "800-1000m", "600-800m", "400-600m", "200-400m", "0-200m")
+depth_bins <- c("0-1000", "800-1000", "600-800", "400-600", "200-400", "0-200")
 
 # Map the codends to depth ranges using the factor function
 km_sf$depth <- factor(km$cod.end, levels = c("1", "2", "3", "4", "5", "6"), labels = depth_bins)
+
+# Define the stations to remove
+abandoned_stations <- c("MIDOC02","MIDOC08", "MIDOC10", "MIDOC12", "MIDOC33")
+
+# Remove the specified stations from km_df
+km_sf <- km_sf %>%
+  filter(!midoc.stn %in% abandoned_stations)
+
+
 
 # Select relevant columns from the km dataframe
 km_heat <- km_sf[, c("midoc.stn", "depth", "bm_g_m3")]
@@ -82,12 +126,15 @@ print(total_biomass_heatmap)
 
 #TOTAL BIOMASS - Only key taxa groups
 # Filter in Fish, Cephalopods, and Krill
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
+
+# Filter the dataframe to exclude the specified taxa and only include non-NA depths
 km_filtered <- km_sf %>%
-  filter(tax.grp %in% c("fish", "cephalopods", "krill")) %>%
+  filter(!tax.grp %in% exclude_taxa) %>%
   filter(!is.na(depth))
 # Select relevant columns from the filtered dataframe
   km_heat <- km_filtered %>%
-  select(midoc.stn, depth, bm_g_m3)
+  dplyr::select(midoc.stn, depth, bm_g_m3)
 
 # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
 heatmap_data <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat, sum)
@@ -95,17 +142,39 @@ heatmap_data <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat, sum)
 # Ensure the depth is treated as a factor to maintain the order
 heatmap_data$depth <- factor(heatmap_data$depth, levels = depth_bins)
          
+#Removing MIDOC 
+label_midoc_stn <- function(x) {
+  sub("MIDOC", "", x)
+}
+
 # Create the heatmap using ggplot2
 total_biomass_heatmap <- ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
     geom_tile() + # Use tiles to represent the heatmap
     scale_fill_viridis_c(option = "rocket", direction = -1) + # Set the gradient colors for the fill
-    labs(title = "Heat Map of Total Biomass (Fish, Cephalopods, Krill)", x = "Midoc Station", y = "Depth", fill = "Total Biomass (g/m³)") + # Add labels and title
+    labs(title = "Heat Map of Total Biomass (Excluding Gelatinous)", x = "Midoc Station", y = "Depth (m) ", fill = "Total Biomass (g/m³)") + # Add labels and title
     theme_minimal() + # Use a minimal theme for the plot
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+  theme(
+    axis.title.x = element_text(margin = margin(t = 10)), # Increase distance between x-axis label and axis
+    axis.text.x = element_text(angle = 90, hjust = 0.5, vjust = 0.5) # Center x-axis labels over tick marks
+  ) + 
+  scale_x_discrete(labels = label_midoc_stn) # Apply the custom labels to x-axis
+# Rotate x-axis labels for better readability
          
 # Print the heatmap
 print(total_biomass_heatmap)
-         
+
+
+# Specify the path where you want to save the plot
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_Day_No_Gelat.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+
+
+# Save the plot
+ggsave(filename = full_output_path, plot = total_biomass_heatmap, width =10, height = 8, dpi = 300, bg = "white")
+
+
 
 #TOTAL BIOMASS - only key groups and time of day
 # Filter in Fish, Cephalopods, and Krill
