@@ -14,13 +14,15 @@ load("km_df_environmental_variables.Rda")
   #remove the 0-1000m
 km_df <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
-#include_taxa <- c("fish")
-#km_df <-  km_df[km_df$tax.grp %in% include_taxa, ]
 
 
   #remove gelatinous 
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
+
+  #include 
+#include_taxa <- c("fish")
+#km_df <-  km_df[km_df$tax.grp %in% include_taxa, ]
 
 #summarising the data 
   #didnt work, but now is working again
@@ -53,13 +55,13 @@ summary(m3)
 
 
  
-#Summed data with depth 
+#SUMMED DATA WITH DEPTH EXCLUDING GELATINOUS
 load("km_df_environmental_variables.Rda")
 #remove the 0-1000m
 km_df <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
 #remove gelatinous 
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
 # Adding day 
@@ -129,11 +131,80 @@ m6 <- gam(log(biomass_sum) ~ s(altitude, by = depth),data = km_df_sum_depth)
 draw(m6, residuals = TRUE)
 summary(m6)
 
+#GAMM for solar angle 
+m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth) + s(lon_start, lat_start, bs = "sos"),data = km_df_sum_depth correlation = corGaus(form = ~ lon_start + lat_start))
+summary(m7$gam)
+plot(m7$lme)
+par(mfrow = c(2, 2))
+gam.check(m7$gam)
+
+m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth, correlation = corExp(form = ~ depth | lon_start + lat_start, nugget = TRUE))
+
+summary(m7$gam)
+draw(m7, residuals = TRUE)
+
+#Jitter
+# Load required libraries
+library(mgcv)
+library(nlme)
+\
+
+#make a plot showing stacked bar charts of the biomass sum for each station, with the tax.grp as the fill colour dataset is km_df
+ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
+  geom_bar(stat = "identity") +#, position = "fill") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  #facet_grid(rows = var("depth")) +
+  #facet_wrap(~factor(depth, levels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m"),
+                  #   labels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m")), ncol = 1) +
+  labs(x = "Station", y = "Biomass sum", fill = "tax.grp")
+
+
+# Assuming your dataframe is called 'df' with columns:
+# 'biomass', 'lunar_angle', 'lat', 'lon'
+
+# Add a small amount of jitter to coordinates to avoid duplicate points
+set.seed(123)  # for reproducibility
+km_df_sum_depth$lon_jitter <- km_df_sum_depth$lon_start + runif(nrow(km_df_sum_depth), -0.00001, 0.00001)
+km_df_sum_depth$lat_jitter <- km_df_sum_depth$lat_start + runif(nrow(km_df_sum_depth), -0.00001, 0.00001)
+
+# Create a correlation structure
+# Here we use an exponential correlation structure
+correlation_structure <- corExp(form = ~ lon_jitter + lat_jitter, nugget = TRUE)
+
+# Fit the GAM model with correlation structure
+model <- gamm(log(biomass_sum) ~ s(altitude, by = depth),
+              data = km_df_sum_depth,
+              correlation = correlation_structure,
+              method = "REML")
+
+# Summary of the model
+summary(model$gam)
+summary(model$lme)
+
+# Plot the model
+plot(model$gam)
+pl
 
 
 
+#random effect 
+m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth, random = list(midoc.stn = ~ 1 ))
 
+#gamma instead of log 
+m8 <- gam(biomass_sum ~ s(altitude, by = depth), data = km_df_sum_depth, family=Gamma())
+par(mfrow = c(2, 2))
+gam.check(m8)
 
+#gamma instead of log 
+library(gamm4)
+m9 <- gamm4(biomass_sum + 0.0001 ~ s(altitude, by = depth) , data = km_df_sum_depth, family = Gamma(link = "inverse"), random = ~(1|midoc.stn))
+par(mfrow = c(2, 2))
+gam.check(m9$gam)
+summary(m9$gam)
+m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth)
+summary(m7$gam)
+par(mfrow = c(2, 2))
+plot(m7$lme)
 
 
 #Sanity check 
