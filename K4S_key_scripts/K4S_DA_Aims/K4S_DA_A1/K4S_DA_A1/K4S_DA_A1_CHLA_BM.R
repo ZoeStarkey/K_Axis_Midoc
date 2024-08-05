@@ -158,7 +158,7 @@ bin_labels <- paste0(
   sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
   " - ",
   sprintf("%.3f", bin_breaks[-1]),
-  ")"
+  
 )
 
 # Modify the mutate step in km_sf_total
@@ -179,8 +179,19 @@ ggplot() +
                                               label.position = "right",
                                               barwidth = 1,
                                               barheight = 15)) +
+  #add ice
+  ggnewscale::new_scale_fill() + 
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+                       name = 'Ice (%)',
+                       guide = guide_colorbar(title.position = "left", 
+                                              title.hjust = 0.5,
+                                              label.position = "right",
+                                              barwidth = 1,
+                                              barheight = 15)) +
+  
+  
   ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
-  # Add the zoomed-in countries layer
   geom_sf(data = wcp_sf, fill = NA, color = "black") +
   # Add the ofp layer
   geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
@@ -188,6 +199,7 @@ ggplot() +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
   geom_sf(data = ktr_sf, size = 1) +
+  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey85", "grey60", "grey40", "black"),
@@ -208,26 +220,29 @@ ggplot() +
     legend.box.background = element_blank(),
     legend.byrow = TRUE,
     strip.background = element_rect(fill = NA)
-  ) +
-  guides(
-    fill = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      override.aes = list(size = c(2, 4, 6, 8, 10))  # Specify sizes for each category
-    ),
-    size = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5
-    ),
-    # Add this line for the Chl-a legend
-    colour = guide_colorbar(title.position = "left", 
-                            title.hjust = 0.5,
-                            label.position = "right",
-                            barwidth = 1,
-                            barheight = 15)
-  ) +
-  # Add this line to merge the fill and size legends
-  theme(legend.box = "vertical")
+  )  +# ... (keep your other layers and settings)
+
+guides(
+  fill = guide_legend(
+    title.position = "left", 
+    title.hjust = 0.5,
+    override.aes = list(size = c(2, 4, 6, 8, 10))
+  ),
+  size = guide_legend(
+    title.position = "left", 
+    title.hjust = 0.5
+  ),
+  colour = guide_colorbar(title.position = "left", 
+                          title.hjust = 0.5,
+                          label.position = "right",
+                          barwidth = 1,
+                          barheight = 15)
+) +
+  theme(
+    legend.position = "right",
+    legend.box = "vertical",
+    # ... (keep your other theme settings)
+  )
 
 
 
