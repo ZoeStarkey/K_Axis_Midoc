@@ -157,8 +157,7 @@ bin_labels <- paste0(
   #c("Very Low (", "Low (", "Medium (", "High (", "Very High ("),
   sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
   " - ",
-  sprintf("%.3f", bin_breaks[-1]),
-  
+  sprintf("%.3f", bin_breaks[-1])
 )
 
 # Modify the mutate step in km_sf_total
@@ -168,11 +167,12 @@ km_sf_total <- km_sf_total %>%
                            labels = bin_labels,
                            include.lowest = TRUE))
 
-ggplot() +
+Chla_total <- ggplot() +
   # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                        limits = c(log(q1), log(q2)),
+                       na.value = "grey85",  # Add this line
                        name = expression(paste("Chl-a (mg ", m^-3, ")")),
                        guide = guide_colorbar(title.position = "left", 
                                               title.hjust = 0.5,
@@ -194,7 +194,7 @@ ggplot() +
   ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
   geom_sf(data = wcp_sf, fill = NA, color = "black") +
   # Add the ofp layer
-  geom_sf(data = ofp_sf, color = "#053061", linetype = "dashed", linewidth = 1.0) +
+  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
@@ -202,15 +202,15 @@ ggplot() +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
-    values = c("white", "grey85", "grey60", "grey40", "black"),
+    values = c("white", "grey85", "grey65", "grey30", "black"),
     name = expression(paste("Total Biomass g m"^"-3"))
   ) +
   scale_size_manual(
-    values = c(2, 4, 6, 8, 10),
+    values = c(4, 6, 8, 10, 12),
     name = expression(paste("Total Biomass g m"^"-3"))
   ) +
   labs(x = "Longitude", y = "Latitude") +
-  coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 600000)) +
+  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
   theme(
     legend.position = "right",
     panel.grid = element_line(color = "gray80", linetype = "solid"),
@@ -219,14 +219,14 @@ ggplot() +
     legend.title = element_text(angle = 90, hjust = 0.5),
     legend.box.background = element_blank(),
     legend.byrow = TRUE,
-    strip.background = element_rect(fill = NA)
+    strip.background = element_rect(fill = "white")
   )  +# ... (keep your other layers and settings)
 
 guides(
   fill = guide_legend(
     title.position = "left", 
     title.hjust = 0.5,
-    override.aes = list(size = c(2, 4, 6, 8, 10))
+    override.aes = list(size = c(4, 6, 8, 10, 12))
   ),
   size = guide_legend(
     title.position = "left", 
@@ -247,9 +247,12 @@ guides(
 
 
 
+#save the plot 
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA")
+output_filename <- "K4S_Plot_A1_CHLA_TBM.png"
+full_output_path <- file.path(output_directory, output_filename)
 
-
-
+ggsave(filename = full_output_path, plot = Chla_total, width = 8, height = 10, bg = "white")
 
 
 
