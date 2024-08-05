@@ -48,6 +48,12 @@ ggplot(R_df, aes(x = x, y = y, fill = value)) +
         axis.title.y = element_blank(),
         legend.position = "right") 
 
+#ADD ICE 
+
+load("/Users/zoestarkey/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_DF_A1/ice_df.rda")
+
+
+
 
 
 #trying to add the sf layers 
@@ -129,9 +135,8 @@ R_projected <- projectRaster(R, crs = prj)
 R_df <- as.data.frame(R_projected, xy = TRUE)
 colnames(R_df) <- c("x", "y", "value")
 
+
 #TOTAL BIOMASS PLOT - only key taxon of interest
-
-
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 
 # Filter data for taxa not in the exclude list and aggregate biomass
@@ -144,14 +149,36 @@ km_sf_total <- km_sf %>%
     lat_end = first(lat_end)
   )
 
+# Calculate the bin breaks
+bin_breaks <- quantile(km_sf_total$total_biomass, probs = seq(0, 1, 0.2))
 
+# Create labels with exact ranges, now using three decimal places
+bin_labels <- paste0(
+  #c("Very Low (", "Low (", "Medium (", "High (", "Very High ("),
+  sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
+  " - ",
+  sprintf("%.3f", bin_breaks[-1]),
+  ")"
+)
+
+# Modify the mutate step in km_sf_total
+km_sf_total <- km_sf_total %>%
+  mutate(biomass_bin = cut(total_biomass, 
+                           breaks = bin_breaks,
+                           labels = bin_labels,
+                           include.lowest = TRUE))
 
 ggplot() +
   # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                        limits = c(log(q1), log(q2)),
-                       name = expression(paste("Chl-a (mg ", m^-3, ")")))  +
+                       name = expression(paste("Chl-a (mg ", m^-3, ")")),
+                       guide = guide_colorbar(title.position = "left", 
+                                              title.hjust = 0.5,
+                                              label.position = "right",
+                                              barwidth = 1,
+                                              barheight = 15)) +
   ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
   # Add the zoomed-in countries layer
   geom_sf(data = wcp_sf, fill = NA, color = "black") +
@@ -161,17 +188,15 @@ ggplot() +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
   geom_sf(data = ktr_sf, size = 1) +
-  geom_sf(data = km_sf_total, aes(fill = total_biomass, size = total_biomass), shape = 21, color = "black") +
-  scale_fill_gradientn(
-    colors = c("white", "grey90", "grey40", "grey20", "black"),
-    name = expression(paste("Total Biomass g m"^"-3")),
-    breaks = pretty_breaks(5)) +
-  #scale_size_continuous(name = expression(paste("Total Biomass m"^"-3"))) +
-  scale_size_binned(name = expression(paste("Total Biomass m"^"-3")),
-                    range = c(0,10),
-                    breaks = pretty_breaks(5),
-                    transform = "exp",
-                    nice.breaks = F) +
+  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
+  scale_fill_manual(
+    values = c("white", "grey85", "grey60", "grey40", "black"),
+    name = expression(paste("Total Biomass g m"^"-3"))
+  ) +
+  scale_size_manual(
+    values = c(2, 4, 6, 8, 10),
+    name = expression(paste("Total Biomass g m"^"-3"))
+  ) +
   labs(x = "Longitude", y = "Latitude") +
   coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 600000)) +
   theme(
@@ -184,10 +209,42 @@ ggplot() +
     legend.byrow = TRUE,
     strip.background = element_rect(fill = NA)
   ) +
-  guides(fill = guide_legend(title.position = "left", title.hjust = 0.5),
-         size = guide_legend(title.position = "left", title.hjust = 0.5))
+  guides(
+    fill = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5,
+      override.aes = list(size = c(2, 4, 6, 8, 10))  # Specify sizes for each category
+    ),
+    size = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5
+    ),
+    # Add this line for the Chl-a legend
+    colour = guide_colorbar(title.position = "left", 
+                            title.hjust = 0.5,
+                            label.position = "right",
+                            barwidth = 1,
+                            barheight = 15)
+  ) +
+  # Add this line to merge the fill and size legends
+  theme(legend.box = "vertical")
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 
 #Individual taxon function
