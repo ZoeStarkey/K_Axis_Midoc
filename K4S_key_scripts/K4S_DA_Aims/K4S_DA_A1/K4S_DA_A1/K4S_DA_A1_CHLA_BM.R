@@ -101,15 +101,25 @@ md <- readRDS(file_path)
 km <- merge(km, md[, c("midoc.stn", "zone")], by = "midoc.stn") 
 km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
 
-#Aggreating biomass data by midoc stqtion 
 km_sf <- st_as_sf(km)
-km_sf_total <- km_sf %>% # Aggregate biomass data by midoc station 
-  group_by(midoc.stn) %>%
-  summarize(
-    total_biomass = sum(bm_g_m3, na.rm = TRUE),
-    lon_end = first(lon_end),
-    lat_end = first(lat_end)
-  )
+# Define the depth ranges for each codend
+depth_bins <- c("0-1000", "800-1000", "600-800", "400-600", "200-400", "0-200")
+
+# Map the codends to depth ranges using the factor function
+km_sf$depth <- factor(km$cod.end, levels = c("1", "2", "3", "4", "5", "6"), labels = depth_bins)
+
+# Define the stations to remove
+abandoned_stations <- c("MIDOC02","MIDOC08", "MIDOC10", "MIDOC12", "MIDOC33")
+
+# Remove the specified stations from km_df
+km_sf <- km_sf %>%
+  filter(!midoc.stn %in% abandoned_stations)
+
+
+# Remove the specified stations from km_df
+km_sf <- km_sf %>%
+  filter(!depth %in% "0-1000")
+
 
 
 # Convert reprojected raster to data frame
@@ -119,20 +129,20 @@ R_projected <- projectRaster(R, crs = prj)
 R_df <- as.data.frame(R_projected, xy = TRUE)
 colnames(R_df) <- c("x", "y", "value")
 
-#TOTAL BIOMASS PLOT - only key taxon of interest 
-km_filtered <- km_sf %>%
-  filter(tax.grp %in% c("fish", "cephalopods", "krill"))
+#TOTAL BIOMASS PLOT - only key taxon of interest
 
-# Aggregate biomass data by midoc station including only fish, cephalopods, and krill
-km_sf_total <- km_sf%>%
+
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+
+# Filter data for taxa not in the exclude list and aggregate biomass
+km_sf_total <- km_sf %>%
+  filter(!tax.grp %in% exclude_taxa) %>%
   group_by(midoc.stn) %>%
   summarize(
     total_biomass = sum(bm_g_m3, na.rm = TRUE),
     lon_end = first(lon_end),
     lat_end = first(lat_end)
   )
-
-
 
 
 
