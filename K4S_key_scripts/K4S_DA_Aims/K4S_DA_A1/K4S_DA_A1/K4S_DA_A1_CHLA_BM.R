@@ -136,6 +136,33 @@ R_df <- as.data.frame(R_projected, xy = TRUE)
 colnames(R_df) <- c("x", "y", "value")
 
 
+
+
+#Fronts
+#loading KAXIS_FEATURESpoly_five.RData
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_FEATURESpoly_five.RData")
+summary(f3)
+
+# Remove the old CRS
+sf::st_crs(f3$finished) <- NA
+
+# Set the new CRS
+sf::st_crs(f3$finished) <- 4326  # Assuming the new CRS is EPSG code 4326 (WGS 84)
+
+
+
+#loading KAXIS_FEATURESpoly_extras.RData
+extra <- load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_FEATURESpoly_extras.RData")
+summary(f1)
+
+# Remove the old CRS
+sf::st_crs(f1$finished) <- NA
+
+# Set the new CRS
+sf::st_crs(f1$finished) <- 4326  #
+
+
+
 #TOTAL BIOMASS PLOT - only key taxon of interest
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 
@@ -167,18 +194,20 @@ km_sf_total <- km_sf_total %>%
                            labels = bin_labels,
                            include.lowest = TRUE))
 
-Chla_total <- ggplot() +
-  # Add the base raster layer
+
+Chla_total <-
+ ggplot() +
+ # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                        limits = c(log(q1), log(q2)),
-                       na.value = "grey85",  # Add this line
+                       na.value = "grey85",
                        name = expression(paste("Chl-a (mg ", m^-3, ")")),
-                       guide = guide_colorbar(title.position = "left", 
+                       guide = guide_colorbar(title.position = "left",
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 15)) +
+                                              barheight = 8)) +
   #add ice
   ggnewscale::new_scale_fill() + 
   geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
@@ -188,7 +217,11 @@ Chla_total <- ggplot() +
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 15)) +
+                                              barheight = 8)) +
+  
+  #  add f3$finished and f1$finished
+  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
+  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
   
   
   ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
@@ -203,11 +236,11 @@ Chla_total <- ggplot() +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey85", "grey65", "grey30", "black"),
-    name = expression(paste("Total Biomass g m"^"-3"))
+    name = expression(paste("Summed Biomass (g m"^-3, ")"))
   ) +
   scale_size_manual(
     values = c(4, 6, 8, 10, 12),
-    name = expression(paste("Total Biomass g m"^"-3"))
+    name = expression(paste("Summed Biomass (g m"^-3, ")"))
   ) +
   labs(x = "Longitude", y = "Latitude") +
   coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
@@ -222,21 +255,26 @@ Chla_total <- ggplot() +
     strip.background = element_rect(fill = "white")
   )  +# ... (keep your other layers and settings)
 
-guides(
-  fill = guide_legend(
-    title.position = "left", 
-    title.hjust = 0.5,
-    override.aes = list(size = c(4, 6, 8, 10, 12))
-  ),
-  size = guide_legend(
-    title.position = "left", 
-    title.hjust = 0.5
-  ),
-  colour = guide_colorbar(title.position = "left", 
-                          title.hjust = 0.5,
-                          label.position = "right",
-                          barwidth = 1,
-                          barheight = 15)
+  guides(
+    fill = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5,
+      override.aes = list(size = c(4, 6, 8, 10, 12)),
+      order = 1  # This will place it at the top
+    ),
+    size = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5,
+      order = 1  # This ensures size legend stays with fill legend
+    ),
+    colour = guide_colorbar(
+      title.position = "left", 
+      title.hjust = 0.5,
+      label.position = "right",
+      barwidth = 1,
+      barheight = 8,
+      order = 2  # This will place it below the biomass legend
+    ),
 ) +
   theme(
     legend.position = "right",
@@ -252,7 +290,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A1_CHLA_TBM.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = Chla_total, width = 8, height = 10, bg = "white")
+ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, bg = "white")
 
 
 
