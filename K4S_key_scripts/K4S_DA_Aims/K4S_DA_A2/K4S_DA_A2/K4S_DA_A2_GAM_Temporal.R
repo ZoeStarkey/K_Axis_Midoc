@@ -190,104 +190,6 @@ summary(m19$gam)
 #PLOTTING RESIDUALS \
 library(ggplot2)
 library(mgcv)
-plot_observed_vs_fitted <- function(model, data, title = "Observed vs Fitted Values") {
-  # Extract fitted values
-  fitted_vals <- fitted(model)
-  
-  # Create a data frame for plotting
-  plot_data <- data.frame(
-    Fitted = fitted_vals,
-    Observed = log(data$bm_g_m3),  # Assuming your response variable is log-transformed
-    Depth = data$depth
-  )
-  
-  # Create the plot
-  p <- ggplot(plot_data, aes(x = Fitted, y = Observed, color = Depth)) +
-    geom_point(size = 2, alpha = 0.7) +  # Slightly transparent points
-    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
-    theme_minimal(base_size = 14) +  # Increase base font size
-    labs(x = "Fitted Values", y = "Observed Values (log-transformed)", 
-         color = "Depth", title = title) +
-    coord_fixed(ratio = 1, expand = TRUE) +  # Allow some expansion around the edges
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 16),  # Center and enlarge title
-      legend.position = "right",  # Move legend to the right
-      aspect.ratio = 0.8  # Make the plot slightly wider than tall
-    ) +
-    scale_x_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to x-axis
-    scale_y_continuous(expand = expansion(mult = 0.1))    # Add 10% expansion to y-axis
-  
-  return(p)
-}
-
-# Now use the function to plot
-p <- plot_observed_vs_fitted(m10, km_df_depth, title = "Total Taxa - Observed vs Fitted (excluding gelat, day)")
-print(p)
-
-
-
-
-library(ggplot2)
-library(mgcv)
-
-plot_observed_vs_residuals <- function(model, data, title = "Observed Values vs Residuals") {
-  # Extract fitted values and residuals
-  fitted_vals <- fitted(model)
-  residuals <- residuals(model)
-  
-  # Create a data frame for plotting
-  plot_data <- data.frame(
-    Observed = log(data$bm_g_m3),  # Assuming your response variable is log-transformed
-    Residuals = residuals,
-    Depth = data$depth
-  )
-  
-  # Define your custom color palette
-  depth_colours <- c(
-    "0-200m" =  "#FFC000",
-    "200-400m" = "#ff7c43",
-    "400-600m" = "#C41E3A",
-    "600-800m" = "#4A92C6",
-    "800-1000m" = "darkblue"
-  )
-  
-  # Create the plot
-  p <- ggplot(plot_data, aes(x = Observed, y = Residuals, color = Depth)) +
-    geom_point(size = 2, alpha = 0.7) +  # Slightly transparent points
-    #geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-    theme_minimal(base_size = 14) +  # Increase base font size
-    labs(x = "Observed Values (log-transformed)", y = "Residuals", 
-         color = "Depth", title = title) +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 16),  # Center and enlarge title
-      legend.position = "right",  # Move legend to the right
-      aspect.ratio = 0.8  # Make the plot slightly wider than tall
-    ) +
-    scale_x_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to x-axis
-    scale_y_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to y-axis
-    scale_color_manual(values = depth_colours)  # Use your custom color palette
-  
-  return(p)
-}
-
-#TOTAL TAXA - GELAT by depth 
-plot_observed_vs_residuals(m10, km_df_depth, title = "Observed Values vs Residuals (Total taxa - excluding gelat, day)")
-plot_observed_vs_residuals(m11, km_df_depth, title = "Observed Values vs Residuals (excluding gelat, lunar)") 
-plot_observed_vs_residuals(m12, km_df_depth, title = "Observed Values vs Residuals (excluding gelat, solar angle)")
-
-
-#FISH - by depth 
-plot_observed_vs_residuals(m13, km_df_depth, title = "Observed Values vs Residuals (Fish - day)")
-plot_observed_vs_residuals(m14, km_df_depth, title = "Observed Values vs Residuals (Fish - lunar fraction)")
-plot_observed_vs_residuals(m15, km_df_depth, title = "Observed Values vs Residuals (Fish - solar angle)")
-
-#SQUID - by depth
-plot_observed_vs_residuals(m16, km_df_depth, title = "Observed Values vs Residuals (Squid - day)")
-plot_observed_vs_residuals(m17, km_df_depth, title = "Observed Values vs Residuals (Squid - lunar fraction)")
-plot_observed_vs_residuals(m18, km_df_depth, title = "Observed Values vs Residuals (Squid - solar angle)")
-
-
-
 
 
 ##SUMMED##
@@ -314,15 +216,71 @@ plot_residuals <- function(model, data, color_var) {
 }
 
 
-plot_residuals(m10, km_df_sum, "midoc.stn")
-plot_residuals(m10,km_df_sum, "depth")
-
-
 
 # For model m4 (Day)
 plot_residuals(m4, km_df_sum, "midoc.stn")
-# To color by depth bins:
-plot_residuals(m4, km_df_sum, "depth")
+
+
+
+
+#FITTED VERSUS OBSERVED
+plot_fitted_vs_observed <- function(model, data, title = "Fitted Values vs Observed Values") {
+  # Extract fitted values
+  fitted_vals <- fitted(model)
+  
+  # Create a data frame for plotting
+  plot_data <- data.frame(
+    Fitted = fitted_vals,
+    Observed = log(data$bm_g_m3),  # Assuming your response variable is log-transformed
+    Depth = data$depth
+  )
+  
+  # Define your custom color palette
+  depth_colours <- c(
+    "0-200m" =  "#FFC000",
+    "200-400m" = "#ff7c43",
+    "400-600m" = "#C41E3A",
+    "600-800m" = "#4A92C6",
+    "800-1000m" = "darkblue"
+  )
+  
+  # Create the plot
+  p <- ggplot(plot_data, aes(x = Fitted, y = Observed, color = Depth)) +
+    geom_point(size = 2, alpha = 0.7) +  # Slightly transparent points
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+    theme_minimal(base_size = 14) +  # Increase base font size
+    labs(x = "Fitted Values", y = "Observed Values (log-transformed)", 
+         color = "Depth", title = title) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16),  # Center and enlarge title
+      legend.position = "right",  # Move legend to the right
+      aspect.ratio = 0.8  # Make the plot slightly wider than tall
+    ) +
+    scale_x_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to x-axis
+    scale_y_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to y-axis
+    scale_color_manual(values = depth_colours) +  # Use your custom color palette
+    coord_fixed(ratio = 1)  # Ensure a 1:1 aspect ratio
+  
+  return(p)
+}
+
+#TOTAL TAXA - GELAT by depth 
+plot_fitted_vs_observed(m10, km_df_depth, title = "Fitted Values vs Observed Values (Total taxa - excluding gelat, day)")
+plot_fitted_vs_observed(m11, km_df_depth, title = "Fitted Values vs Observed Values (excluding gelat, lunar)")
+plot_fitted_vs_observed(m12, km_df_depth, title = "Fitted Values vs Observed Values (excluding gelat, solar angle)")
+
+#FISH - by depth
+plot_fitted_vs_observed(m13, km_df_depth, title = "Fitted Values vs Observed Values (Fish - day)")
+plot_fitted_vs_observed(m14, km_df_depth, title = "Fitted Values vs Observed Values (Fish - lunar fraction)")
+plot_fitted_vs_observed(m15, km_df_depth, title = "Fitted Values vs Observed Values (Fish - solar angle)")
+
+#SQUID - by depth
+plot_fitted_vs_observed(m16, km_df_depth, title = "Fitted Values vs Observed Values (Squid - day)")
+plot_fitted_vs_observed(m17, km_df_depth, title = "Fitted Values vs Observed Values (Squid - lunar fraction)")
+plot_fitted_vs_observed(m18, km_df_depth, title = "Fitted Values vs Observed Values (Squid - solar angle)")
+
+
+
 
 
 
