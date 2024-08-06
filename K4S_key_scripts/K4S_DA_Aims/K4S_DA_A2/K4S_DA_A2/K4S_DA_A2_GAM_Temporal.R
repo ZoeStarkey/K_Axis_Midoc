@@ -1,219 +1,277 @@
-#library
-library(mgcv)
-library(gratia)
+
 library(dplyr)
+library(mgcv)
+library(gamm4)
+library(gratia)
 
 usr <- Sys.info()["user"]
-d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_DA_A2")
 setwd(d)
 dir.exists(d)
 
-#Summed data - one biom data point per station  
-load("km_df_environmental_variables.Rda")
-  #remove the 0-1000m
-km_df <- km_df %>%
-  filter(!is.na(depth) & depth != "0-1000m")
 
 
-  #remove gelatinous 
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
-km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
+############. SUMMED BIOMASS. ##################
+# 1. SUMMED BIOMASS - Excluding Gelatinous 
+#Load in the dataframe 
+load("km_df_sum.Rda")
 
-  #include 
-#include_taxa <- c("fish")
-#km_df <-  km_df[km_df$tax.grp %in% include_taxa, ]
-
-#summarising the data 
-  #didnt work, but now is working again
-km_df_sum <- km_df %>%
-  group_by(midoc.stn) %>%
-  summarize(
-    total_biomass = sum(bm_g_m3, na.rm = TRUE),
-    across(-bm_g_m3, ~ first(.))
-  )
-
-# Adding day 
-km_df_sum <- km_df_sum %>%
-  mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
-
-#
-m1 <- gam(log(total_biomass) ~ s(day),data = km_df_sum)
+#Day
+m1 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
 draw(m1, residuals = TRUE) 
 summary(m1)
 
-#Lunar fraction 
-m2 <- gam(log(total_biomass) ~ s(lunar_fraction),data = km_df_sum)
+#Lunar fraction - illuminated disk 
+m2 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
 draw(m2, residuals = TRUE) 
 summary(m2)
 
- #Solar angle 
-m3 <- gam(log(total_biomass) ~ s(altitude),data = km_df_sum)
+#Solar angle 
+m3 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
 draw(m3, residuals = TRUE) 
 summary(m3)
 
 
 
- 
-#SUMMED DATA WITH DEPTH EXCLUDING GELATINOUS
-load("km_df_environmental_variables.Rda")
-#remove the 0-1000m
+
+#  2. SUMMED BIOMASS - FISH
+#Load in the dataframe 
+load("km_df_sum.Rda")
+
+#Filter only for fish 
+include_taxa <- c("fish")
+km_df_depth <-  km_df_sum[km_df_sum$tax.grp %in% include_taxa, ]
+
+#Day
+m4 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m4, residuals = TRUE) 
+summary(m4)
+
+#Lunar fraction - illuminated disk 
+m5 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m5, residuals = TRUE) 
+summary(m5)
+
+#Solar angle 
+m6 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m6, residuals = TRUE) 
+summary(m6)
+
+
+
+
+# 3. SUMMED BIOMASS - SQUID
+#Load in the dataframe 
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
+
+#Filter only for fish 
+include_taxa <- c("cephalopods")
+km_df_depth <-  km_df_sum[km_df_sum$tax.grp %in% include_taxa, ]
+
+#Day
+m7 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m7, residuals = TRUE) 
+summary(m7)
+
+#Lunar fraction - illuminated disk 
+m8 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m8, residuals = TRUE) 
+summary(m8)
+
+#Solar angle 
+m9 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
+draw(m9, residuals = TRUE) 
+summary(m9)
+
+
+############. BIOMASS SEPARATED BY DEPTH. ##################
+
+
+
+#BIOMASS SEPARATED BY DEPTH - EXCLUDING GELATINOUS 
+#load in the dataframe 
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
+
+#summing the biomass for each depth bin at each midoc station 
+km_df_depth <- km_df_depth %>%
+ group_by(midoc.stn, depth) %>%
+  summarize(
+    bm_g_m3 = sum(bm_g_m3, na.rm = TRUE),
+    across(c(-bm_g_m3), ~ first(.))
+   )
+
+#day 
+m10 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m10, residuals = TRUE)
+summary(m10)
+
+#lunar fraction
+m11 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m11, residuals = TRUE)
+summary(m11)
+
+#solar angle
+m12 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m12, residuals = TRUE)
+summary(m12)
+
+
+
+
+#BIOMASS SEPARATED BY DEPTH - FISH
+#load in the dataframe 
+load("km_df_depth.Rda")
+
+#Filter only for fish 
+include_taxa <- c("fish")
+km_df_depth <-  km_df_depth[km_df_depth$tax.grp %in% include_taxa, ]
+
+#day
+m13 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m13, residuals = TRUE)
+summary(m13)
+
+#lunar fraction
+m14 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m14, residuals = TRUE)
+summary(m14)
+
+#solar angle
+m15 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m15, residuals = TRUE)
+summary(m15)
+
+
+
+
+#BIOMASS SEPARATED BY DEPTH - CEPHALOPODS
+#load in the dataframe 
+load("km_df_depth.Rda")
+
+#Filter only for squid
+include_taxa <- c("cephalopods")
+km_df_depth <-  km_df_depth[km_df_depth$tax.grp %in% include_taxa, ]
+
+#day
+m16 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m16, residuals = TRUE)
+summary(m16)
+
+#lunar fraction
+m17 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m17, residuals = TRUE)
+summary(m17)
+
+#solar angle
+m18 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+draw(m18, residuals = TRUE)
+summary(m18)
+
+
+
+
+#### TESTING GAMMA ######
+#gamma instead of log for fish and solar angle 
+library(gamm4)
+m19<- gamm4(bm_g_m3 + 0.0001 ~ s(altitude, by = depth) , data = km_df_depth, family = Gamma(link = "inverse"), random = ~(1|midoc.stn))
+par(mfrow = c(2, 2))
+gam.check(m19$gam)
+summary(m19$gam)
+
+
+
+##### PLOT OF TAXA TOTAL ######
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_environmental_variables.Rda")  
+
 km_df <- km_df %>%
   filter(!is.na(depth) & depth != "0-1000m")
+
+label_midoc_stn <- function(x) {
+  sub("MIDOC", "", x)
+}
+
+
+km_df <- km_df %>% 
+  mutate(tax.grp = na_if(tax.grp, "NA")) %>%
+  filter(!is.na(tax.grp))
+
+
 #remove gelatinous 
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
-# Adding day 
-km_df <- km_df %>%
-  mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
-
-km_df_sum_depth <- km_df %>%
-  group_by(midoc.stn, depth) %>%
-  summarize(
-    biomass_sum = sum(bm_g_m3, na.rm = TRUE),
-    across(c(-bm_g_m3), ~ first(.))
-  )
-
-#day 
-m4 <- gam(log(biomass_sum) ~ s(day, by = depth),data = km_df_sum_depth)
-draw(m4, residuals = TRUE)
-summary(m4)
-
-#lunar fraction
-m5 <- gam(log(biomass_sum) ~ s(lunar_fraction, by = depth),data = km_df_sum_depth)
-draw(m5, residuals = TRUE)
-summary(m5)
-
-#solar angle
-m6 <- gam(log(biomass_sum) ~ s(altitude, by = depth),data = km_df_sum_depth)
-draw(m6, residuals = TRUE)
-summary(m6)
-
-
-
-
-
-
-#FISH/SQUID
-#Summed data with depth 
-load("km_df_environmental_variables.Rda")
-#remove the 0-1000m
-km_df <- km_df %>%
-  filter(!is.na(depth) & depth != "0-1000m")
-#remove gelatinous 
-include_taxa <- c("cephalopods")
-km_df <-  km_df[km_df$tax.grp %in% include_taxa, ]
-
-# Adding day 
-km_df <- km_df %>%
-  mutate(day = as.numeric(as.POSIXct(start_time)) / (60 * 60 * 24))
-
-km_df_sum_depth <- km_df %>%
-  group_by(midoc.stn, depth) %>%
-  summarize(
-    biomass_sum = sum(bm_g_m3, na.rm = TRUE),
-    across(c(-bm_g_m3), ~ first(.))
-  )
-
-#day 
-m4 <- gam(log(biomass_sum) ~ s(day, by = depth),data = km_df_sum_depth)
-draw(m4, residuals = TRUE)
-summary(m4)
-
-#lunar fraction
-m5 <- gam(log(biomass_sum) ~ s(lunar_fraction, by = depth),data = km_df_sum_depth, family = poisson)
-draw(m5, residuals = TRUE)
-summary(m5)
-
-#solar angle
-m6 <- gam(log(biomass_sum) ~ s(altitude, by = depth),data = km_df_sum_depth)
-draw(m6, residuals = TRUE)
-summary(m6)
-
-#GAMM for solar angle 
-m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth) + s(lon_start, lat_start, bs = "sos"),data = km_df_sum_depth correlation = corGaus(form = ~ lon_start + lat_start))
-summary(m7$gam)
-plot(m7$lme)
-par(mfrow = c(2, 2))
-gam.check(m7$gam)
-
-m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth, correlation = corExp(form = ~ depth | lon_start + lat_start, nugget = TRUE))
-
-summary(m7$gam)
-draw(m7, residuals = TRUE)
-
-#Jitter
-# Load required libraries
-library(mgcv)
-library(nlme)
-\
-
 #make a plot showing stacked bar charts of the biomass sum for each station, with the tax.grp as the fill colour dataset is km_df
 ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
   geom_bar(stat = "identity") +#, position = "fill") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        (background = colour = "white"),
+        ) +
+  scale_x_discrete(labels = label_midoc_stn) +
   #facet_grid(rows = var("depth")) +
   #facet_wrap(~factor(depth, levels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m"),
-                  #   labels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m")), ncol = 1) +
-  labs(x = "Station", y = "Biomass sum", fill = "tax.grp")
+  #   labels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m")), ncol = 1) +
+  labs(x = "Station", y = "Biomass sum", fill = "tax.grp") + 
+    guides(fill = guide_legend(title = "Taxonomy group"))
 
 
-# Assuming your dataframe is called 'df' with columns:
-# 'biomass', 'lunar_angle', 'lat', 'lon'
+library(RColorBrewer)
 
-# Add a small amount of jitter to coordinates to avoid duplicate points
-set.seed(123)  # for reproducibility
-km_df_sum_depth$lon_jitter <- km_df_sum_depth$lon_start + runif(nrow(km_df_sum_depth), -0.00001, 0.00001)
-km_df_sum_depth$lat_jitter <- km_df_sum_depth$lat_start + runif(nrow(km_df_sum_depth), -0.00001, 0.00001)
+# Define a color-blind friendly palette
+cb_palette <- brewer.pal(8, "Paired")
 
-# Create a correlation structure
-# Here we use an exponential correlation structure
-correlation_structure <- corExp(form = ~ lon_jitter + lat_jitter, nugget = TRUE)
-
-# Fit the GAM model with correlation structure
-model <- gamm(log(biomass_sum) ~ s(altitude, by = depth),
-              data = km_df_sum_depth,
-              correlation = correlation_structure,
-              method = "REML")
-
-# Summary of the model
-summary(model$gam)
-summary(model$lme)
-
-# Plot the model
-plot(model$gam)
-pl
+ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.grid.major.x = element_blank(),
+    legend.position = "bottom"
+  ) +
+  scale_x_discrete(labels = label_midoc_stn) +
+  scale_fill_manual(values = cb_palette) +
+  labs(x = "Station", y = expression(paste("Biomass (g m"^"-3",")")), fill = "Taxonomic Group")
 
 
+## Define the custom color palette
 
-#random effect 
-m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth, random = list(midoc.stn = ~ 1 ))
+custom_palette <- c("#2e4057", "#4A92C6", "#FFC000",  "#ff7c43", "#C41E3A")
 
-#gamma instead of log 
-m8 <- gam(biomass_sum ~ s(altitude, by = depth), data = km_df_sum_depth, family=Gamma())
-par(mfrow = c(2, 2))
-gam.check(m8)
+custom_palette <- c("#1F4E79", "#4A92C6", "#FFC000", "#7B3C5D","#E68A4F") 
 
-#gamma instead of log 
-library(gamm4)
-m9 <- gamm4(biomass_sum + 0.0001 ~ s(altitude, by = depth) , data = km_df_sum_depth, family = Gamma(link = "inverse"), random = ~(1|midoc.stn))
-par(mfrow = c(2, 2))
-gam.check(m9$gam)
-summary(m9$gam)
-m7 <- gamm(log(biomass_sum) ~ s(altitude, by = depth), data = km_df_sum_depth)
-summary(m7$gam)
-par(mfrow = c(2, 2))
-plot(m7$lme)
+# Create the stacked bar plot
+stacked_bar_plot <- ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    panel.grid.major.x = element_blank(),
+    legend.position = "right",
+    axis.line.x = element_line(colour = NA, size = 0.5),
+    axis.ticks.x = element_line(colour = "grey80", size = 0.5),
+    axis.ticks.length = unit(3, "pt"),
+    axis.title.x = element_text(margin = margin(t = 10))  # Increase space above x-axis label
+  ) +
+  scale_x_discrete(labels = label_midoc_stn, 
+                   expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  facet_grid(rows = var("depth")) +
+  facet_wrap(~factor(depth, levels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m"),
+     labels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m")), ncol = 1) +
+  scale_fill_manual(values = custom_palette) +
+  labs(x = "Midoc Station", y = expression(paste("Biomass (g m"^"-3",")")), fill = "Taxonomic Group")
+
+# Display the plot
+print(stacked_bar_plot)
 
 
-#Sanity check 
-new_df <- km_df_sum_depth[, c("midoc.stn", "biomass_sum", "depth")]
-new_df <- km_df[, c("midoc.stn", "bm_g_m3", "depth")]
 
-original_subset <- km_df %>%
-  filter(midoc.stn == "MIDOC01" & depth == "200-400m")
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bar_Chart")
+output_filename <- "K4S_Plot_A1_Bar_Chart_Depth.png"
+full_output_path <- file.path(output_directory, output_filename)
 
-# Calculate the manual sum of bm_g_m3 for this subset
-manual_sum <- sum(original_subset$bm_g_m3, na.rm = TRUE)
 
-print(manual_sum)
+
+# Save the plot
+ggsave(filename = full_output_path, plot = stacked_bar_plot, width =10, height = 8, dpi = 300, bg = "white")
+
+
