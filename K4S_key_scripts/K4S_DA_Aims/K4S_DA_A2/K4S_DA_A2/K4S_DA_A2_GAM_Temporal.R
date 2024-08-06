@@ -14,8 +14,7 @@ dir.exists(d)
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
-load("km_df_sum.Rda")
-
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
 #Day
 m1 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
 draw(m1, residuals = TRUE) 
@@ -36,7 +35,7 @@ summary(m3)
 
 #  2. SUMMED BIOMASS - FISH
 #Load in the dataframe 
-load("km_df_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
 
 #Filter only for fish 
 include_taxa <- c("fish")
@@ -104,6 +103,9 @@ km_df_depth <- km_df_depth %>%
 m10 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
 draw(m10, residuals = TRUE)
 summary(m10)
+par(mfrow = c(2, 2))
+gam.check(m10)
+
 
 #lunar fraction
 m11 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
@@ -120,7 +122,7 @@ summary(m12)
 
 #BIOMASS SEPARATED BY DEPTH - FISH
 #load in the dataframe 
-load("km_df_depth.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
 
 #Filter only for fish 
 include_taxa <- c("fish")
@@ -146,7 +148,7 @@ summary(m15)
 
 #BIOMASS SEPARATED BY DEPTH - CEPHALOPODS
 #load in the dataframe 
-load("km_df_depth.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
 
 #Filter only for squid
 include_taxa <- c("cephalopods")
@@ -180,6 +182,161 @@ summary(m19$gam)
 
 
 
+
+
+
+
+
+#PLOTTING RESIDUALS \
+library(ggplot2)
+library(mgcv)
+plot_observed_vs_fitted <- function(model, data, title = "Observed vs Fitted Values") {
+  # Extract fitted values
+  fitted_vals <- fitted(model)
+  
+  # Create a data frame for plotting
+  plot_data <- data.frame(
+    Fitted = fitted_vals,
+    Observed = log(data$bm_g_m3),  # Assuming your response variable is log-transformed
+    Depth = data$depth
+  )
+  
+  # Create the plot
+  p <- ggplot(plot_data, aes(x = Fitted, y = Observed, color = Depth)) +
+    geom_point(size = 2, alpha = 0.7) +  # Slightly transparent points
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+    theme_minimal(base_size = 14) +  # Increase base font size
+    labs(x = "Fitted Values", y = "Observed Values (log-transformed)", 
+         color = "Depth", title = title) +
+    coord_fixed(ratio = 1, expand = TRUE) +  # Allow some expansion around the edges
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16),  # Center and enlarge title
+      legend.position = "right",  # Move legend to the right
+      aspect.ratio = 0.8  # Make the plot slightly wider than tall
+    ) +
+    scale_x_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to x-axis
+    scale_y_continuous(expand = expansion(mult = 0.1))    # Add 10% expansion to y-axis
+  
+  return(p)
+}
+
+# Now use the function to plot
+p <- plot_observed_vs_fitted(m10, km_df_depth, title = "Total Taxa - Observed vs Fitted (excluding gelat, day)")
+print(p)
+
+
+
+
+library(ggplot2)
+library(mgcv)
+
+plot_observed_vs_residuals <- function(model, data, title = "Observed Values vs Residuals") {
+  # Extract fitted values and residuals
+  fitted_vals <- fitted(model)
+  residuals <- residuals(model)
+  
+  # Create a data frame for plotting
+  plot_data <- data.frame(
+    Observed = log(data$bm_g_m3),  # Assuming your response variable is log-transformed
+    Residuals = residuals,
+    Depth = data$depth
+  )
+  
+  # Define your custom color palette
+  depth_colours <- c(
+    "0-200m" =  "#FFC000",
+    "200-400m" = "#ff7c43",
+    "400-600m" = "#C41E3A",
+    "600-800m" = "#4A92C6",
+    "800-1000m" = "darkblue"
+  )
+  
+  # Create the plot
+  p <- ggplot(plot_data, aes(x = Observed, y = Residuals, color = Depth)) +
+    geom_point(size = 2, alpha = 0.7) +  # Slightly transparent points
+    #geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    theme_minimal(base_size = 14) +  # Increase base font size
+    labs(x = "Observed Values (log-transformed)", y = "Residuals", 
+         color = "Depth", title = title) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16),  # Center and enlarge title
+      legend.position = "right",  # Move legend to the right
+      aspect.ratio = 0.8  # Make the plot slightly wider than tall
+    ) +
+    scale_x_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to x-axis
+    scale_y_continuous(expand = expansion(mult = 0.1)) +  # Add 10% expansion to y-axis
+    scale_color_manual(values = depth_colours)  # Use your custom color palette
+  
+  return(p)
+}
+
+#TOTAL TAXA - GELAT by depth 
+plot_observed_vs_residuals(m10, km_df_depth, title = "Observed Values vs Residuals (Total taxa - excluding gelat, day)")
+plot_observed_vs_residuals(m11, km_df_depth, title = "Observed Values vs Residuals (excluding gelat, lunar)") 
+plot_observed_vs_residuals(m12, km_df_depth, title = "Observed Values vs Residuals (excluding gelat, solar angle)")
+
+
+#FISH - by depth 
+plot_observed_vs_residuals(m13, km_df_depth, title = "Observed Values vs Residuals (Fish - day)")
+plot_observed_vs_residuals(m14, km_df_depth, title = "Observed Values vs Residuals (Fish - lunar fraction)")
+plot_observed_vs_residuals(m15, km_df_depth, title = "Observed Values vs Residuals (Fish - solar angle)")
+
+#SQUID - by depth
+plot_observed_vs_residuals(m16, km_df_depth, title = "Observed Values vs Residuals (Squid - day)")
+plot_observed_vs_residuals(m17, km_df_depth, title = "Observed Values vs Residuals (Squid - lunar fraction)")
+plot_observed_vs_residuals(m18, km_df_depth, title = "Observed Values vs Residuals (Squid - solar angle)")
+
+
+
+
+
+##SUMMED##
+plot_residuals <- function(model, data, color_var) {
+  # Extract fitted values and residuals
+  fitted_vals <- fitted(model)
+  residuals <- residuals(model)
+  
+  # Create a data frame for plotting
+  plot_data <- data.frame(
+    Fitted = fitted_vals,
+    Residuals = residuals,
+    Color = data[[color_var]]
+  )
+  
+  # Create the plot
+  p <- ggplot(plot_data, aes(x = Fitted, y = Residuals, color = Color)) +
+    geom_point() +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    theme_minimal() +
+    labs(x = "Fitted Values", y = "Residuals", color = color_var)
+  
+  return(p)
+}
+
+
+plot_residuals(m10, km_df_sum, "midoc.stn")
+plot_residuals(m10,km_df_sum, "depth")
+
+
+
+# For model m4 (Day)
+plot_residuals(m4, km_df_sum, "midoc.stn")
+# To color by depth bins:
+plot_residuals(m4, km_df_sum, "depth")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##### PLOT OF TAXA TOTAL ######
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_environmental_variables.Rda")  
 
@@ -199,20 +356,6 @@ km_df <- km_df %>%
 #remove gelatinous 
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
-
-#make a plot showing stacked bar charts of the biomass sum for each station, with the tax.grp as the fill colour dataset is km_df
-ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
-  geom_bar(stat = "identity") +#, position = "fill") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1),
-        (background = colour = "white"),
-        ) +
-  scale_x_discrete(labels = label_midoc_stn) +
-  #facet_grid(rows = var("depth")) +
-  #facet_wrap(~factor(depth, levels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m"),
-  #   labels = c("0-200m", "200-400m", "400-600m", "600-800m", "800-1000m")), ncol = 1) +
-  labs(x = "Station", y = "Biomass sum", fill = "tax.grp") + 
-    guides(fill = guide_legend(title = "Taxonomy group"))
-
 
 library(RColorBrewer)
 
