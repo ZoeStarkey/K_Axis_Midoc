@@ -14,26 +14,28 @@ dir.exists(d)
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+
 #Day
-m1 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m1, residuals = TRUE) 
-summary(m1)
+allbiom.doy <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
+draw(allbiom.doy, residuals = TRUE) 
+summary(allbiom.doy)
+
 
 #Lunar fraction - illuminated disk 
-m2 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m2, residuals = TRUE) 
-summary(m2)
+allbiom.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum)
+draw(allbiom.lunar, residuals = TRUE) 
+summary(allbiom.lunar)
 
 #Solar angle 
-m3 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m3, residuals = TRUE) 
-summary(m3)
+allbiom.solar <- gam(log(bm_sum_all_taxa) ~ s(altitude),data = km_bm_sum)
+draw(allbiom.solar, residuals = TRUE) 
+summary(allbiom.solar)
 
 
 
 
-#  2. SUMMED BIOMASS - FISH
+x#  2. SUMMED BIOMASS - FISH
 #Load in the dataframe 
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
 
