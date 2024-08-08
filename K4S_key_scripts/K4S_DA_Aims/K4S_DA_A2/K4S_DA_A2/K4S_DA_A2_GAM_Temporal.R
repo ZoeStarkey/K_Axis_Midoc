@@ -80,90 +80,118 @@ summary(cephbiom_sum.solar)
 
 
 ############. BIOMASS SEPARATED BY DEPTH. ##################
-
-
-
 #BIOMASS SEPARATED BY DEPTH - EXCLUDING GELATINOUS 
 #load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_depth.Rda")
 
-#summing the biomass for each depth bin at each midoc station 
-km_df_depth <- km_df_depth %>%
- group_by(midoc.stn, depth) %>%
-  summarize(
-    bm_g_m3 = sum(bm_g_m3, na.rm = TRUE),
-    across(c(-bm_g_m3), ~ first(.))
-   )
 
 #day 
-m10 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m10, residuals = TRUE)
-summary(m10)
-par(mfrow = c(2, 2))
-gam.check(m10)
+allbiom_depth.day.gam <- gam(log(bm_depth_all_taxa) ~ s(day, by = depth),data = km_bm_depth)
+draw(allbiom_depth.day.gam, residuals = TRUE)
+summary(allbiom_depth.day.gam)
+
+allbiom_depth.day.re <- gamm(log(bm_depth_all_taxa) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(allbiom_depth.day.re, residuals = TRUE)
+summary(allbiom_depth.day.re$gam)
+summary(allbiom_depth.day.re$lme)
+
+#lunar fraction - illuminated disk
+allbiom_depth.lunar.gam <- gam(log(bm_depth_all_taxa) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
+draw(allbiom_depth.lunar.gam, residuals = TRUE)
+summary(allbiom_depth.lunar.gam)
+
+allbiom_depth.lunar.re <- gamm(log(bm_depth_all_taxa) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(allbiom_depth.lunar.re, residuals = TRUE)
+summary(allbiom_depth.lunar.re$gam)
+summary(allbiom_depth.lunar.re$lme)
 
 
-#lunar fraction
-m11 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m11, residuals = TRUE)
-summary(m11)
+#solar angle 
+allbiom_depth.solar.gam <- gam(log(bm_depth_all_taxa) ~ s(altitude, by = depth),data = km_bm_depth)
+draw(allbiom_depth.solar.gam, residuals = TRUE)
+summary(allbiom_depth.solar.gam)
 
-#solar angle
-m12 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m12, residuals = TRUE)
-summary(m12)
+allbiom_depth.solar.re <- gamm(log(bm_depth_all_taxa) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(allbiom_depth.solar.re, residuals = TRUE)
+summary(allbiom_depth.solar.re$gam)
+summary(allbiom_depth.solar.re$lme)
 
 
 
 
 #BIOMASS SEPARATED BY DEPTH - FISH
-#load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
 
-#Filter only for fish 
-include_taxa <- c("fish")
-km_df_depth <-  km_df_depth[km_df_depth$tax.grp %in% include_taxa, ]
+#day 
+fish_depth.day.gam <- gam(log(bm_depth_fish) ~ s(day, by = depth),data = km_bm_depth)
+draw(fish_depth.day.gam, residuals = TRUE)
+summary(fish_depth.day.gam)
 
-#day
-m13 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m13, residuals = TRUE)
-summary(m13)
+fish_depth.day.re <- gamm(log(bm_depth_fish) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(fish_depth.day.re, residuals = TRUE)
+summary(fish_depth.day.re$gam)
+summary(fish_depth.day.re$lme)
 
-#lunar fraction
-m14 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m14, residuals = TRUE)
-summary(m14)
+#lunar fraction - illuminated disk
+fish_depth.lunar.gam <- gam(log(bm_depth_fish) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
+draw(fish_depth.lunar.gam, residuals = TRUE)
+summary(fish_depth.lunar.gam)
 
-#solar angle
-m15 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth)#, random = list(midoc.stn = ~ 1 ))
-draw(m15, residuals = TRUE)
-summary(m15)
+fish_depth.lunar.re <- gamm(log(bm_depth_fish) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(fish_depth.lunar.re, residuals = TRUE)
+summary(fish_depth.lunar.re$gam)
+summary(fish_depth.lunar.re$lme)
 
 
+#solar angle 
+fish_depth.solar.gam <- gam(log(bm_depth_fish) ~ s(altitude, by = depth),data = km_bm_depth)
+draw(fish_depth.solar.gam, residuals = TRUE)
+summary(fish_depth.solar.gam)
+
+fish_depth.solar.re <- gamm(log(bm_depth_fish) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(fish_depth.solar.re, residuals = TRUE)
+summary(fish_depth.solar.re$gam)
+summary(fish_depth.solar.re$lme)
 
 
 #BIOMASS SEPARATED BY DEPTH - CEPHALOPODS
-#load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_depth.Rda")
-
-#Filter only for squid
-include_taxa <- c("cephalopods")
-km_df_depth <-  km_df_depth[km_df_depth$tax.grp %in% include_taxa, ]
 
 #day
-m16 <- gam(log(bm_g_m3) ~ s(day, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m16, residuals = TRUE)
-summary(m16)
+ceph_depth.day.gam <- gam(log(bm_depth_ceph) ~ s(day, by = depth),data = km_bm_depth)
+draw(ceph_depth.day.gam, residuals = TRUE)
+summary(ceph_depth.day.gam)
 
-#lunar fraction
-m17 <- gam(log(bm_g_m3) ~ s(lunar_fraction, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m17, residuals = TRUE)
-summary(m17)
+ceph_depth.day.re <- gamm(log(bm_depth_ceph) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(ceph_depth.day.re, residuals = TRUE)
+summary(ceph_depth.day.re$gam)
+summary(ceph_depth.day.re$lme)
 
-#solar angle
-m18 <- gam(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
-draw(m18, residuals = TRUE)
-summary(m18)
+#lunar fraction - illuminated disk
+ceph_depth.lunar.gam <- gam(log(bm_depth_ceph) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
+draw(ceph_depth.lunar.gam, residuals = TRUE)
+summary(ceph_depth.lunar.gam)
+
+ceph_depth.lunar.re <- gamm(log(bm_depth_ceph) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(ceph_depth.lunar.re, residuals = TRUE)
+summary(ceph_depth.lunar.re$gam)
+summary(ceph_depth.lunar.re$lme)
+
+
+#solar angle 
+ceph_depth.solar.gam <- gam(log(bm_depth_ceph) ~ s(altitude, by = depth),data = km_bm_depth)
+draw(ceph_depth.solar.gam, residuals = TRUE)
+summary(ceph_depth.solar.gam)
+
+ceph_depth.solar.re <- gamm(log(bm_depth_ceph) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(ceph_depth.solar.re, residuals = TRUE)
+summary(ceph_depth.solar.re$gam)
+summary(ceph_depth.solar.re$lme)
+
+
+
+
+
+
+
 
 
 
