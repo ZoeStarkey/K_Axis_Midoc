@@ -14,7 +14,8 @@ dir.exists(d)
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_A2_GAM_temporal_collaboration/K4S_DA_A2_GAM_Temporal_Colab_Dataframe/km_bm_sum.Rda")
+
 
 #Day
 allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
@@ -35,9 +36,7 @@ summary(allbiom_sum.solar)
 
 
 
-x#  2. SUMMED BIOMASS - FISH
-#Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+#  2. SUMMED BIOMASS - FISH
 
 #Day 
 fishbiom_sum.day <- gam(log(bm_sum_fish) ~ s(day),data = km_bm_sum)
@@ -60,7 +59,6 @@ summary(fishbiom_sum.solar)
 
 # 3. SUMMED BIOMASS - SQUID
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
 
 #Day
 cephbiom_sum.day <- gam(log(bm_sum_ceph) ~ s(day),data = km_bm_sum)
@@ -81,8 +79,8 @@ summary(cephbiom_sum.solar)
 
 ############. BIOMASS SEPARATED BY DEPTH. ##################
 #BIOMASS SEPARATED BY DEPTH - EXCLUDING GELATINOUS 
-#load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_depth.Rda")
+#load in the dataframe
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_A2_GAM_temporal_collaboration/K4S_DA_A2_GAM_Temporal_Colab_Dataframe/km_bm_depth.Rda")
 
 
 #day 
