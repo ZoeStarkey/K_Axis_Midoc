@@ -60,26 +60,23 @@ summary(fishbiom_sum.solar)
 
 # 3. SUMMED BIOMASS - SQUID
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
-
-#Filter only for fish 
-include_taxa <- c("cephalopods")
-km_df_depth <-  km_df_sum[km_df_sum$tax.grp %in% include_taxa, ]
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
 
 #Day
-m7 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m7, residuals = TRUE) 
-summary(m7)
+cephbiom_sum.day <- gam(log(bm_sum_ceph) ~ s(day),data = km_bm_sum)
+draw(cephbiom_sum.day, residuals = TRUE) 
+summary(cephbiom_sum.day)
 
 #Lunar fraction - illuminated disk 
-m8 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m8, residuals = TRUE) 
-summary(m8)
+cephbiom_sum.lunar <- gam(log(bm_sum_ceph) ~ s(lunar_fraction),data = km_bm_sum)
+draw(cephbiom_sum.lunar, residuals = TRUE) 
+summary(cephbiom_sum.lunar)
 
 #Solar angle 
-m9 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m9, residuals = TRUE) 
-summary(m9)
+cephbiom_sum.solar <- gam(log(bm_sum_ceph) ~ s(altitude),data = km_bm_sum)
+draw(cephbiom_sum.solar, residuals = TRUE) 
+summary(cephbiom_sum.solar)
+
 
 
 ############. BIOMASS SEPARATED BY DEPTH. ##################
