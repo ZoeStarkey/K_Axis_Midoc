@@ -17,7 +17,6 @@ km_df$depth <- factor(km_df$cod.end, levels = c("1", "2", "3", "4", "5", "6"), l
 
 
 #removing 0-1000m
-
 remove_depth <- c("0-1000")
 
 # Remove the specified stations from km_df
@@ -39,21 +38,6 @@ km_df <- subset(km_df, select = -depth)
 km_df<- subset(km_df, select = -cod.end)
 
 #adding a day column
-km_df <- km_df %>%
-  mutate(
-    date = as_date(start_time),
-    day_numeric = as.numeric(date - min(date) + 1)
-  )
-
-km_df <- km_df %>%
-  arrange(midoc.stn, start_time) %>%
-  group_by(midoc.stn) %>%
-  mutate(
-    date = as_date(start_time),
-    day_numeric = as.numeric(difftime(date, first(date), units = "days")) + 1
-  ) %>%
-  ungroup()
-
 
 # Convert start_time to Date if it's not already
 km_df$date <- as.Date(km_df$start_time)
@@ -130,11 +114,10 @@ km_bm_sum <-km_bm_sum %>%
     bm_sum_all_taxa,
     bm_sum_fish,
     bm_sum_ceph,
-    # List other columns in the order you want them
     everything()
   )
 
-
+#saving the dataframe
 save(km_bm_sum, file = "km_bm_sum.Rda")
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
 
