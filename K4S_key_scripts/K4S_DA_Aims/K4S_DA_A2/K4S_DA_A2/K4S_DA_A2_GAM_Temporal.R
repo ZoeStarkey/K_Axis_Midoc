@@ -17,46 +17,43 @@ dir.exists(d)
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
 
 #Day
-allbiom.doy <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
-draw(allbiom.doy, residuals = TRUE) 
-summary(allbiom.doy)
+allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
+draw(allbiom_sum.day, residuals = TRUE) 
+summary(allbiom_sum.day)
 
 
 #Lunar fraction - illuminated disk 
-allbiom.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum)
-draw(allbiom.lunar, residuals = TRUE) 
-summary(allbiom.lunar)
+allbiom_sum.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum)
+draw(allbiom_sum.lunar, residuals = TRUE) 
+summary(allbiom_sum.lunar)
 
 #Solar angle 
-allbiom.solar <- gam(log(bm_sum_all_taxa) ~ s(altitude),data = km_bm_sum)
-draw(allbiom.solar, residuals = TRUE) 
-summary(allbiom.solar)
+allbiom_sum.solar <- gam(log(bm_sum_all_taxa) ~ s(altitude),data = km_bm_sum)
+draw(allbiom_sum.solar, residuals = TRUE) 
+summary(allbiom_sum.solar)
 
 
 
 
 x#  2. SUMMED BIOMASS - FISH
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/km_df_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
 
-#Filter only for fish 
-include_taxa <- c("fish")
-km_df_depth <-  km_df_sum[km_df_sum$tax.grp %in% include_taxa, ]
-
-#Day
-m4 <- gam(log(bm_g_m3) ~ s(day),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m4, residuals = TRUE) 
-summary(m4)
+#Day 
+fishbiom_sum.day <- gam(log(bm_sum_fish) ~ s(day),data = km_bm_sum)
+draw(fishbiom_sum.day, residuals = TRUE) 
+summary(fishbiom_sum.day)
 
 #Lunar fraction - illuminated disk 
-m5 <- gam(log(bm_g_m3) ~ s(lunar_fraction),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m5, residuals = TRUE) 
-summary(m5)
+fishbiom_sum.lunar <- gam(log(bm_sum_fish) ~ s(lunar_fraction),data = km_bm_sum)
+draw(fishbiom_sum.lunar, residuals = TRUE) 
+summary(fishbiom_sum.lunar)
+
 
 #Solar angle 
-m6 <- gam(log(bm_g_m3) ~ s(altitude),data = km_df_sum, random = list(midoc.stn = ~ 1 ))
-draw(m6, residuals = TRUE) 
-summary(m6)
+fishbiom_sum.solar <- gam(log(bm_sum_fish) ~ s(altitude),data = km_bm_sum)
+draw(fishbiom_sum.solar, residuals = TRUE) 
+summary(fishbiom_sum.solar)
 
 
 
