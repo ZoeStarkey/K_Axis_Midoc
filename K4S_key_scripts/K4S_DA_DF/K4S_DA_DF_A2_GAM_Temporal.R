@@ -156,8 +156,9 @@ km_bm_squid_sum_depth <- km_df %>%
 km_bm_depth <- km_bm_all_taxa_sum_depth %>%
   left_join(km_bm_fish_sum_depth, by = c("midoc.stn", "depth")) %>%
   left_join(km_bm_squid_sum_depth, by = c("midoc.stn", "depth"))
+fs
 
-km_bm_depth <-km_bm_depth %>%
+km_bm_depth <-km_bm_depth %>% 
   dplyr::select(
     midoc.stn,
     bm_depth_all_taxa,
