@@ -7,7 +7,7 @@ setwd(d)
 dir.exists(d)
 
 #Making all taxa - gelatinous summed dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_df_environmental_variables.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_df_environmental_variables.Rda")
 
 # Define the depth ranges for each codend
 depth_bins <- c("0-200", "200-400", "400-600", "600-800", "800-1000", "0-1000")
@@ -50,7 +50,7 @@ km_df$day <- round(as.numeric(difftime(km_df$date, min_dates[km_df$midoc.stn], u
 
 
 #excluding the taxa 
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 
 # Filter the dataframe to exclude the specified taxa and only include non-NA depths
 km_filtered_all_taxa <- km_df %>%
@@ -114,13 +114,13 @@ km_bm_sum <-km_bm_sum %>%
   )
 
 #saving the dataframe
-save(km_bm_sum, file = "km_bm_sum.Rda")
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+save(km_bm_sum, file = "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
 
 
 ### SUMMING ACCROSS MIDOC AND DEPTH 
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
 
 km_bm_all_taxa_sum_depth <- km_df %>%
   filter(!tax.grp %in% exclude_taxa) %>%
@@ -169,6 +169,6 @@ km_bm_depth <-km_bm_depth %>%
 
 
 
-save(km_bm_depth , file = "km_bm_depth.Rda")
+save(km_bm_depth , file = "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_depth.Rda")
 
