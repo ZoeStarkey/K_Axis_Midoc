@@ -14,7 +14,7 @@ dir.exists(d)
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
 #Day
 allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
