@@ -165,8 +165,8 @@ sf::st_crs(f1$finished) <- 4326  #
 
 #TOTAL BIOMASS PLOT - only key taxon of interest
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
-
-# Filter data for taxa not in the exclude list and aggregate biomass
+# 
+#Filter data for taxa not in the exclude list and aggregate biomass
 km_sf_total <- km_sf %>%
   filter(!tax.grp %in% exclude_taxa) %>%
   group_by(midoc.stn) %>%
@@ -176,15 +176,16 @@ km_sf_total <- km_sf %>%
     lat_end = first(lat_end)
   )
 
-# Calculate the bin breaks
-bin_breaks <- quantile(km_sf_total$total_biomass, probs = seq(0, 1, 0.2))
+# Calculate the bin breaks using pretty breaks
+n_bins <- 5  # You can adjust this number for more or fewer bins
+bin_range <- range(km_sf_total$total_biomass, na.rm = TRUE)
+bin_breaks <- pretty(bin_range, n = n_bins)
 
-# Create labels with exact ranges, now using three decimal places
+# Create labels with exact ranges, using four decimal places
 bin_labels <- paste0(
-  #c("Very Low (", "Low (", "Medium (", "High (", "Very High ("),
-  sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
+  sprintf("%.2f", bin_breaks[-length(bin_breaks)]),
   " - ",
-  sprintf("%.3f", bin_breaks[-1])
+  sprintf("%.2f", bin_breaks[-1])
 )
 
 # Modify the mutate step in km_sf_total
@@ -196,8 +197,8 @@ km_sf_total <- km_sf_total %>%
 
 
 #Chla_total <-
- ggplot() +
- # Add the base raster layer
+ggplot() +
+  # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                        limits = c(log(q1), log(q2)),
@@ -239,7 +240,7 @@ km_sf_total <- km_sf_total %>%
     name = expression(paste("Summed Biomass (g m"^-3, ")"))
   ) +
   scale_size_manual(
-    values = c(4, 6, 8, 10, 12),
+    values = c( 6, 8, 10, 12),
     name = expression(paste("Summed Biomass (g m"^-3, ")"))
   ) +
   labs(x = "Longitude", y = "Latitude") +
@@ -254,12 +255,12 @@ km_sf_total <- km_sf_total %>%
     legend.byrow = TRUE,
     strip.background = element_rect(fill = "white")
   )  +# ... (keep your other layers and settings)
-
+  
   guides(
     fill = guide_legend(
       title.position = "left", 
       title.hjust = 0.5,
-      override.aes = list(size = c(4, 6, 8, 10, 12)),
+      override.aes = list(size = c(6, 8, 10, 12)),
       order = 1  # This will place it at the top
     ),
     size = guide_legend(
@@ -275,14 +276,12 @@ km_sf_total <- km_sf_total %>%
       barheight = 8,
       order = 2  # This will place it below the biomass legend
     ),
-) +
+  ) +
   theme(
     legend.position = "right",
     legend.box = "vertical",
     # ... (keep your other theme settings)
   )
-
-
 
 
 #save the plot 
@@ -327,9 +326,9 @@ create_biomass_plot <- function(data, taxa_of_interest, output_filename) {
   
   # Create labels with exact ranges, using three decimal places
   bin_labels <- paste0(
-    sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
+    sprintf("%.4f", bin_breaks[-length(bin_breaks)]),
     " - ",
-    sprintf("%.3f", bin_breaks[-1])
+    sprintf("%.4f", bin_breaks[-1])
   )
   
   # Add biomass bins to the filtered data
@@ -441,8 +440,8 @@ cephalopods_plot <- create_biomass_plot(km_sf, c("cephalopods"), "K4S_Plot_A1_CH
 cephalopods_plot
 
 
-
-
+krill_plot <- create_biomass_plot(km_sf, c("krill"), "K4S_Plot_A1_CHLA_BM_Krill.png")
+krill_plot
 
 
 
