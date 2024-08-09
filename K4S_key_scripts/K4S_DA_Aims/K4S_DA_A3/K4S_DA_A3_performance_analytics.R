@@ -11,13 +11,14 @@ setwd(d)
 dir.exists(d)
 
 #adding a small number to the logged value 
-km_log_bm_sum$log_bm_sum_all_taxa <- km_log_bm_sum$log_bm_sum_all_taxa + 1
 
 
+#########TOTAL TAXA############ 
 
 #loading dataframe - values were logged and then summed 
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_log_bm_sum.Rda")
 
+# km_log_bm_sum$log_bm_sum_all_taxa <- km_log_bm_sum$log_bm_sum_all_taxa 
 temporal_all_taxa <- km_log_bm_sum[, c("log_bm_sum_all_taxa", "lunar_fraction", "altitude", "day")]
 temporal_all_taxa <- temporal_all_taxa[complete.cases(temporal_all_taxa), ]
 chart.Correlation(temporal_all_taxa, histogram=TRUE, pch=19)
@@ -33,8 +34,37 @@ environ_all_taxa<- environ_all_taxa[complete.cases(environ_all_taxa), ]
 chart.Correlation(environ_all_taxa, histogram=TRUE, pch=19)
 
 
+##############FISH####################
+#temporal variables 
+temporal_fish <- km_log_bm_sum[, c("log_bm_sum_fish", "lunar_fraction", "altitude", "day")]
+temporal_fish <- temporal_fish[complete.cases(temporal_all_taxa), ]
+chart.Correlation(temporal_fish, histogram=TRUE, pch=19)
 
+#satellite variables
+satellite_fish <- km_log_bm_sum[,c("log_bm_sum_fish", "TSM", "CUR", "SST","CHLA")]
+satellite_fish <- satellite_fish[complete.cases(satellite_fish), ]
+chart.Correlation(satellite_fish, histogram=TRUE, pch=19)
 
+#Environmental insitu
+environ_fish <- km_log_bm_sum[, c("log_bm_sum_fish", "Tmin", "O2_min", "SML", "Smax")]
+environ_fish <- environ_fish[complete.cases(environ_fish), ]
+chart.Correlation(environ_fish, histogram=TRUE, pch=19)
+
+###########CEPHALOPODS##############
+#temporal variables
+temporal_ceph <- km_log_bm_sum[, c("log_bm_sum_ceph", "lunar_fraction", "altitude", "day")]
+temporal_ceph <- temporal_ceph[complete.cases(temporal_ceph), ]
+chart.Correlation(temporal_ceph, histogram=TRUE, pch=19)
+
+#satellite variables
+satellite_ceph <- km_log_bm_sum[,c("log_bm_sum_ceph", "TSM", "CUR", "SST","CHLA")]
+satellite_ceph <- satellite_ceph[complete.cases(satellite_ceph), ]
+chart.Correlation(satellite_ceph, histogram=TRUE, pch=19)
+
+#Environmental insitu
+environ_ceph <- km_log_bm_sum[, c("log_bm_sum_ceph", "Tmin", "O2_min", "SML", "Smax")]
+environ_ceph <- environ_ceph[complete.cases(environ_ceph), ]
+chart.Correlation(environ_ceph, histogram=TRUE, pch=19)
 
 
 
