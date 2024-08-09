@@ -82,7 +82,7 @@ summary(cephbiom_sum.solar)
 ############. BIOMASS SEPARATED BY DEPTH. ##################
 #BIOMASS SEPARATED BY DEPTH - EXCLUDING GELATINOUS 
 #load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_depth.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
 
 
 #day 
