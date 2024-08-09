@@ -433,7 +433,7 @@ create_biomass_plot <- function(data, taxa_of_interest, output_filename) {
 
 
 
-# For fish
+# For fis
 fish_plot <- create_biomass_plot(km_sf, c("fish"), "K4S_Plot_A1_CHLA_BM_Fish.png")
 fish_plot
 
