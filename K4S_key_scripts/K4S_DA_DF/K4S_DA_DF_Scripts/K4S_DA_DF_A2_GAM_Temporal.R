@@ -124,6 +124,7 @@ km_bm_sum <-km_bm_sum %>%
     bm_sum_all_taxa,
     bm_sum_fish,
     bm_sum_ceph,
+    bm_sum_krill,
     everything()
   )
 
@@ -180,12 +181,19 @@ km_bm_krill_sum_depth <- km_df %>%
   )
 
 km_bm_depth <- km_bm_all_taxa_sum_depth %>%
-  left_join(km_bm_fish_sum_depth, by = c("midoc.stn", "depth")) %>%
-  left_join(km_bm_squid_sum_depth, by = c("midoc.stn", "depth")) %>%
-  left_join(km_bm_krill_sum_depth, by = c("midoc.stn", "depth"))
+  dplyr::select(midoc.stn, depth, bm_depth_all_taxa, everything())
+
+km_bm_depth <- km_bm_depth %>%
+  left_join(dplyr::select(km_bm_fish_sum_depth, midoc.stn, depth, bm_depth_fish), 
+            by = c("midoc.stn", "depth")) %>%
+  left_join(dplyr::select(km_bm_squid_sum_depth, midoc.stn, depth, bm_depth_ceph), 
+            by = c("midoc.stn", "depth")) %>%
+  left_join(dplyr::select(km_bm_krill_sum_depth, midoc.stn, depth, bm_depth_krill), 
+            by = c("midoc.stn", "depth"))
 
 
-km_bm_depth <-km_bm_depth %>% 
+
+km_bm_depth <- km_bm_depth %>% 
   dplyr::select(
     midoc.stn,
     bm_depth_all_taxa,
@@ -194,7 +202,6 @@ km_bm_depth <-km_bm_depth %>%
     bm_depth_krill,
     everything()
   )
-
 
 
 save(km_bm_depth , file = "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
