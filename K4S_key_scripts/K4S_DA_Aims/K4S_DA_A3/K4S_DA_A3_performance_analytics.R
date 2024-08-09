@@ -4,8 +4,41 @@ library(mgcv)
 library(caret)
 library(dplyr)
 
+#setting working directory
+usr <- Sys.info()["user"]
+d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
+setwd(d)
+dir.exists(d)
 
-\
+#adding a small number to the logged value 
+km_log_bm_sum$log_bm_sum_all_taxa <- km_log_bm_sum$log_bm_sum_all_taxa + 1
+
+
+
+#loading dataframe - values were logged and then summed 
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_log_bm_sum.Rda")
+
+temporal_all_taxa <- km_log_bm_sum[, c("log_bm_sum_all_taxa", "lunar_fraction", "altitude", "day")]
+temporal_all_taxa <- temporal_all_taxa[complete.cases(temporal_all_taxa), ]
+chart.Correlation(temporal_all_taxa, histogram=TRUE, pch=19)
+
+#Satellite Data 
+satellite_all_taxa <- km_log_bm_sum[,c("log_bm_sum_all_taxa", "TSM", "CUR", "SST","CHLA")]
+satellite_all_taxa <- satellite_all_taxa[complete.cases(satellite_all_taxa), ]
+chart.Correlation(satellite_all_taxa, histogram=TRUE, pch=19)
+
+#Environmental insitu
+environ_all_taxa <- km_log_bm_sum[, c("log_bm_sum_all_taxa", "Tmin", "O2_min", "SML", "Smax")]
+environ_all_taxa<- environ_all_taxa[complete.cases(environ_all_taxa), ]
+chart.Correlation(environ_all_taxa, histogram=TRUE, pch=19)
+
+
+
+
+
+
+
+
 #All Taxa
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts")
