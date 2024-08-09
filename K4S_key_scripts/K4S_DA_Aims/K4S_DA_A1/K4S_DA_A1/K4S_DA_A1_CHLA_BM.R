@@ -236,7 +236,7 @@ ggplot() +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
-    values = c("white", "grey85", "grey65", "grey30", "black"),
+    values = c("white", "grey65", "grey30", "black"),
     name = expression(paste("Summed Biomass (g m"^-3, ")"))
   ) +
   scale_size_manual(
@@ -260,7 +260,7 @@ ggplot() +
     fill = guide_legend(
       title.position = "left", 
       title.hjust = 0.5,
-      override.aes = list(size = c(6, 8, 10, 12)),
+      override.aes = list(size = c( 6, 8, 10, 12)),
       order = 1  # This will place it at the top
     ),
     size = guide_legend(
