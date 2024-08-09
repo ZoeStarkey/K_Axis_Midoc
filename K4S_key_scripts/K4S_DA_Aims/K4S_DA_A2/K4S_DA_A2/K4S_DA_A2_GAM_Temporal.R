@@ -60,7 +60,7 @@ summary(fishbiom_sum.solar)
 
 # 3. SUMMED BIOMASS - SQUID
 #Load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/km_bm_sum.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
 #Day
 cephbiom_sum.day <- gam(log(bm_sum_ceph) ~ s(day),data = km_bm_sum)
@@ -77,6 +77,22 @@ cephbiom_sum.solar <- gam(log(bm_sum_ceph) ~ s(altitude),data = km_bm_sum)
 draw(cephbiom_sum.solar, residuals = TRUE) 
 summary(cephbiom_sum.solar)
 
+
+#4. SUMMED BIOMASS - KRILL 
+#Day
+krillbiom_sum.day <- gam(log(bm_sum_krill) ~ s(day),data = km_bm_sum)
+draw(krillbiom_sum.day, residuals = TRUE)
+summary(krillbiom_sum.day)
+
+#Lunar fraction - illuminated disk
+krillbiom_sum.lunar <- gam(log(bm_sum_krill) ~ s(lunar_fraction),data = km_bm_sum)
+draw(krillbiom_sum.lunar, residuals = TRUE)
+summary(krillbiom_sum.lunar)
+
+#solar angle
+krillbiom_sum.solar <- gam(log(bm_sum_krill) ~ s(altitude),data = km_bm_sum)
+draw(krillbiom_sum.solar, residuals = TRUE)
+summary(krillbiom_sum.solar)
 
 
 ############. BIOMASS SEPARATED BY DEPTH. ##################
@@ -188,7 +204,36 @@ summary(ceph_depth.solar.re$lme)
 
 
 
+#BIOMASS SEPARATED BY DEPTH - KRILL
+#day
+krill_depth.day.gam <- gam(log(bm_depth_krill) ~ s(day, by = depth),data = km_bm_depth)
+draw(krill_depth.day.gam, residuals = TRUE)
+summary(krill_depth.day.gam)
 
+krill_depth.day.re <- gamm(log(bm_depth_krill) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(krill_depth.day.re, residuals = TRUE)
+summary(krill_depth.day.re$gam)
+summary(krill_depth.day.re$lme)
+
+#lunar fraction - illuminated disk
+krill_depth.lunar.gam <- gam(log(bm_depth_krill) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
+draw(krill_depth.lunar.gam, residuals = TRUE)
+summary(krill_depth.lunar.gam)
+
+krill_depth.lunar.re <- gamm(log(bm_depth_krill) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(krill_depth.lunar.re, residuals = TRUE)
+summary(krill_depth.lunar.re$gam)
+summary(krill_depth.lunar.re$lme)
+
+#solar angle
+krill_depth.solar.gam <- gam(log(bm_depth_krill) ~ s(altitude, by = depth),data = km_bm_depth)
+draw(krill_depth.solar.gam, residuals = TRUE)
+summary(krill_depth.solar.gam)
+
+krill_depth.solar.re <- gamm(log(bm_depth_krill) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+draw(krill_depth.solar.re, residuals = TRUE)
+summary(krill_depth.solar.re$gam)
+summary(krill_depth.solar.re$lme)
 
 
 
