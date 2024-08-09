@@ -50,7 +50,7 @@ ggplot(R_df, aes(x = x, y = y, fill = value)) +
 
 #ADD ICE 
 
-load("/Users/zoestarkey/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_DF_A1/ice_df.rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/ice_df.rda")
 
 
 
@@ -195,7 +195,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 
-Chla_total <-
+#Chla_total <-
  ggplot() +
  # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
@@ -291,6 +291,158 @@ output_filename <- "K4S_Plot_A1_CHLA_TBM.png"
 full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, bg = "white")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##############INDIVIDUAL TAXA PLOTS######################
+
+
+create_biomass_plot <- function(data, taxa_of_interest, output_filename) {
+  # Filter data for the specified taxa
+  km_sf_filtered <- data %>%
+    filter(tax.grp %in% taxa_of_interest) %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      total_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  # Calculate the bin breaks
+  bin_breaks <- quantile(km_sf_filtered$total_biomass, probs = seq(0, 1, 0.2))
+  
+  # Create labels with exact ranges, using three decimal places
+  bin_labels <- paste0(
+    sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
+    " - ",
+    sprintf("%.3f", bin_breaks[-1])
+  )
+  
+  # Add biomass bins to the filtered data
+  km_sf_filtered <- km_sf_filtered %>%
+    mutate(biomass_bin = cut(total_biomass, 
+                             breaks = bin_breaks,
+                             labels = bin_labels,
+                             include.lowest = TRUE))
+  
+  # Create the plot
+  plot <- ggplot() +
+    # Add the base raster layer
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
+                         limits = c(log(q1), log(q2)),
+                         na.value = "grey85",
+                         name = expression(paste("Chl-a (mg ", m^-3, ")")),
+                         guide = guide_colorbar(title.position = "left",
+                                                title.hjust = 0.5,
+                                                label.position = "right",
+                                                barwidth = 1,
+                                                barheight = 8)) +
+    # Add ice
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+                         name = 'Ice (%)',
+                         guide = guide_colorbar(title.position = "left", 
+                                                title.hjust = 0.5,
+                                                label.position = "right",
+                                                barwidth = 1,
+                                                barheight = 8)) +
+    
+    # Add f3$finished and f1$finished
+    geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
+    geom_sf(data = f1$finished, color = "black", linewidth = 1 ) +
+    
+    ggnewscale::new_scale_fill() +
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1) +
+    geom_sf(data = km_sf_filtered, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
+    scale_fill_manual(
+      values = c("white", "grey85", "grey65", "grey30", "black"),
+      name = expression(paste("Summed Biomass (g m"^-3, ")"))
+    ) +
+    scale_size_manual(
+      values = c(4, 6, 8, 10, 12),
+      name = expression(paste("Summed Biomass (g m"^-3, ")"))
+    ) +
+    labs(x = "Longitude", y = "Latitude", 
+         title = paste("Biomass Plot for", paste(taxa_of_interest, collapse = ", "))) +
+    coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = "white")
+    ) +
+    guides(
+      fill = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        override.aes = list(size = c(4, 6, 8, 10, 12)),
+        order = 1
+      ),
+      size = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        order = 1
+      ),
+      colour = guide_colorbar(
+        title.position = "left", 
+        title.hjust = 0.5,
+        label.position = "right",
+        barwidth = 1,
+        barheight = 8,
+        order = 2
+      )
+    ) +
+    theme(
+      legend.position = "right",
+      legend.box = "vertical"
+    )
+  
+  # Save the plot
+  output_directory <- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA")
+  full_output_path <- file.path(output_directory, output_filename)
+  ggsave(filename = full_output_path, plot = plot, width = 10, height = 8, bg = "white")
+  
+  return(plot)
+}
+
+
+
+
+# For fish
+fish_plot <- create_biomass_plot(km_sf, c("fish"), "K4S_Plot_A1_CHLA_BM_Fish.png")
+fish_plot
+
+cephalopods_plot <- create_biomass_plot(km_sf, c("cephalopods"), "K4S_Plot_A1_CHLA_BM_Cephalopods.png")
+cephalopods_plot
+
+
+
+
 
 
 
