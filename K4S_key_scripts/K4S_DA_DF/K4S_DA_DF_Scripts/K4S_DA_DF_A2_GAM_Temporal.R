@@ -95,6 +95,20 @@ squid_biomass_summary <- km_filtered_squid %>%
 km_bm_sum <- km_sum_all_taxa_with_fish %>%
   left_join(squid_biomass_summary, by = "midoc.stn")
 
+
+#KRILL
+include_taxa <- c("krill")
+km_filtered_krill <- km_df %>%
+  filter(tax.grp %in% include_taxa)
+krill_biomass_summary <- km_filtered_krill %>%
+  filter(tax.grp == "krill") %>%  # 
+  group_by(midoc.stn) %>%
+  summarize(bm_sum_krill = sum(bm_g_m3, na.rm = TRUE)) %>%
+  ungroup()
+
+km_bm_sum <- km_bm_sum %>% left_join(krill_biomass_summary, by = "midoc.stn")
+
+
 #removing columns that are no longer useful 
 km_bm_sum <- subset(km_bm_sum, select = -tax.grp)
 km_bm_sum <- subset(km_bm_sum, select = -fish.grp)
@@ -153,9 +167,22 @@ km_bm_squid_sum_depth <- km_df %>%
     .groups = "drop"
   )
 
+
+#KRILL
+include_taxa <- c("krill")
+km_bm_krill_sum_depth <- km_df %>%
+  filter(tax.grp %in% include_taxa) %>%
+  group_by(midoc.stn, depth) %>%
+  summarize(
+    bm_depth_krill = sum(bm_g_m3, na.rm = TRUE),
+    across(everything(), ~first(.)),
+    .groups = "drop"
+  )
+
 km_bm_depth <- km_bm_all_taxa_sum_depth %>%
   left_join(km_bm_fish_sum_depth, by = c("midoc.stn", "depth")) %>%
-  left_join(km_bm_squid_sum_depth, by = c("midoc.stn", "depth"))
+  left_join(km_bm_squid_sum_depth, by = c("midoc.stn", "depth")) %>%
+  left_join(km_bm_krill_sum_depth, by = c("midoc.stn", "depth"))
 
 
 km_bm_depth <-km_bm_depth %>% 
@@ -164,6 +191,7 @@ km_bm_depth <-km_bm_depth %>%
     bm_depth_all_taxa,
     bm_depth_fish,
     bm_depth_ceph,
+    bm_depth_krill,
     everything()
   )
 
