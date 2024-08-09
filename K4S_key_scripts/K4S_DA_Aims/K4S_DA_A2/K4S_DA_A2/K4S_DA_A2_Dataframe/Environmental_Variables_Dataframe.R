@@ -194,6 +194,14 @@ km_df <- km_df %>%
   ) %>%
   select(-solar_position) 
 
+#adding day
+km_df$date <- as.Date(km_df$start_time)
+
+# Get the minimum date for each midoc.stn
+min_dates <- tapply(km_df$date, km_df$midoc.stn, min)
+
+# Calculate day_numeric
+km_df$day <- round(as.numeric(difftime(km_df$date, min_dates[km_df$midoc.stn], units = "days")) + 1 - (16822.81 + 0.995277), 1)
 
 
 # Define the stations to remove
