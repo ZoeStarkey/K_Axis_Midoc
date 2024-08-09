@@ -14,6 +14,7 @@ library(colorspace)
 library(stars)
 library(raster)
 library(scales)
+library(gridExtra)
 
 #setting directory
 usr <- Sys.info()["user"]
@@ -69,15 +70,26 @@ md <- readRDS(file_path)
 km <- merge(km, md[, c("midoc.stn", "zone")], by = "midoc.stn") 
 km <- ll2prj(km, loncol="lon_start", latcol="lat_start")
 
-#Aggreating biomass data by midoc stqtion 
 km_sf <- st_as_sf(km)
-km_sf_total <- km_sf %>% # Aggregate biomass data by midoc station 
-  group_by(midoc.stn) %>%
-  summarize(
-    total_biomass = sum(bm_g_m3, na.rm = TRUE),
-    lon_end = first(lon_end),
-    lat_end = first(lat_end)
-  )
+# Define the depth ranges for each codend
+depth_bins <- c("0-1000", "800-1000", "600-800", "400-600", "200-400", "0-200")
+
+# Map the codends to depth ranges using the factor function
+km_sf$depth <- factor(km$cod.end, levels = c("1", "2", "3", "4", "5", "6"), labels = depth_bins)
+
+# Define the stations to remove
+abandoned_stations <- c("MIDOC02","MIDOC08", "MIDOC10", "MIDOC12", "MIDOC33")
+
+# Remove the specified stations from km_df
+km_sf <- km_sf %>%
+  filter(!midoc.stn %in% abandoned_stations)
+
+
+# Remove the specified stations from km_df
+km_sf <- km_sf %>%
+  filter(!depth %in% "0-1000")
+
+
 
 #TSM
 bx <- c(60, 95, -71, -55)  
@@ -143,9 +155,178 @@ ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
 
 
 
-#TOTAL BIOMASS PLOT - only key taxon of interest 
-#km_filtered <- km_sf %>%
- # filter(tax.grp %in% c("fish", "cephalopods", "krill"))
+
+###########TOTAL BIOMASS PLOT EXCLUDING GELATINOUS ORGANISMS ################
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+# 
+#Filter data for taxa not in the exclude list and aggregate biomass
+km_sf_total <- km_sf %>%
+  filter(!tax.grp %in% exclude_taxa) %>%
+  group_by(midoc.stn) %>%
+  summarize(
+    total_biomass = sum(bm_g_m3, na.rm = TRUE),
+    lon_end = first(lon_end),
+    lat_end = first(lat_end)
+  )
+
+# Calculate bin breaks for biomass 
+n_bins <- 5  # can adjust this number for more or fewer bins
+bin_range <- range(km_sf_total$total_biomass, na.rm = TRUE)
+bin_breaks <- pretty(bin_range, n = n_bins)
+
+# Create labels with exact ranges, using two decimal places
+bin_labels <- paste0(
+  sprintf("%.2f", bin_breaks[-length(bin_breaks)]),
+  " - ",
+  sprintf("%.2f", bin_breaks[-1])
+)
+
+# Modify the mutate step in km_sf_total (if not already done)
+km_sf_total <- km_sf_total %>%
+  mutate(biomass_bin = cut(total_biomass, 
+                           breaks = bin_breaks,
+                           labels = bin_labels,
+                           include.lowest = TRUE))
+
+# Now create the plot
+TSM_total <-
+  ggplot() +
+  # Base layer for time since melt
+  geom_sf(data = wcp_sf, fill = NA) +
+  geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.7, show.legend = TRUE) +
+  scale_fill_cmocean(name = "curl", guide = guide_colourbar(theme = theme(legend.title.position = "left",
+                                                                          legend.title = element_text(angle = 90)),
+                                                            title = "days since melt"), na.value = NA) +
+  
+  # Add ice
+  ggnewscale::new_scale_fill() + 
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+                       name = 'Ice (%)',
+                       guide = guide_colorbar(title.position = "left", 
+                                              title.hjust = 0.5,
+                                              label.position = "right",
+                                              barwidth = 1,
+                                              barheight = 8)) +
+  
+  # Add f3$finished and f1$finished (if these exist in your data)
+  geom_sf(data = f3$finished, color = "black", linewidth = 1) +
+  geom_sf(data = f1$finished, color = "black", linewidth = 1) +
+  
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wcp_sf, fill = NA, color = "black") +
+  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+  geom_sf(data = ktr_sf, size = 1) +
+  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
+  scale_fill_manual(
+    values = c("white", "grey65", "grey30", "black"),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  scale_size_manual(
+    values = c(6, 8, 10, 12),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
+  theme(
+    legend.position = "right",
+    panel.grid = element_line(color = "gray80", linetype = "solid"),
+    panel.background = element_blank(),
+    legend.background = element_blank(),
+    legend.key = element_blank(),
+    legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.box.background = element_blank(),
+    legend.byrow = TRUE,
+    strip.background = element_rect(fill = "white")
+  ) +
+    guides(
+      fill = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        override.aes = list(size = c(6, 8, 10, 12)),
+        order = 1,
+        keywidth = unit(1, "cm"),
+        keyheight = unit(1, "cm"),
+        default.unit = "cm",
+        background = element_rect(fill = "transparent", colour = NA)
+      ),
+      size = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        order = 1,
+        background = element_rect(fill = "transparent", colour = NA)
+      ),
+      colour = guide_colorbar(
+        title.position = "left", 
+        title.hjust = 0.5,
+        label.position = "right",
+        barwidth = 1,
+        barheight = 8,
+        order = 2
+      ) ) +
+   theme(
+     legend.position = "right",
+     legend.box = "vertical"
+    )
+
+
+
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_TSM")
+output_filename <- "K4S_Plot_A1_TSM_TBM.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = TSM_total, width = 10, height = 8, bg = "white")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Aggregate biomass data by midoc station including only fish, cephalopods, and krill
 km_sf <- st_as_sf(km)
