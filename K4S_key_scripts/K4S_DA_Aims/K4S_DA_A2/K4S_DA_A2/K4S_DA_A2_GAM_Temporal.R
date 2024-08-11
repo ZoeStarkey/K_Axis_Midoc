@@ -161,35 +161,42 @@ summary(allbiom_depth.solar.re$lme)
 
 
 #BIOMASS SEPARATED BY DEPTH - FISH
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
 
 #day 
 fish_depth.day.gam <- gam(log(bm_depth_fish) ~ s(day, by = depth),data = km_bm_depth)
-draw(fish_depth.day.gam, residuals = TRUE)
+draw(fish_depth.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Fish - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.day.gam)
 
 fish_depth.day.re <- gamm(log(bm_depth_fish) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(fish_depth.day.re, residuals = TRUE)
+draw(fish_depth.day.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Fish - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.day.re$gam)
 summary(fish_depth.day.re$lme)
 
 #lunar fraction - illuminated disk
 fish_depth.lunar.gam <- gam(log(bm_depth_fish) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
-draw(fish_depth.lunar.gam, residuals = TRUE)
+draw(fish_depth.lunar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Fish - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.lunar.gam)
 
 fish_depth.lunar.re <- gamm(log(bm_depth_fish) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(fish_depth.lunar.re, residuals = TRUE)
+draw(fish_depth.lunar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Fish - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.lunar.re$gam)
 summary(fish_depth.lunar.re$lme)
 
 
 #solar angle 
 fish_depth.solar.gam <- gam(log(bm_depth_fish) ~ s(altitude, by = depth),data = km_bm_depth)
-draw(fish_depth.solar.gam, residuals = TRUE)
+draw(fish_depth.solar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Fish - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.solar.gam)
 
 fish_depth.solar.re <- gamm(log(bm_depth_fish) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(fish_depth.solar.re, residuals = TRUE)
+draw(fish_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Fish - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.solar.re$gam)
 summary(fish_depth.solar.re$lme)
 
@@ -198,32 +205,38 @@ summary(fish_depth.solar.re$lme)
 
 #day
 ceph_depth.day.gam <- gam(log(bm_depth_ceph) ~ s(day, by = depth),data = km_bm_depth)
-draw(ceph_depth.day.gam, residuals = TRUE)
+draw(ceph_depth.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Cephalopods - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.day.gam)
 
 ceph_depth.day.re <- gamm(log(bm_depth_ceph) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(ceph_depth.day.re, residuals = TRUE)
+draw(ceph_depth.day.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Cephalopods - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.day.re$gam)
 summary(ceph_depth.day.re$lme)
 
 #lunar fraction - illuminated disk
 ceph_depth.lunar.gam <- gam(log(bm_depth_ceph) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
-draw(ceph_depth.lunar.gam, residuals = TRUE)
+draw(ceph_depth.lunar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Cephalopods - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.lunar.gam)
 
 ceph_depth.lunar.re <- gamm(log(bm_depth_ceph) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(ceph_depth.lunar.re, residuals = TRUE)
+draw(ceph_depth.lunar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Cephalopods - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.lunar.re$gam)
 summary(ceph_depth.lunar.re$lme)
 
 
 #solar angle 
 ceph_depth.solar.gam <- gam(log(bm_depth_ceph) ~ s(altitude, by = depth),data = km_bm_depth)
-draw(ceph_depth.solar.gam, residuals = TRUE)
+draw(ceph_depth.solar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Cephalopods - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.solar.gam)
 
 ceph_depth.solar.re <- gamm(log(bm_depth_ceph) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(ceph_depth.solar.re, residuals = TRUE)
+draw(ceph_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Cephalopods - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(ceph_depth.solar.re$gam)
 summary(ceph_depth.solar.re$lme)
 
@@ -232,38 +245,52 @@ summary(ceph_depth.solar.re$lme)
 #BIOMASS SEPARATED BY DEPTH - KRILL
 #day
 krill_depth.day.gam <- gam(log(bm_depth_krill) ~ s(day, by = depth),data = km_bm_depth)
-draw(krill_depth.day.gam, residuals = TRUE)
+draw(krill_depth.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.day.gam)
 
 krill_depth.day.re <- gamm(log(bm_depth_krill) ~ s(day, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(krill_depth.day.re, residuals = TRUE)
+draw(krill_depth.day.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Krill - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.day.re$gam)
 summary(krill_depth.day.re$lme)
 
 #lunar fraction - illuminated disk
 krill_depth.lunar.gam <- gam(log(bm_depth_krill) ~ s(lunar_fraction, by = depth),data = km_bm_depth)
-draw(krill_depth.lunar.gam, residuals = TRUE)
+draw(krill_depth.lunar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.lunar.gam)
 
 krill_depth.lunar.re <- gamm(log(bm_depth_krill) ~ s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(krill_depth.lunar.re, residuals = TRUE)
+draw(krill_depth.lunar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Krill - Lunar Fraction",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.lunar.re$gam)
 summary(krill_depth.lunar.re$lme)
 
 #solar angle
 krill_depth.solar.gam <- gam(log(bm_depth_krill) ~ s(altitude, by = depth),data = km_bm_depth)
-draw(krill_depth.solar.gam, residuals = TRUE)
+draw(krill_depth.solar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.solar.gam)
 
 krill_depth.solar.re <- gamm(log(bm_depth_krill) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(krill_depth.solar.re, residuals = TRUE)
+draw(krill_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth + RE: Krill - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(krill_depth.solar.re$gam)
 summary(krill_depth.solar.re$lme)
 
 
+#testing out only surface layer s
 
-
-
+# km_bm_depth$bm_depth_krill_surface <- ifelse(km_bm_depth$depth == "0-200", 
+#                                              km_bm_depth$bm_depth_krill, 
+#                                              NA)
+# km_bm_depth_surface <- km_bm_depth[!is.na(km_bm_depth$bm_depth_krill_surface), ]
+# krill_surface.day.gam <- gam(log(bm_depth_krill_surface) ~ s(day), 
+#                              data = km_bm_depth_surface)
+# draw(krill_surface.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+# grid.text("Biomass (Logged) by depth: Krill - Day (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
+# summary(krill_surface.day.gam)
 
 
 #### TESTING GAMMA ######
