@@ -11,108 +11,166 @@ dir.exists(d)
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
 #TSM
-allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(TSM),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.TSM, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - TSM") 
+allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(TSM), data = km_bm_sum)
+plot_TSM <- draw(allbiom_sum.TSM, residuals = TRUE) +
+  ggtitle("TSM") +
+  theme(plot.title = element_text(size = 10))
 summary(allbiom_sum.TSM)
 
-#CUR
-allbiom_sum.CUR <- gam(log(bm_sum_all_taxa) ~ s(CUR),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.CUR, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - CUR")
+
+# CUR model
+allbiom_sum.CUR <- gam(log(bm_sum_all_taxa) ~ s(CUR), data = km_bm_sum)
+plot_CUR <- draw(allbiom_sum.CUR, residuals = TRUE) +
+  ggtitle("CUR") +
+  theme(plot.title = element_text(size = 10))
 summary(allbiom_sum.CUR)
 
-#CHLA
-allbiom_sum.CHLA <- gam(log(bm_sum_all_taxa) ~ s(CHLA),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.CHLA, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - CHLA")
+# CHLA model
+allbiom_sum.CHLA <- gam(log(bm_sum_all_taxa) ~ s(CHLA), data = km_bm_sum)
+plot_CHLA <- draw(allbiom_sum.CHLA, residuals = TRUE) +
+  ggtitle("CHLA") +
+  theme(plot.title = element_text(size = 10))
 summary(allbiom_sum.CHLA)
 
-#SST
-allbiom_sum.SST <- gam(log(bm_sum_all_taxa) ~ s(SST),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.SST, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - SST")
+# SST model
+allbiom_sum.SST <- gam(log(bm_sum_all_taxa) ~ s(SST), data = km_bm_sum)
+plot_SST <- draw(allbiom_sum.SST, residuals = TRUE) +
+  ggtitle("SST") +
+  theme(plot.title = element_text(size = 10))
 summary(allbiom_sum.SST)
+
+# Combine all plots
+(plot_TSM + plot_CUR + plot_layout(ncol = 2)) / 
+  (plot_CHLA + plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) All Taxa (Exclude Gelatinous)",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+
 
 #  2. SUMMED BIOMASS - FISH
 #Load in the dataframe 
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
 #TSM
-fishbiom_sum.TSM <- gam(log(bm_sum_fish) ~ s(TSM),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.TSM, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - TSM")
+fishbiom_sum.TSM <- gam(log(bm_sum_fish) ~ s(TSM), data = km_bm_sum)
+plot_TSM <- draw(fishbiom_sum.TSM, residuals = TRUE) +
+  ggtitle("TSM") +
+  theme(plot.title = element_text(size = 10))
 summary(fishbiom_sum.TSM)
 
-#CUR
-fishbiom_sum.CUR <- gam(log(bm_sum_fish) ~ s(CUR),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.CUR, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - CUR")
+# CUR model
+fishbiom_sum.CUR <- gam(log(bm_sum_fish) ~ s(CUR), data = km_bm_sum)
+plot_CUR <- draw(fishbiom_sum.CUR, residuals = TRUE) +
+  ggtitle("CUR") +
+  theme(plot.title = element_text(size = 10))
 summary(fishbiom_sum.CUR)
 
-#CHLA
-fishbiom_sum.CHLA <- gam(log(bm_sum_fish) ~ s(CHLA),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.CHLA, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - CHLA")
+# CHLA model
+fishbiom_sum.CHLA <- gam(log(bm_sum_fish) ~ s(CHLA), data = km_bm_sum)
+plot_CHLA <- draw(fishbiom_sum.CHLA, residuals = TRUE) +
+  ggtitle("CHLA") +
+  theme(plot.title = element_text(size = 10))
 summary(fishbiom_sum.CHLA)
 
-#SST
-fishbiom_sum.SST <- gam(log(bm_sum_fish) ~ s(SST),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.SST, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - SST")
+# SST model
+fishbiom_sum.SST <- gam(log(bm_sum_fish) ~ s(SST), data = km_bm_sum)
+plot_SST <- draw(fishbiom_sum.SST, residuals = TRUE) +
+  ggtitle("SST") +
+  theme(plot.title = element_text(size = 10))
 summary(fishbiom_sum.SST)
 
+# Combine all plots
+combined_plot <- (plot_TSM + plot_CUR + plot_layout(ncol = 2)) / 
+  (plot_CHLA + plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Fish",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+# Display the combined plot
+print(combined_plot)
+
 ###SUMMED CEPHALOPODS
-#TSM
-cephbiom_sum.TSM <- gam(log(bm_sum_ceph) ~ s(TSM),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.TSM, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - TSM")
+# TSM model
+cephbiom_sum.TSM <- gam(log(bm_sum_ceph) ~ s(TSM), data = km_bm_sum)
+plot_TSM <- draw(cephbiom_sum.TSM, residuals = TRUE) +
+  ggtitle("TSM") +
+  theme(plot.title = element_text(size = 10))
 summary(cephbiom_sum.TSM)
 
-
-#CUR
-cephbiom_sum.CUR <- gam(log(bm_sum_ceph) ~ s(CUR),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.CUR, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - CUR")
+# CUR model
+cephbiom_sum.CUR <- gam(log(bm_sum_ceph) ~ s(CUR), data = km_bm_sum)
+plot_CUR <- draw(cephbiom_sum.CUR, residuals = TRUE) +
+  ggtitle("CUR") +
+  theme(plot.title = element_text(size = 10))
 summary(cephbiom_sum.CUR)
 
-#CHLA
-cephbiom_sum.CHLA <- gam(log(bm_sum_ceph) ~ s(CHLA),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.CHLA, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - CHLA")
+# CHLA model
+cephbiom_sum.CHLA <- gam(log(bm_sum_ceph) ~ s(CHLA), data = km_bm_sum)
+plot_CHLA <- draw(cephbiom_sum.CHLA, residuals = TRUE) +
+  ggtitle("CHLA") +
+  theme(plot.title = element_text(size = 10))
 summary(cephbiom_sum.CHLA)
 
-#SST
-cephbiom_sum.SST <- gam(log(bm_sum_ceph) ~ s(SST),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.SST, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - SST")
+# SST model
+cephbiom_sum.SST <- gam(log(bm_sum_ceph) ~ s(SST), data = km_bm_sum)
+plot_SST <- draw(cephbiom_sum.SST, residuals = TRUE) +
+  ggtitle("SST") +
+  theme(plot.title = element_text(size = 10))
 summary(cephbiom_sum.SST)
+
+# Combine all plots
+combined_plot <- (plot_TSM + plot_CUR + plot_layout(ncol = 2)) / 
+  (plot_CHLA + plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Cephalopods",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+# Display the combined plot
+print(combined_plot)
 
 #KRILL
 
 #TSM
-krillbiom_sum.TSM <- gam(log(bm_sum_krill) ~ s(TSM),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.TSM, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - TSM")
+krillbiom_sum.TSM <- gam(log(bm_sum_krill) ~ s(TSM), data = km_bm_sum)
+plot_TSM <- draw(krillbiom_sum.TSM, residuals = TRUE) +
+  ggtitle("TSM") +
+  theme(plot.title = element_text(size = 10))
 summary(krillbiom_sum.TSM)
 
-#CUR
-krillbiom_sum.CUR <- gam(log(bm_sum_krill) ~ s(CUR),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.CUR, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - CUR")
+# CUR model
+krillbiom_sum.CUR <- gam(log(bm_sum_krill) ~ s(CUR), data = km_bm_sum)
+plot_CUR <- draw(krillbiom_sum.CUR, residuals = TRUE) +
+  ggtitle("CUR") +
+  theme(plot.title = element_text(size = 10))
 summary(krillbiom_sum.CUR)
 
-#CHLA
-krillbiom_sum.CHLA <- gam(log(bm_sum_krill) ~ s(CHLA),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.CHLA, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - CHLA")
+# CHLA model
+krillbiom_sum.CHLA <- gam(log(bm_sum_krill) ~ s(CHLA), data = km_bm_sum)
+plot_CHLA <- draw(krillbiom_sum.CHLA, residuals = TRUE) +
+  ggtitle("CHLA") +
+  theme(plot.title = element_text(size = 10))
 summary(krillbiom_sum.CHLA)
 
-#SST
-krillbiom_sum.SST <- gam(log(bm_sum_krill) ~ s(SST),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.SST, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - SST")
-summary(krillbiom_sum.SST)
+# SST model
+krillbiom_sum.SST <- gam(log(bm_sum_krill) ~ s(SST), data = km_bm_sum)
+plot_SST <- draw(krillbiom_sum.SST, residuals = TRUE) +
+  ggtitle("SST") +
+  theme(plot.title = element_text(size = 10))
+
+# Combine all plots
+combined_plot <- (plot_TSM + plot_CUR + plot_layout(ncol = 2)) / 
+  (plot_CHLA + plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Krill",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+# Display the combined plot
+print(combined_plot)
 
 
 
