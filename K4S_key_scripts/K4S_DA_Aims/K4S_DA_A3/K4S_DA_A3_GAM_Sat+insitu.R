@@ -160,6 +160,7 @@ krillbiom_sum.SST <- gam(log(bm_sum_krill) ~ s(SST), data = km_bm_sum)
 plot_SST <- draw(krillbiom_sum.SST, residuals = TRUE) +
   ggtitle("SST") +
   theme(plot.title = element_text(size = 10))
+summary(krillbiom_sum.SST)
 
 # Combine all plots
 combined_plot <- (plot_TSM + plot_CUR + plot_layout(ncol = 2)) / 
