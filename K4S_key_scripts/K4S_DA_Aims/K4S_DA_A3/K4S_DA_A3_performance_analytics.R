@@ -11,6 +11,8 @@ setwd(d)
 dir.exists(d)
 
 #Logging the values
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
+
 km_bm_sum$log_bm_sum_all_taxa <- log(km_bm_sum$bm_sum_all_taxa)
 km_bm_sum$log_bm_sum_fish <- log(km_bm_sum$bm_sum_fish)
 km_bm_sum$log_bm_sum_ceph <- log(km_bm_sum$bm_sum_ceph)
@@ -34,7 +36,6 @@ km_bm_sum <-km_bm_sum %>%
 #########TOTAL TAXA############ 
 
 #loading dataframe - values were logged and then summed 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 par(mar=c(5,4,6,2))
 #Temporal Data
 temporal_all_taxa <- km_bm_sum[, c("log_bm_sum_all_taxa", "lunar_fraction", "altitude", "day")]
