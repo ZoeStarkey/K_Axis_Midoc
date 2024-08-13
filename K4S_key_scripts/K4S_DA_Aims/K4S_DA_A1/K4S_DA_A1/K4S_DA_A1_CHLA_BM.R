@@ -196,7 +196,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 
-#Chla_total <-
+Chla_total <-
 ggplot() +
   # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
