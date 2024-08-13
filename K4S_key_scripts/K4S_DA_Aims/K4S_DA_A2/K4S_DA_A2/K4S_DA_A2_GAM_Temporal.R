@@ -327,6 +327,30 @@ summary(m_re$gam)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #PLOTTING RESIDUALS \
 library(ggplot2)
 library(mgcv)
