@@ -24,13 +24,13 @@ library(RColorBrewer)
 cb_palette <- brewer.pal(8, "Paired")
 cb_palette <- c("#2e4057", "#4A92C6", "#FFC000",  "#ff7c43", "#C41E3A")
 
-ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
+stacked_bar_plot <-ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
     panel.grid.major.x = element_blank(),
-    legend.position = "bottom"
+    legend.position = "right"
   ) +
   scale_x_discrete(labels = label_midoc_stn) +
   scale_fill_manual(values = cb_palette) +
@@ -39,7 +39,14 @@ ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
 
 
 
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Stacked")
+output_filename <- "K4S_Plot_A1_Bar_Chart.png"
+full_output_path <- file.path(output_directory, output_filename)
 
+
+
+# Save the plot
+ggsave(filename = full_output_path, plot = stacked_bar_plot, width =10, height = 8, dpi = 300, bg = "white")
 
 
 
@@ -51,7 +58,7 @@ custom_palette <- c("#2e4057", "#4A92C6", "#FFC000",  "#ff7c43", "#C41E3A")
 custom_palette <- c("#1F4E79", "#4A92C6", "#FFC000", "#7B3C5D","#E68A4F") 
 
 # Create the stacked bar plot
-stacked_bar_plot <- ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
+stacked_bar_plot_depth <- ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   theme(
@@ -77,13 +84,13 @@ print(stacked_bar_plot)
 
 
 
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bar_Chart")
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Stacked")
 output_filename <- "K4S_Plot_A1_Bar_Chart_Depth.png"
 full_output_path <- file.path(output_directory, output_filename)
 
 
 
 # Save the plot
-ggsave(filename = full_output_path, plot = stacked_bar_plot, width =10, height = 8, dpi = 300, bg = "white")
+ggsave(filename = full_output_path, plot = stacked_bar_plot_depth, width =10, height = 8, dpi = 300, bg = "white")
 
 
