@@ -159,7 +159,7 @@ label_midoc_stn <- function(x) {
 total_biomass_heatmap <- ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
     geom_tile() + # Use tiles to represent the heatmap
     scale_fill_viridis_c(option = "rocket", direction = -1) + # Set the gradient colors for the fill
-    labs(title = "Heat Map of Total Biomass (Excluding Gelatinous)", x = "Midoc Station", y = "Depth (m) ", fill = "Total Biomass (g/m³)") + # Add labels and title
+    labs(title = "Heat Map of Total Biomass (Excluding Gelatinous)", x = "Midoc Station", y = "Depth (m) ", fill = "Biomass (g/m³)") + # Add labels and title
     theme_minimal() + # Use a minimal theme for the plot
   theme(
     axis.title.x = element_text(margin = margin(t = 10)), # Increase distance between x-axis label and axis
