@@ -314,7 +314,7 @@ summary(krill_depth.solar.re$lme)
 #all of the gamchekcs in one place
 par(mfrow=c(2,2))
 #ALL BIOM 
-gam.check(allbiom_depth.day.gam)
+gam.check(allbiom_depth.day.gam) 
 gam.check(allbiom_depth.day.re$gam)
 gam.check(allbiom_depth.lunar.gam)
 gam.check(allbiom_depth.lunar.re$gam)
