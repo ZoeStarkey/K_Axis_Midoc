@@ -296,8 +296,9 @@ summary(krill_depth.solar.re$lme)
 #### TESTING GAMMA ######
 #gamma instead of log for fish and solar angle 
 library(gamm4)
-m19<- gamm4(bm_g_m3 + 0.0001 ~ s(altitude, by = depth) , data = km_df_depth, family = Gamma(), random = ~(1|midoc.stn))
+m19<- gamm4(bm_depth_fish + 0.0001 ~ s(altitude, by = depth) , data = km_bm_depth, family = Gamma(), random = ~(1|midoc.stn))
 par(mfrow = c(2, 2))
+
 gam.check(m19$gam)
 summary(m19$gam)
 draw(m19$gam, residuals = TRUE)
@@ -309,19 +310,19 @@ draw(m19$gam, residuals = TRUE)
 
 
 #solar angle
-m_gaus <- gam(log(bm_g_m3) ~ s(altitude, by = depth) ,data = km_df_depth)
+m_gaus <- gam(log(bm_depth_fish) ~ s(altitude, by = depth) ,data = km_bm_depth)
 plot(m_gaus, residuals = TRUE,pages=1)
 summary(m_gaus)
 par(mfrow=c(2,2))
 gam.check(m_gaus)
 
-m_gamma <- gam(bm_g_m3+ 0.0001 ~ s(altitude, by = depth),data = km_df_depth, family = Gamma())
+m_gamma <- gam(bm_depth_fish+ 0.0001 ~ s(altitude, by = depth),data = km_bm_depth, family = Gamma())
 plot(m_gamma, residuals = TRUE,type="response")
 summary(m_gamma)
 par(mfrow=c(2,2))
 gam.check(m_gamma)
 
-m_re <- gamm(log(bm_g_m3) ~ s(altitude, by = depth),data = km_df_depth, random = list(midoc.stn = ~ 1 ))
+m_re <- gamm(log(bm_depth_fish) ~ s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
 draw(m_re$gam, residuals = TRUE)
 summary(m_re$gam)
 
