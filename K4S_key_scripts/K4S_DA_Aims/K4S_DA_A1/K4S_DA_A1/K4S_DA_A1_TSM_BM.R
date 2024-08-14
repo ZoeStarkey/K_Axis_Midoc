@@ -194,10 +194,28 @@ TSM_total <-
   # Base layer for time since melt
   geom_sf(data = wcp_sf, fill = NA) +
   geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.7, show.legend = TRUE) +
-  scale_fill_cmocean(name = "curl", guide = guide_colourbar(theme = theme(legend.title.position = "left",
-                                                                          legend.title = element_text(angle = 90)),
-                                                            title = "days since melt"), na.value = NA) +
+    scale_fill_cmocean( name = "curl", na.value = NA,
+      guide = guide_colorbar(
+        title = "Days",
+        title.position = "left",
+        title.hjust = 0.5,
+        label.position = "right",
+        barwidth = 1,
+        barheight = 16,
+        order = 2,
+        frame.linewidth = 0.2,
+        # ticks.linewidth = 0.5,
+        title.theme = element_text(size = 14, angle = 90),
+        label.theme = element_text(size = 14)
+      )
+    ) + 
   
+    
+    # Add f3$finished and f1$finished 
+    geom_sf(data = f3$finished, color = "black", linewidth = 1) +
+    geom_sf(data = f1$finished, color = "black", linewidth = 1) +
+    
+    
   # Add ice
   ggnewscale::new_scale_fill() + 
   geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
@@ -207,11 +225,14 @@ TSM_total <-
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 8)) +
+                                              barheight = 8,
+                                              order = 3,
+                                              frame.linewidth = 0.2,
+                                              #ticks.linewidth = 0.5,
+                                              title.theme = element_text(size = 14, angle = 90),
+                                              label.theme = element_text(size = 14))) + 
   
-  # Add f3$finished and f1$finished (if these exist in your data)
-  geom_sf(data = f3$finished, color = "black", linewidth = 1) +
-  geom_sf(data = f1$finished, color = "black", linewidth = 1) +
+ 
   
   ggnewscale::new_scale_fill() +
   geom_sf(data = wcp_sf, fill = NA, color = "black") +
@@ -219,7 +240,7 @@ TSM_total <-
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1) +
+  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
@@ -236,11 +257,16 @@ TSM_total <-
     panel.grid = element_line(color = "gray80", linetype = "solid"),
     panel.background = element_blank(),
     legend.background = element_blank(),
-    legend.key = element_blank(),
     legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.text = element_text(size = 14),
     legend.box.background = element_blank(),
     legend.byrow = TRUE,
-    strip.background = element_rect(fill = "white")
+    strip.background = element_rect(fill = "white"),
+    axis.title = element_text(size = 20),  # Increased axis title size
+    axis.text = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
   ) +
     guides(
       fill = guide_legend(
@@ -248,6 +274,7 @@ TSM_total <-
         title.hjust = 0.5,
         override.aes = list(size = c(6, 8, 10, 12)),
         order = 1,
+        title.theme = element_text(size = 14, angle = 90),
         keywidth = unit(1, "cm"),
         keyheight = unit(1, "cm"),
         default.unit = "cm",
@@ -257,16 +284,10 @@ TSM_total <-
         title.position = "left", 
         title.hjust = 0.5,
         order = 1,
+        title.theme = element_text(size = 14, angle = 90),
         background = element_rect(fill = "transparent", colour = NA)
       ),
-      colour = guide_colorbar(
-        title.position = "left", 
-        title.hjust = 0.5,
-        label.position = "right",
-        barwidth = 1,
-        barheight = 8,
-        order = 2
-      ) ) +
+      ) +
    theme(
      legend.position = "right",
      legend.box = "vertical"
