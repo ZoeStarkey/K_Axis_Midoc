@@ -208,7 +208,12 @@ ggplot() +
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 8)) +
+                                              barheight = 16,
+                                              order = 2,
+                                             frame.linewidth = 0.2,
+                                            # ticks.linewidth = 0.5,
+                                              title.theme = element_text(size = 14, angle = 90),
+                                              label.theme = element_text(size = 14))) +
   #add ice
   ggnewscale::new_scale_fill() + 
   geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
@@ -218,9 +223,14 @@ ggplot() +
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 8)) +
+                                              barheight = 8,
+                                              order = 3,
+                                              frame.linewidth = 0.2,
+                                              #ticks.linewidth = 0.5,
+                                              title.theme = element_text(size = 14, angle = 90),
+                                              label.theme = element_text(size = 14))) + 
   
-  #  add f3$finished and f1$finished
+  #  add fronts
   geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
   geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
   
@@ -232,7 +242,7 @@ ggplot() +
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1) +
+  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
@@ -259,7 +269,8 @@ ggplot() +
     axis.text = element_text(size = 16),
     axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt"),
+
   )  +# ... (keep your other layers and settings)
   
   guides(
@@ -275,15 +286,6 @@ ggplot() +
       title.hjust = 0.5,
       order = 1, # This ensures size legend stays with fill legend
       title.theme = element_text(size = 14, angle = 90)
-    ),
-    colour = guide_colorbar(
-      title.position = "left", 
-      title.hjust = 0.5,
-      label.position = "right",
-      barwidth = 1,
-      barheight = 8,
-      order = 2,
-      title.theme = element_text(size = 14, angle = 90)# This will place it below the biomass legend
     ),
   ) +
   theme(
