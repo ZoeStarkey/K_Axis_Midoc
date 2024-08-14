@@ -214,6 +214,11 @@ ggplot() +
                                             # ticks.linewidth = 0.5,
                                               title.theme = element_text(size = 14, angle = 90),
                                               label.theme = element_text(size = 14))) +
+  
+  #  add fronts
+  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
+  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
+  
   #add ice
   ggnewscale::new_scale_fill() + 
   geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
@@ -230,9 +235,7 @@ ggplot() +
                                               title.theme = element_text(size = 14, angle = 90),
                                               label.theme = element_text(size = 14))) + 
   
-  #  add fronts
-  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
-  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
+
   
   
   ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
@@ -300,7 +303,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A1_CHLA_TBM.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 10, bg = "white")
+ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, bg = "white")
 
 
 
