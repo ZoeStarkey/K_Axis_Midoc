@@ -203,7 +203,7 @@ ggplot() +
   scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                        limits = c(log(q1), log(q2)),
                        na.value = "grey85",
-                       name = expression(paste("Chl-a (mg ", m^-3, ")")),
+                       name = expression(paste("Chl-", italic("a")," (mg", m^-3, ")")),
                        guide = guide_colorbar(title.position = "left",
                                               title.hjust = 0.5,
                                               label.position = "right",
@@ -237,11 +237,11 @@ ggplot() +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
-    name = expression(paste("Summed Biomass (g m"^-3, ")"))
+    name = expression(paste("Biomass (g m"^-3, ")"))
   ) +
   scale_size_manual(
     values = c( 6, 8, 10, 12),
-    name = expression(paste("Summed Biomass (g m"^-3, ")"))
+    name = expression(paste("Biomass (g m"^-3, ")"))
   ) +
   labs(x = "Longitude", y = "Latitude") +
   coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
@@ -251,9 +251,15 @@ ggplot() +
     legend.background = element_blank(),
     legend.key = element_blank(),
     legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.text = element_text(size = 14),
     legend.box.background = element_blank(),
     legend.byrow = TRUE,
-    strip.background = element_rect(fill = "white")
+    strip.background = element_rect(fill = "white"),
+    axis.title = element_text(size = 20),  # Increased axis title size
+    axis.text = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
   )  +# ... (keep your other layers and settings)
   
   guides(
@@ -261,12 +267,14 @@ ggplot() +
       title.position = "left", 
       title.hjust = 0.5,
       override.aes = list(size = c( 6, 8, 10, 12)),
-      order = 1  # This will place it at the top
+      order = 1,  # This will place it at the top
+      title.theme = element_text(size = 14, angle = 90)
     ),
     size = guide_legend(
       title.position = "left", 
       title.hjust = 0.5,
-      order = 1  # This ensures size legend stays with fill legend
+      order = 1, # This ensures size legend stays with fill legend
+      title.theme = element_text(size = 14, angle = 90)
     ),
     colour = guide_colorbar(
       title.position = "left", 
@@ -274,7 +282,8 @@ ggplot() +
       label.position = "right",
       barwidth = 1,
       barheight = 8,
-      order = 2  # This will place it below the biomass legend
+      order = 2,
+      title.theme = element_text(size = 14, angle = 90)# This will place it below the biomass legend
     ),
   ) +
   theme(
@@ -289,7 +298,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A1_CHLA_TBM.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, bg = "white")
+ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 10, bg = "white")
 
 
 
@@ -307,7 +316,7 @@ ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, b
 
 
 
-##############INDIVIDUAL TAXA PLOTS######################
+ ##############INDIVIDUAL TAXA PLOTS######################
 
 
 create_biomass_plot <- function(data, taxa_of_interest, output_filename) {
