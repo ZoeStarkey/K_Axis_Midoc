@@ -471,6 +471,154 @@ TSM_krill <- plot_tsm_biomass(
 
 
 
+#MIXED PLOT######
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "fish", "cephalopods", "krill")
+# 
+#Filter data for taxa not in the exclude list and aggregate biomass
+km_sf_total <- km_sf %>%
+  filter(!tax.grp %in% exclude_taxa) %>%
+  group_by(midoc.stn) %>%
+  summarize(
+    total_biomass_mixed = sum(bm_g_m3, na.rm = TRUE),
+    lon_end = first(lon_end),
+    lat_end = first(lat_end)
+  )
+
+# Calculate the bin breaks using pretty breaks
+n_bins <- 5  # You can adjust this number for more or fewer bins
+bin_range <- range(km_sf_total$total_biomass_mixed, na.rm = TRUE)
+bin_breaks <- pretty(bin_range, n = n_bins)
+
+# Create labels with exact ranges, using four decimal places
+bin_labels <- paste0(
+  sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
+  " - ",
+  sprintf("%.3f", bin_breaks[-1])
+)
+
+# Modify the mutate step in km_sf_total
+km_sf_total <- km_sf_total %>%
+  mutate(mixed_biomass_bin = cut(total_biomass_mixed, 
+                                 breaks = bin_breaks,
+                                 labels = bin_labels,
+                                 include.lowest = TRUE))
+
+
+# Now create the plot
+TSM_mixed <-
+  ggplot() +
+  # Base layer for time since melt
+  geom_sf(data = wcp_sf, fill = NA) +
+  geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.7, show.legend = TRUE) +
+  scale_fill_cmocean( name = "curl", na.value = NA,
+                      guide = guide_colorbar(
+                        title = "Days",
+                        title.position = "left",
+                        title.hjust = 0.5,
+                        label.position = "right",
+                        barwidth = 1,
+                        barheight = 16,
+                        order = 2,
+                        frame.linewidth = 0.2,
+                        # ticks.linewidth = 0.5,
+                        title.theme = element_text(size = 14, angle = 90),
+                        label.theme = element_text(size = 14)
+                      )
+  ) + 
+  
+  
+  # Add f3$finished and f1$finished 
+  geom_sf(data = f3$finished, color = "black", linewidth = 1) +
+  geom_sf(data = f1$finished, color = "black", linewidth = 1) +
+  
+  
+  # Add ice
+  ggnewscale::new_scale_fill() + 
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+                       name = 'Ice (%)',
+                       guide = guide_colorbar(title.position = "left", 
+                                              title.hjust = 0.5,
+                                              label.position = "right",
+                                              barwidth = 1,
+                                              barheight = 8,
+                                              order = 3,
+                                              frame.linewidth = 0.2,
+                                              #ticks.linewidth = 0.5,
+                                              title.theme = element_text(size = 14, angle = 90),
+                                              label.theme = element_text(size = 14))) + 
+  
+  
+  
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wcp_sf, fill = NA, color = "black") +
+  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+  geom_sf(data = km_sf_total, aes(fill = mixed_biomass_bin , size = mixed_biomass_bin ), shape = 21, color = "black") +
+  scale_fill_manual(
+    values = c("white", "grey65", "grey45", "grey30", "black"),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  scale_size_manual(
+    values = c(4, 6, 8, 10, 12),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
+  theme(
+    legend.position = "right",
+    panel.grid = element_line(color = "gray80", linetype = "solid"),
+    panel.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.text = element_text(size = 14),
+    legend.box.background = element_blank(),
+    legend.byrow = TRUE,
+    strip.background = element_rect(fill = "white"),
+    axis.title = element_text(size = 20),  # Increased axis title size
+    axis.text = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+  ) +
+  guides(
+    fill = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5,
+      override.aes = list(size = c(4, 6, 8, 10, 12)),
+      order = 1,
+      title.theme = element_text(size = 14, angle = 90),
+      keywidth = unit(1, "cm"),
+      keyheight = unit(1, "cm"),
+      default.unit = "cm",
+      background = element_rect(fill = "transparent", colour = NA)
+    ),
+    size = guide_legend(
+      title.position = "left", 
+      title.hjust = 0.5,
+      order = 1,
+      title.theme = element_text(size = 14, angle = 90),
+      background = element_rect(fill = "transparent", colour = NA)
+    ),
+  ) +
+  theme(
+    legend.position = "right",
+    legend.box = "vertical"
+  )
+
+
+
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_TSM")
+output_filename <- "K4S_Plot_A1_TSM_Mixed.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = TSM_mixed, width = 10, height = 8, bg = "white")
+
+
 
 
 
