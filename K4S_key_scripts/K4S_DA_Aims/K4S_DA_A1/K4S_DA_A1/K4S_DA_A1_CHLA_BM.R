@@ -8,6 +8,7 @@ library(orsifronts)
 library(dplyr)
 library(readr)
 library(scales)
+library(sp)
 
 
 #setting directory
@@ -307,446 +308,160 @@ ggsave(filename = full_output_path, plot = Chla_total, width = 10, height = 8, b
 
 
 
+#INDIVIDUAL TAXA PLOTS 
 
-
-
-
-###################INDIVIDUAL TAXA PLOTS ###########################
-
-
-#FISH
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
-
-
-include_fish <- c("fish")
-# 
-#Filter data for taxa not in the exclude list and aggregate biomass
-km_sf_total <- km_sf %>%
-  filter(tax.grp %in% include_fish) %>%
-  group_by(midoc.stn) %>%
-  summarize(
-    total_fish_biomass = sum(bm_g_m3, na.rm = TRUE),
-    lon_end = first(lon_end),
-    lat_end = first(lat_end)
+plot_chla_biomass <- function(include_taxa, decimal_places = 2, output_directory = NULL, output_filename = NULL) {
+  # Filter data for specified taxa and aggregate biomass
+  km_sf_total <- km_sf %>%
+    filter(tax.grp %in% include_taxa) %>%
+    group_by(midoc.stn) %>%
+    summarize(
+      total_biomass = sum(bm_g_m3, na.rm = TRUE),
+      lon_end = first(lon_end),
+      lat_end = first(lat_end)
+    )
+  
+  # Calculate bin breaks
+  n_bins <- 5
+  bin_range <- range(km_sf_total$total_biomass, na.rm = TRUE)
+  bin_breaks <- pretty(bin_range, n = n_bins)
+  
+  # Create labels with specified decimal places
+  bin_labels <- paste0(
+    sprintf(paste0("%.", decimal_places, "f"), bin_breaks[-length(bin_breaks)]),
+    " - ",
+    sprintf(paste0("%.", decimal_places, "f"), bin_breaks[-1])
   )
+  
+  # Modify km_sf_total with bins
+  km_sf_total <- km_sf_total %>%
+    mutate(biomass_bin = cut(total_biomass, 
+                             breaks = bin_breaks,
+                             labels = bin_labels,
+                             include.lowest = TRUE))
+  
+  # Create the plot
+  Chla_plot <- 
+    ggplot() +
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
+                         limits = c(log(q1), log(q2)),
+                         na.value = "grey85",
+                         name = expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")")),
+                         guide = guide_colorbar(title.position = "left", 
+                                                title.hjust = 0.5,
+                                                label.position = "right",
+                                                barwidth = 1,
+                                                barheight = 16,
+                                                order = 2,
+                                                frame.linewidth = 0.2,
+                                                title.theme = element_text(size = 14, angle = 90),
+                                                label.theme = element_text(size = 14))) +
+    geom_sf(data = f3$finished, color = "black", linewidth = 1) +
+    geom_sf(data = f1$finished, color = "black", linewidth = 1) +
+    ggnewscale::new_scale_fill() + 
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+                         name = 'Ice (%)',
+                         guide = guide_colorbar(title.position = "left", 
+                                                title.hjust = 0.5,
+                                                label.position = "right",
+                                                barwidth = 1,
+                                                barheight = 8,
+                                                order = 3,
+                                                frame.linewidth = 0.2,
+                                                title.theme = element_text(size = 14, angle = 90),
+                                                label.theme = element_text(size = 14))) + 
+    ggnewscale::new_scale_fill() +
+    geom_sf(data = wcp_sf, fill = NA, color = "black") +
+    geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
+    geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+    annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+    annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+    geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+    geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
+    scale_fill_manual(
+      values = c("white", "grey65", "grey30", "black"),
+      name = expression(paste("Biomass (g m"^-3, ")"))
+    ) +
+    scale_size_manual(
+      values = c(6, 8, 10, 12),
+      name = expression(paste("Biomass (g m"^-3, ")"))
+    ) +
+    labs(x = "Longitude", y = "Latitude") +
+    coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
+    theme(
+      legend.position = "right",
+      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.title = element_text(angle = 90, hjust = 0.5),
+      legend.text = element_text(size = 14),
+      legend.box.background = element_blank(),
+      legend.byrow = TRUE,
+      strip.background = element_rect(fill = "white"),
+      axis.title = element_text(size = 20),
+      axis.text = element_text(size = 16),
+      axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+      axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+    ) +
+    guides(
+      fill = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        override.aes = list(size = c(6, 8, 10, 12)),
+        order = 1,
+        title.theme = element_text(size = 14, angle = 90)
+      ),
+      size = guide_legend(
+        title.position = "left", 
+        title.hjust = 0.5,
+        order = 1,
+        title.theme = element_text(size = 14, angle = 90)
+      )
+    ) +
+    theme(
+      legend.position = "right",
+      legend.box = "vertical"
+    )
+  
+  # Save the plot if output directory and filename are provided
+  if (!is.null(output_directory) && !is.null(output_filename)) {
+    full_output_path <- file.path(output_directory, output_filename)
+    ggsave(filename = full_output_path, plot = Chla_plot, width = 10, height = 8, bg = "white")
+    cat("Plot saved to:", full_output_path, "\n")
+  } else {
+    cat("Plot was not saved. To save the plot, provide both output_directory and output_filename.\n")
+  }
+  
+  return(Chla_plot)
+}
 
-# Calculate the bin breaks using pretty breaks
-n_bins <- 5  # You can adjust this number for more or fewer bins
-bin_range <- range(km_sf_total$total_fish_biomass, na.rm = TRUE)
-bin_breaks <- pretty(bin_range, n = n_bins)
-
-# Create labels with exact ranges, using four decimal places
-bin_labels <- paste0(
-  sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
-  " - ",
-  sprintf("%.3f", bin_breaks[-1])
+# Example usage:
+# Fish plot
+Chla_fish <- plot_chla_biomass(
+  include_taxa = c("fish"),
+  decimal_places = 3,
+  output_directory =  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA"), 
+  output_filename = "K4S_Plot_A1_CHLA_Fish.png"
 )
 
-# Modify the mutate step in km_sf_total
-km_sf_total <- km_sf_total %>%
-  mutate(fish_biomass_bin = cut(total_fish_biomass, 
-                           breaks = bin_breaks,
-                           labels = bin_labels,
-                           include.lowest = TRUE))
-
-
-Chla_fish <- 
-ggplot() +
-  # Add the base raster layer
-  geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
-  scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
-                       limits = c(log(q1), log(q2)),
-                       na.value = "grey85",
-                       name = expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")")),
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 16,
-                                              order = 2,
-                                              frame.linewidth = 0.2,
-                                              # ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) +
-  
-  #  add fronts
-  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
-  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
-  
-  #add ice
-  ggnewscale::new_scale_fill() + 
-  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
-                       name = 'Ice (%)',
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 8,
-                                              order = 3,
-                                              frame.linewidth = 0.2,
-                                              #ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) + 
-  
-  
-  
-  
-  ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
-  geom_sf(data = wcp_sf, fill = NA, color = "black") +
-  # Add the ofp layer
-  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
-  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
-  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
-  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
-  geom_sf(data = km_sf_total, aes(fill = fish_biomass_bin, size = fish_biomass_bin), shape = 21, color = "black") +
-  geom_sf(data = km_sf_total, aes(fill = fish_biomass_bin, size = fish_biomass_bin), shape = 21, color = "black") +
-  scale_fill_manual(
-    values = c("white", "grey65", "grey40", "black"),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  scale_size_manual(
-    values = c( 6, 8, 10, 14),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  labs(x = "Longitude", y = "Latitude") +
-  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
-  theme(
-    legend.position = "right",
-    panel.grid = element_line(color = "gray80", linetype = "solid"),
-    legend.background = element_blank(),
-    legend.key = element_blank(),
-    legend.title = element_text(angle = 90, hjust = 0.5),
-    legend.text = element_text(size = 14),
-    legend.box.background = element_blank(),
-    legend.byrow = TRUE,
-    strip.background = element_rect(fill = "white"),
-    axis.title = element_text(size = 20),  # Increased axis title size
-    axis.text = element_text(size = 16),
-    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
-    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt"),
-    
-  )  +# ... (keep your other layers and settings)
-  
-  guides(
-    fill = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      override.aes = list(size = c( 6, 8, 10, 14)),
-      order = 1,  # This will place it at the top
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-    size = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      order = 1, # This ensures size legend stays with fill legend
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-  ) +
-  theme(
-    legend.position = "right",
-    legend.box = "vertical",
-    # ... (keep your other theme settings)
-  )
-
-
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA")
-output_filename <- "K4S_Plot_A1_CHLA_Fish.png"
-full_output_path <- file.path(output_directory, output_filename)
-
-ggsave(filename = full_output_path, plot = Chla_fish, width = 10, height = 8, bg = "white")
-
-
-
-
-#CEPHALOPODS
-include_cephalopods <- c("cephalopods")
-
-#Filter data for taxa not in the exclude list and aggregate biomass
-km_sf_total <- km_sf %>%
-  filter(tax.grp %in% include_cephalopods) %>%
-  group_by(midoc.stn) %>%
-  summarize(
-    total_ceph_biomass = sum(bm_g_m3, na.rm = TRUE),
-    lon_end = first(lon_end),
-    lat_end = first(lat_end)
-  )
-
-
-n_bins <- 5  # You can adjust this number for more or fewer bins
-bin_range <- range(km_sf_total$total_ceph_biomass, na.rm = TRUE)
-bin_breaks <- pretty(bin_range, n = n_bins)
-
-# Create labels with exact ranges, using four decimal places
-bin_labels <- paste0(
-  sprintf("%.4f", bin_breaks[-length(bin_breaks)]),
-  " - ",
-  sprintf("%.4f", bin_breaks[-1])
+# Cephalopod plot
+Chla_cephalopods <- plot_chla_biomass(
+  include_taxa = c("cephalopods"),
+  decimal_places = 4,
+  output_directory =  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA"),
+  output_filename = "K4S_Plot_A1_CHLA_Cephalopods.png"
 )
 
-# Modify the mutate step in km_sf_total
-km_sf_total <- km_sf_total %>%
-  mutate(ceph_biomass_bin = cut(total_ceph_biomass, 
-                                breaks = bin_breaks,
-                                labels = bin_labels,
-                                include.lowest = TRUE))
-
-
-Chla_ceph <- 
-  ggplot() +
-  # Add the base raster layer
-  geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
-  scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
-                       limits = c(log(q1), log(q2)),
-                       na.value = "grey85",
-                       name = expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")")),
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 16,
-                                              order = 2,
-                                              frame.linewidth = 0.2,
-                                              # ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) +
-  
-  #  add fronts
-  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
-  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
-  
-  #add ice
-  ggnewscale::new_scale_fill() + 
-  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
-                       name = 'Ice (%)',
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 8,
-                                              order = 3,
-                                              frame.linewidth = 0.2,
-                                              #ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) + 
-  
-  
-  
-  
-  ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
-  geom_sf(data = wcp_sf, fill = NA, color = "black") +
-  # Add the ofp layer
-  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
-  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
-  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
-  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
-  geom_sf(data = km_sf_total, aes(fill = ceph_biomass_bin, size = ceph_biomass_bin), shape = 21, color = "black") +
-  geom_sf(data = km_sf_total, aes(fill = ceph_biomass_bin, size = ceph_biomass_bin), shape = 21, color = "black") +
-  scale_fill_manual(
-    values = c("white", "grey65", "grey30", "black"),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  scale_size_manual(
-    values = c( 6, 8, 10, 12),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  labs(x = "Longitude", y = "Latitude") +
-  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
-  theme(
-    legend.position = "right",
-    panel.grid = element_line(color = "gray80", linetype = "solid"),
-    legend.background = element_blank(),
-    legend.key = element_blank(),
-    legend.title = element_text(angle = 90, hjust = 0.5),
-    legend.text = element_text(size = 14),
-    legend.box.background = element_blank(),
-    legend.byrow = TRUE,
-    strip.background = element_rect(fill = "white"),
-    axis.title = element_text(size = 20),  # Increased axis title size
-    axis.text = element_text(size = 16),
-    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
-    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt"),
-    
-  )  +# ... (keep your other layers and settings)
-  
-  guides(
-    fill = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      override.aes = list(size = c( 6, 8, 10, 12)),
-      order = 1,  # This will place it at the top
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-    size = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      order = 1, # This ensures size legend stays with fill legend
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-  ) +
-  theme(
-    legend.position = "right",
-    legend.box = "vertical",
-    # ... (keep your other theme settings)
-  )
-
-
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA")
-output_filename <- "K4S_Plot_A1_CHLA_Cephalopods.png"
-full_output_path <- file.path(output_directory, output_filename)
-
-ggsave(filename = full_output_path, plot = Chla_ceph, width = 10, height = 8, bg = "white")
-
-
-
-
-
-#KRILL
-
-include_krill <- c("krill")
-
-#Filter data for taxa not in the exclude list and aggregate biomass
-km_sf_total <- km_sf %>%
-  filter(tax.grp %in% include_krill) %>%
-  group_by(midoc.stn) %>%
-  summarize(
-    total_krill_biomass = sum(bm_g_m3, na.rm = TRUE),
-    lon_end = first(lon_end),
-    lat_end = first(lat_end)
-  )
-
-
-n_bins <- 5  # You can adjust this number for more or fewer bins
-bin_range <- range(km_sf_total$total_krill_biomass, na.rm = TRUE)
-bin_breaks <- pretty(bin_range, n = n_bins)
-
-# Create labels with exact ranges, using four decimal places
-bin_labels <- paste0(
-  sprintf("%.3f", bin_breaks[-length(bin_breaks)]),
-  " - ",
-  sprintf("%.3f", bin_breaks[-1])
+# Krill plot
+Chla_krill <- plot_chla_biomass(
+  include_taxa = c("krill"),
+  decimal_places = 3,
+  output_directory =  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA"),
+  output_filename = "K4S_Plot_A1_CHLA_Krill.png"
 )
-
-# Modify the mutate step in km_sf_total
-km_sf_total <- km_sf_total %>%
-  mutate(krill_biomass_bin = cut(total_krill_biomass, 
-                                breaks = bin_breaks,
-                                labels = bin_labels,
-                                include.lowest = TRUE))
-
-
-Chla_krill <- 
-  ggplot() +
-  # Add the base raster layer
-  geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
-  scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
-                       limits = c(log(q1), log(q2)),
-                       na.value = "grey85",
-                       name = expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")")),
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 16,
-                                              order = 2,
-                                              frame.linewidth = 0.2,
-                                              # ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) +
-  
-  #  add fronts
-  geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
-  geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
-  
-  #add ice
-  ggnewscale::new_scale_fill() + 
-  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
-  scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
-                       name = 'Ice (%)',
-                       guide = guide_colorbar(title.position = "left", 
-                                              title.hjust = 0.5,
-                                              label.position = "right",
-                                              barwidth = 1,
-                                              barheight = 8,
-                                              order = 3,
-                                              frame.linewidth = 0.2,
-                                              #ticks.linewidth = 0.5,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) + 
-  
-  
-  
-  
-  ggnewscale::new_scale_fill() +  # Add new_scale_fill before adding new fill layers
-  geom_sf(data = wcp_sf, fill = NA, color = "black") +
-  # Add the ofp layer
-  geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
-  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
-  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
-  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
-  geom_sf(data = km_sf_total, aes(fill = krill_biomass_bin, size = krill_biomass_bin), shape = 21, color = "black") +
-  geom_sf(data = km_sf_total, aes(fill = krill_biomass_bin, size = krill_biomass_bin), shape = 21, color = "black") +
-  scale_fill_manual(
-    values = c("white", "grey65", "grey30", "black"),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  scale_size_manual(
-    values = c( 6, 8, 10, 12),
-    name = expression(paste("Biomass (g m"^-3, ")"))
-  ) +
-  labs(x = "Longitude", y = "Latitude") +
-  coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
-  theme(
-    legend.position = "right",
-    panel.grid = element_line(color = "gray80", linetype = "solid"),
-    legend.background = element_blank(),
-    legend.key = element_blank(),
-    legend.title = element_text(angle = 90, hjust = 0.5),
-    legend.text = element_text(size = 14),
-    legend.box.background = element_blank(),
-    legend.byrow = TRUE,
-    strip.background = element_rect(fill = "white"),
-    axis.title = element_text(size = 20),  # Increased axis title size
-    axis.text = element_text(size = 16),
-    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
-    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt"),
-    
-  )  +# ... (keep your other layers and settings)
-  
-  guides(
-    fill = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      override.aes = list(size = c( 6, 8, 10, 12)),
-      order = 1,  # This will place it at the top
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-    size = guide_legend(
-      title.position = "left", 
-      title.hjust = 0.5,
-      order = 1, # This ensures size legend stays with fill legend
-      title.theme = element_text(size = 14, angle = 90)
-    ),
-  ) +
-  theme(
-    legend.position = "right",
-    legend.box = "vertical",
-    # ... (keep your other theme settings)
-  )
-
-
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA")
-output_filename <- "K4S_Plot_A1_CHLA_Krill.png"
-full_output_path <- file.path(output_directory, output_filename)
-
-ggsave(filename = full_output_path, plot = Chla_krill, width = 10, height = 8, bg = "white")
 
 
 
