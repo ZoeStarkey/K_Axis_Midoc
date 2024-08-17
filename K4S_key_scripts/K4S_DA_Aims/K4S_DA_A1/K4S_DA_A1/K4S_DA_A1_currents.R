@@ -430,7 +430,7 @@ CS_cephalopods <- plot_CS_biomass(
 #Krill 
 CS_krill <- plot_CS_biomass(
   include_taxa = c("krill"),
-  decimal_places = 4,
+  decimal_places = 3,
   output_directory = paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CS"),
   output_filename = "K4S_Plot_A1_CS_Krill.png"
 )
