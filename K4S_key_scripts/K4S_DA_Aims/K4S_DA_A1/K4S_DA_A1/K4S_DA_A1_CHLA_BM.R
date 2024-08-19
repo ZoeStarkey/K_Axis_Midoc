@@ -205,7 +205,7 @@ ggplot() +
                        limits = c(log(q1), log(q2)),
                        na.value = "grey85",
                        name = expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")")),
-                       guide = guide_colorbar(title.position = "left", 
+                       guide = guide_colorbar(title.position = "left",
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
@@ -215,14 +215,14 @@ ggplot() +
                                             # ticks.linewidth = 0.5,
                                               title.theme = element_text(size = 14, angle = 90),
                                               label.theme = element_text(size = 14))) +
-  
+
   #  add fronts
   geom_sf(data = f3$finished, color = "black", linewidth = 1 ) +
   geom_sf(data = f1$finished, color = "black", linewidth = 1 )+
   
   #add ice
   ggnewscale::new_scale_fill() + 
-  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
   scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
                        name = 'Ice (%)',
                        guide = guide_colorbar(title.position = "left", 
