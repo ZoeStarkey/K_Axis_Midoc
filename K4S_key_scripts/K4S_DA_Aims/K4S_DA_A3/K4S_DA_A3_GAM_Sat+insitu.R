@@ -1,3 +1,17 @@
+
+
+
+
+library(dplyr)
+library(mgcv)
+library(gamm4)
+library(gratia)
+library(patchwork)
+library(ggplot2)
+library(grid)
+
+
+
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_DA_A2")
 setwd(d)
@@ -278,3 +292,252 @@ summary(krillbiom_sum.Smax)
 
 
 
+
+################ONLY UPPER 200m ###############
+
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
+
+#Filtering upper 200m 
+km_bm_surface <- km_bm_depth %>%
+  filter(depth == "0-200")
+
+allbiom_sum.SST <- gam(log(bm_depth_all_taxa) ~ s(SST), data = km_bm_surface)
+plot_SST <- draw(allbiom_sum.TSM, residuals = TRUE) +
+  ggtitle("TSM") +
+  theme(plot.title = element_text(size = 10))
+summary(allbiom_sum.SST)
+
+
+
+#Function 
+
+gam_analysis <- function(data, response_var, predictor_var) {
+  # Create the formula for GAM
+  formula <- as.formula(paste("log(", response_var, ") ~ s(", predictor_var, ")"))
+  
+  # Fit the GAM model
+  gam_model <- gam(formula, data = data)
+  
+  # Create the plot
+  plot <- draw(gam_model, residuals = TRUE) +
+    ggtitle(predictor_var) +
+    theme(plot.title = element_text(size = 10))
+  
+  # Return a list containing the model and the plot
+  return(list(model = gam_model, plot = plot))
+}
+
+######ALL TAXA 0-200m#########
+
+
+#TSM
+surface_all_tax_TSM <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "TSM")
+surface_all_tax_TSM_plot <-(surface_all_tax_TSM$plot)
+summary(surface_all_tax_TSM$model)
+
+#CUR
+surface_all_tax_CUR <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "CUR")
+surface_all_tax_CUR_plot <-(surface_all_tax_CUR$plot)
+summary(surface_all_tax_CUR$model)
+
+#CHLA
+surface_all_tax_CHLA <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "CHLA")
+surface_all_tax_CHLA_plot <-(surface_all_tax_CHLA$plot)
+summary(surface_all_tax_CHLA$model)
+
+#SST
+surface_all_tax_SST <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "SST")
+surface_all_tax_SST_plot <- (surface_all_tax_SST$plot)
+summary(surface_all_tax_SST$model)
+
+
+
+
+
+(surface_all_tax_TSM_plot + surface_all_tax_CUR_plot + plot_layout(ncol = 2)) / 
+  (surface_all_tax_CHLA_plot + surface_all_tax_SST_plot + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "0-200m Biomass (Logged) All Taxa (Exclude Gelatinous)",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+
+
+#fish
+
+
+#TSM
+surface_fish_TSM <- gam_analysis(km_bm_surface, "bm_depth_fish", "TSM")
+surface_fish_plot_TSM <-(surface_fish_TSM$plot)
+summary(surface_fish_TSM$model)
+
+
+#CUR
+surface_fish_CUR <- gam_analysis(km_bm_surface, "bm_depth_fish", "CUR")
+surface_fish_plot_CUR <-(surface_fish_CUR$plot)
+summary(surface_fish_CUR$model)
+
+#CHLA
+surface_fish_CHLA <- gam_analysis(km_bm_surface, "bm_depth_fish", "CHLA")
+surface_fish_plot_CHLA <-(surface_fish_CHLA$plot)
+summary(surface_fish_CHLA$model)
+
+
+#SST
+surface_fish_SST <- gam_analysis(km_bm_surface, "bm_depth_fish", "SST")
+surface_fish_plot_SST <-(surface_fish_SST$plot)
+summary(surface_fish_SST$model)
+
+
+
+(surface_fish_plot_TSM + surface_fish_plot_CUR + plot_layout(ncol = 2)) / 
+  (surface_fish_plot_CHLA + surface_fish_plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "0-200m Biomass (Logged) Fish (Exclude Gelatinous)",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+
+
+#######CEPHALOPODS
+
+#TSM
+surface_ceph_TSM <- gam_analysis(km_bm_surface, "bm_depth_ceph", "TSM")
+surface_ceph_plot_TSM <-(surface_ceph_TSM$plot)
+summary(surface_ceph_TSM$model)
+
+#CHLA
+surface_ceph_CHLA <- gam_analysis(km_bm_surface, "bm_depth_ceph", "CHLA")
+surface_ceph_plot_CHLA <-(surface_ceph_CHLA$plot)
+summary(surface_ceph_CHLA$model)
+
+#CUR
+surface_ceph_CUR <- gam_analysis(km_bm_surface, "bm_depth_ceph", "CUR")
+surface_ceph_plot_CUR <-(surface_ceph_CUR$plot)
+summary(surface_ceph_CUR$model)
+
+#SST
+surface_ceph_SST <- gam_analysis(km_bm_surface, "bm_depth_ceph", "SST")
+surface_ceph_SST_plot <- (surface_ceph_SST$plot)
+summary(surface_ceph_SST$model)
+
+
+(surface_ceph_plot_TSM + surface_ceph_plot_CUR + plot_layout(ncol = 2)) / 
+  (surface_ceph_plot_CHLA + surface_ceph_SST_plot + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "0-200m Biomass (Logged) Cephalopods",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+
+#krill
+#TSM
+surface_krill_TSM <- gam_analysis(km_bm_surface, "bm_depth_krill", "TSM")
+surface_krill_plot_TSM <- (surface_krill_TSM$plot)
+summary(surface_krill_TSM$model)
+
+#CUR
+surface_krill_CUR <- gam_analysis(km_bm_surface, "bm_depth_krill", "CUR")
+surface_krill_plot_CUR <- (surface_krill_CUR$plot)
+summary(surface_krill_CUR$model)
+
+#CHLA
+surface_krill_CHLA <- gam_analysis(km_bm_surface, "bm_depth_krill", "CHLA")
+surface_krill_plot_CHLA <- (surface_krill_CHLA$plot)
+summary(surface_krill_CHLA$model)
+
+#SST
+surface_krill_SST <- gam_analysis(km_bm_surface, "bm_depth_krill", "SST")
+surface_krill_plot_SST <- (surface_krill_SST$plot)
+summary(surface_krill_SST$model)
+
+(combined_plot <- (surface_krill_plot_TSM + surface_krill_plot_CUR + plot_layout(ncol = 2)) / 
+  (surface_krill_plot_CHLA + surface_krill_plot_SST + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "0-200m Biomass (Logged) Krill",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  ))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#INSITU 
+#ALL TAXA
+#tmin
+surface_all_tax_SST <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "Tmin")
+print(surface_all_tax_SST$plot)
+summary(surface_all_tax_SST$model)
+
+#O2_min
+surface_all_tax_O2_min <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "O2_min")
+print(surface_all_tax_O2_min$plot)
+summary(surface_all_tax_O2_min$model)
+
+#SML
+surface_all_tax_SML <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "SML")
+print(surface_all_tax_SML$plot)
+summary(surface_all_tax_SML$model)
+
+#Smax
+surface_all_tax_Smax <- gam_analysis(km_bm_surface, "bm_depth_all_taxa", "Smax")
+print(surface_all_tax_Smax$plot)
+summary(surface_all_tax_Smax$model)
+
+#FISH
+#tmin
+surface_all_tax_SST <- gam_analysis(km_bm_surface, "bm_depth_all_fish", "Tmin")
+print(surface_all_tax_SST$plot)
+summary(surface_all_tax_SST$model)
+
+#O2_min
+surface_all_tax_O2_min <- gam_analysis(km_bm_surface, "bm_depth_all_fish", "O2_min")
+print(surface_all_tax_O2_min$plot)
+summary(surface_all_tax_O2_min$model)
+
+#SML
+surface_all_tax_SML <- gam_analysis(km_bm_surface, "bm_depth_all_fish", "SML")
+print(surface_all_tax_SML$plot)
+summary(surface_all_tax_SML$model)
+
+#Smax
+surface_all_tax_Smax <- gam_analysis(km_bm_surface, "bm_depth_all_fish", "Smax")
+print(surface_all_tax_Smax$plot)
+summary(surface_all_tax_Smax$model)
+
+#CEPHALOPODS
+#tmin
+surface_all_tax_SST <- gam_analysis(km_bm_surface, "bm_depth_all_ceph", "Tmin")
+print(surface_all_tax_SST$plot)
+summary(surface_all_tax_SST$model)
+
+#O2_min
+surface_all_tax_O2_min <- gam_analysis(km_bm_surface, "bm_depth_all_ceph", "O2_min")
+print(surface_all_tax_O2_min$plot)
+summary(surface_all_tax_O2_min$model)
+
+#SML
+surface_all_tax_SML <- gam_analysis(km_bm_surface, "bm_depth_all_ceph", "SML")
+print(surface_all_tax_SML$plot)
+summary(surface_all_tax_SML$model)
+
+#Smax
+surface_all_tax_Smax <- gam_analysis(km_bm_surface, "bm_depth_all_ceph", "Smax")
+print(surface_all_tax_Smax$plot)
+summary(surface_all_tax_Smax$model)
