@@ -189,108 +189,133 @@ print(combined_plot)
 
 
 
+
+
+
+
+
 ###################INSITU DATA######################
 #ALL TAXA - Exluding gelatinous 
 #tmin 
 allbiom_sum.tmin <- gam(log(bm_sum_all_taxa) ~ s(Tmin),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.tmin, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Tmin")
+all_tax_plot_tmin <- draw(allbiom_sum.tmin, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Tmin")
 summary(allbiom_sum.tmin)
 
 #O2_min
 allbiom_sum.O2_min <- gam(log(bm_sum_all_taxa) ~ s(O2_min),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.O2_min, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - O2_min")
+all_tax_plot_O2_min <- draw(allbiom_sum.O2_min, residuals = TRUE)+ ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - O2_min")
 summary(allbiom_sum.O2_min)
 
 #SML
 allbiom_sum.SML <- gam(log(bm_sum_all_taxa) ~ s(SML),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.SML, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - SML")
+all_tax_plot_SML <- draw(allbiom_sum.SML, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - SML")
 summary(allbiom_sum.SML)
 
 #Smax
 allbiom_sum.Smax <- gam(log(bm_sum_all_taxa) ~ s(Smax),data = km_bm_sum)
-plot_object <- draw(allbiom_sum.Smax, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Smax")
+all_tax_plot_Smax <- draw(allbiom_sum.Smax, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Smax")
 summary(allbiom_sum.Smax)
+
+ (all_tax_plot_tmin + all_tax_plot_O2_min + plot_layout(ncol = 2)) /
+  (all_tax_plot_SML + all_tax_plot_Smax + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) All Taxa (Exclude Gelatinous)",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+  
+  
+  
+  
+
 
 ########FISH######## 
 #tmin
 fishbiom_sum.tmin <- gam(log(bm_sum_fish) ~ s(Tmin),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.tmin, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - Tmin")
+fish_plot_tmin <- draw(fishbiom_sum.tmin, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Fish - Tmin")
 summary(fishbiom_sum.tmin)
 
 #O2_min
 fishbiom_sum.O2_min <- gam(log(bm_sum_fish) ~ s(O2_min),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.O2_min, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - O2_min")
+fish_plot_O2_min <- draw(fishbiom_sum.O2_min, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Fish - O2_min")
 summary(fishbiom_sum.O2_min)
 
 #SML
 fishbiom_sum.SML <- gam(log(bm_sum_fish) ~ s(SML),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.SML, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - SML")
+fish_plot_SML <- draw(fishbiom_sum.SML, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Fish - SML")
 summary(fishbiom_sum.SML)
 
 #Smax
 fishbiom_sum.Smax <- gam(log(bm_sum_fish) ~ s(Smax),data = km_bm_sum)
-plot_object <- draw(fishbiom_sum.Smax, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Fish - Smax")
+fish_plot_Smax <- draw(fishbiom_sum.Smax, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Fish - Smax")
 summary(fishbiom_sum.Smax)
 
-#CEPHALOPODS
+
+#summary plot 
+(fish_plot_tmin + fish_plot_O2_min + plot_layout(ncol = 2)) /
+  (fish_plot_SML + fish_plot_Smax + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Fish",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
+#######CEPHALOPODS#########
 #tmin
 cephbiom_sum.tmin <- gam(log(bm_sum_ceph) ~ s(Tmin),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.tmin, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - Tmin")
+ceph_plot_tmin <- draw(cephbiom_sum.tmin, residuals = TRUE)+ ggtitle("Sum Biomass (Logged) Cephalopods - Tmin")
 summary(cephbiom_sum.tmin)
 
 #O2_min
 cephbiom_sum.O2_min <- gam(log(bm_sum_ceph) ~ s(O2_min),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.O2_min, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - O2_min")
+ceph_plot_O2_min <- draw(cephbiom_sum.O2_min, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Cephalopods - O2_min")
 summary(cephbiom_sum.O2_min)
 
 #SML
 cephbiom_sum.SML <- gam(log(bm_sum_ceph) ~ s(SML),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.SML, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - SML")
+ceph_plot_SML <- draw(cephbiom_sum.SML, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Cephalopods - SML")
 summary(cephbiom_sum.SML)
 
 #Smax
 cephbiom_sum.Smax <- gam(log(bm_sum_ceph) ~ s(Smax),data = km_bm_sum)
-plot_object <- draw(cephbiom_sum.Smax, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Cephalopods - Smax")
+ceph_plot_Smax <- draw(cephbiom_sum.Smax, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Cephalopods - Smax")
 summary(cephbiom_sum.Smax)
+
+#summary plot 
+(ceph_plot_tmin + ceph_plot_O2_min + plot_layout(ncol = 2)) /
+  (ceph_plot_SML + ceph_plot_Smax + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Cephalopods",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5))
+  )
+
 
 #KRILL
 #tmin
 krillbiom_sum.tmin <- gam(log(bm_sum_krill) ~ s(Tmin),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.tmin, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - Tmin")
+krill_plot_tmin <- draw(krillbiom_sum.tmin, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Krill - Tmin")
 summary(krillbiom_sum.tmin)
 
 #O2_min
 krillbiom_sum.O2_min <- gam(log(bm_sum_krill) ~ s(O2_min),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.O2_min, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - O2_min")
+krill_plot_O2_min <- draw(krillbiom_sum.O2_min, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Krill - O2_min")
 summary(krillbiom_sum.O2_min)
 
 #SML
 krillbiom_sum.SML <- gam(log(bm_sum_krill) ~ s(SML),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.SML, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - SML")
+krill_plot_SML <- draw(krillbiom_sum.SML, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Krill - SML")
 summary(krillbiom_sum.SML)
 
 #Smax
 krillbiom_sum.Smax <- gam(log(bm_sum_krill) ~ s(Smax),data = km_bm_sum)
-plot_object <- draw(krillbiom_sum.Smax, residuals = TRUE)
-plot_object + ggtitle("Sum Biomass (Logged) Krill - Smax")
+krill_plot_Smax <- draw(krillbiom_sum.Smax, residuals = TRUE) + ggtitle("Sum Biomass (Logged) Krill - Smax")
 summary(krillbiom_sum.Smax)
 
-
+#summary plot 
+(krill_plot_tmin + krill_plot_O2_min + plot_layout(ncol = 2)) /
+  (krill_plot_SML + krill_plot_Smax + plot_layout(ncol = 2)) +
+  plot_annotation(
+    title = "Sum Biomass (Logged) Krill",
+    theme = theme(plot.title = element_text(size = 14, hjust = 0.5)))
+  
 
 
 ################ONLY UPPER 200m ###############
