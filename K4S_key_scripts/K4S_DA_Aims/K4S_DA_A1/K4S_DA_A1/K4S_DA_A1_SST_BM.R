@@ -72,6 +72,8 @@ ofp_sf <- st_as_sf(ofp)
 # grat lines
 xx <- c(0,30, 60, 90, 120,150,180); yy <- c(-90,-80, -70,-60, -50,-40,-30,-20)
 
+
+
 ##full SO extent
 ras.ext2  <- raster(xmn=-180, xmx=180, ymn=-90, ymx=0) # full SO extent to make fill play nicely
 data(package = "rworldmap")
@@ -127,22 +129,25 @@ km_sf <- km_sf %>%
 
 
 # ADD ICE (leftover from KAXIS_MAPS_2017)
-file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
-icefile <- raster(file_path)
-# Reproject the ice raster to the desired projection
-icefile_proj <- projectRaster(icefile, crs = prj)
-
-# Convert to data frame for plotting
-ice_df <- as.data.frame(rasterToPoints(icefile_proj))
-
-# Replace 0 values with NA
-ice_df[ice_df$layer == 0, "layer"] <- NA
-
-ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
-
-
+# file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
+# icefile <- raster(file_path)
+# # Reproject the ice raster to the desired projection
+# icefile_proj <- projectRaster(icefile, crs = prj)
+# 
+# # Convert to data frame for plotting
+# ice_df <- as.data.frame(rasterToPoints(icefile_proj))
+# 
+# # Replace 0 values with NA
+# ice_df[ice_df$layer == 0, "layer"] <- NA
+# 
+# ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
 
 
+
+
+#ADD ICE 
+
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/ice_df.rda")
 
 
 
@@ -207,13 +212,13 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 # Now create the plot
-SST_total <- 
+#SST_total <- 
   
   ggplot() +
   # Add the base raster layer for SST
   geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
-  scale_fill_gradientn(colours = cols1, 
-                       limits = c(sstmin, sstmax), 
+  scale_fill_gradientn(colours = cols1,
+                       limits = c(sstmin, sstmax),
                        na.value = "transparent",
                        name = expression(SST ~ (degree * C)),
                        guide = guide_colorbar(title.position = "left",
@@ -233,7 +238,7 @@ SST_total <-
   
   # Add ice
   ggnewscale::new_scale_fill() + 
-  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+  geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
   scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
                        name = 'Ice (%)',
                        guide = guide_colorbar(title.position = "left", 
@@ -368,7 +373,7 @@ plot_sst_biomass <- function(include_taxa, decimal_places = 2, output_directory 
     geom_sf(data = f3$finished, color = "black", linewidth = 1) +
     geom_sf(data = f1$finished, color = "black", linewidth = 1) +
     ggnewscale::new_scale_fill() + 
-    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
     scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
                          name = 'Ice (%)',
                          guide = guide_colorbar(title.position = "left", 
