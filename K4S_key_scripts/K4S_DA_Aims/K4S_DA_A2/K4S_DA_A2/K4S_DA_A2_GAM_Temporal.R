@@ -353,37 +353,41 @@ gam.check(krill_depth.solar.gam)
 
 
 
-#testing out only surface layer s
+#KRILL UPPER 0-200M 
 
- km_bm_depth$bm_depth_krill_surface <- ifelse(km_bm_depth$depth == "0-200", 
-                                              km_bm_depth$bm_depth_krill, 
-                                              NA)
- km_bm_depth_surface <- km_bm_depth[!is.na(km_bm_depth$bm_depth_krill_surface), ]
- 
- 
- krill_surface.day.gam <- gam(log(bm_depth_krill_surface) ~ s(day), 
-                              data = km_bm_depth_surface)
- draw(krill_surface.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
- grid.text("Biomass (Logged) by depth: Krill - Day (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
- summary(krill_surface.day.gam)
- 
- 
- #lunar
- krill_surface.lunar.gam <- gam(log(bm_depth_krill_surface) ~ s(lunar_fraction), data = km_bm_depth_surface)
- draw(krill_surface.lunar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
- grid.text("Biomass (Logged) by depth: Krill - Lunar Fraction (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
- summary(krill_surface.lunar.gam)
- 
- #solar
- krill_surface.solar.gam <- gam(log(bm_depth_krill_surface) ~ s(altitude), data = km_bm_depth_surface)
- draw(krill_surface.solar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
- grid.text("Biomass (Logged) by depth: Krill - Solar Angle (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
- summary(krill_surface.solar.gam)
- 
- 
- 
- 
- 
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
+
+#Filtering upper 200m 
+km_bm_surface <- km_bm_depth %>%
+  filter(depth == "0-200")
+
+#day
+krill_surface.day.gam <- gam(log(bm_depth_krill) ~ s(day),data = km_bm_surface)
+draw(krill_surface.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Day (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
+summary(krill_surface.day.gam)
+gam.check(krill_surface.day.gam)
+
+#lunar fraction
+krill_surface.lunar.gam <- gam(log(bm_depth_krill) ~ s(lunar_fraction),data = km_bm_surface)
+draw(krill_surface.lunar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Lunar Fraction (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
+summary(krill_surface.lunar.gam)
+gam.check(krill_surface.lunar.gam)
+
+#solar angle
+krill_surface.solar.gam <- gam(log(bm_depth_krill) ~ s(altitude),data = km_bm_surface)
+draw(krill_surface.solar.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+grid.text("Biomass (Logged) by depth: Krill - Solar Angle (Surface Layer)",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
+summary(krill_surface.solar.gam)
+gam.check(krill_surface.solar.gam)
+
+
+
+
+
+
+
 
 
 #### TESTING GAMMA ######
