@@ -197,7 +197,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 
-Chla_total <-
+#Chla_total <-
 ggplot() +
   # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
@@ -243,11 +243,10 @@ ggplot() +
   geom_sf(data = wcp_sf, fill = NA, color = "black") +
   # Add the ofp layer
   geom_sf(data = ofp_sf, color = "black", linetype = "dashed", linewidth = 1.0) +
-  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
-  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  geom_sf(data = wp_sf, fill = "darkgrey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") + 
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
-  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
+  geom_sf(data = ktr_sf, size = 1, colour = "grey30") + #voyage track 
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
@@ -275,7 +274,7 @@ ggplot() +
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
     plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt"),
 
-  )  +# ... (keep your other layers and settings)
+  )  +
   
   guides(
     fill = guide_legend(
@@ -295,7 +294,6 @@ ggplot() +
   theme(
     legend.position = "right",
     legend.box = "vertical",
-    # ... (keep your other theme settings)
   )
 
 
