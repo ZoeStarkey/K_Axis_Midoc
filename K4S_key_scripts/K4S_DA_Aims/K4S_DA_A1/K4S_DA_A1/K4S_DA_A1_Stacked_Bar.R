@@ -1,3 +1,5 @@
+library(stringr)
+
 ##### PLOT OF TAXA TOTAL ######
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_df_environmental_variables.Rda")  
 
@@ -13,7 +15,17 @@ km_df <- km_df %>%
   mutate(tax.grp = na_if(tax.grp, "NA")) %>%
   filter(!is.na(tax.grp))
 
-
+# Get unique values
+# unique_taxa <- unique(as.character(km_df$tax.grp))
+# 
+# # Capitalize first letter
+# capitalized_taxa <- sapply(unique_taxa, function(x) {
+#   paste0(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)))
+# })
+# 
+# km_df$tax.grp <- factor(km_df$tax.grp, 
+#                         levels = unique_taxa, 
+#                         labels = capitalized_taxa)
 #remove gelatinous 
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
@@ -22,15 +34,22 @@ library(RColorBrewer)
 
 # Define a color-blind friendly palette
 cb_palette <- brewer.pal(8, "Paired")
-cb_palette <- c("#2e4057", "#4A92C6", "#FFC000",  "#ff7c43", "#C41E3A")
+cb_palette <- c( "#2e4057", "#4A92C6", "#803c5c", "#FFC000",  "#ff7c43")
+#"#C41E3A"
 
-stacked_bar_plot <-ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp)) +
-  geom_bar(stat = "identity") +
+stacked_bar_plot <-
+ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp, )) +
+  geom_bar(stat = "identity",) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 20,  margin = margin(t = 0, r = 0, b = 0, l = 0)),
+    axis.text.y = element_text(size = 20),
+    axis.title.x = element_text(size = 20, margin = margin(t = 24)),
+    axis.title.y = element_text(size = 20, margin = margin(t = 24)),
     panel.grid.major.x = element_blank(),
-    legend.position = "right"
+    legend.position = "right",
+    legend.text = element_text(size = 20),
+    legend.title = element_text(size = 24)
   ) +
   scale_x_discrete(labels = label_midoc_stn) +
   scale_fill_manual(values = cb_palette) +
@@ -46,7 +65,7 @@ full_output_path <- file.path(output_directory, output_filename)
 
 
 # Save the plot
-ggsave(filename = full_output_path, plot = stacked_bar_plot, width =10, height = 8, dpi = 300, bg = "white")
+ggsave(filename = full_output_path, plot = stacked_bar_plot, width =20, height = 12, dpi = 300, bg = "white")
 
 
 
