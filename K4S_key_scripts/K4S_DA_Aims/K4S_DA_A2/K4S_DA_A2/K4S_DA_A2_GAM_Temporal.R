@@ -6,6 +6,7 @@ library(gratia)
 library(patchwork)
 library(ggplot2)
 library(grid)
+library(lubridate)
 
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_DA_A2")
@@ -19,12 +20,19 @@ dir.exists(d)
 #Load in the dataframe 
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
+yday(km_bm_sum$start_time)
+format(km_bm_sum$start_time, "%j")
+
+
+with(km_bm_sum, plot(day,lunar_fraction))
+
 #Day
 allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day),data = km_bm_sum)
 plot_object <- draw(allbiom_sum.day, residuals = TRUE)
 plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Day") 
 summary(allbiom_sum.day)
 gam.check(allbiom_sum.day)
+par(mfrow=c(2,2))
 
 #Lunar fraction - illuminated disk 
 allbiom_sum.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum)
@@ -173,6 +181,11 @@ grid.text("Biomass (Logged) by depth + RE: All Taxa (Exclude Gelat) - Solar Angl
 summary(allbiom_depth.solar.re$gam)
 summary(allbiom_depth.solar.re$lme)
 gam.check(allbiom_depth.solar.re$gam)
+
+
+
+
+
 
 
 
