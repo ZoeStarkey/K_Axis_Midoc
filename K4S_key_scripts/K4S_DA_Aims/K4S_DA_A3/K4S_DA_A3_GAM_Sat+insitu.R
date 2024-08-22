@@ -33,6 +33,7 @@ plot_TSM <- draw(allbiom_sum.TSM, residuals = TRUE) +
 summary(allbiom_sum.TSM)
 gam.check(allbiom_sum.TSM)
 
+par(mfrow=c(2,2))
 
 # CUR model
 allbiom_sum.CUR <- gam(log(bm_sum_all_taxa) ~ s(CUR), data = km_bm_sum)
@@ -207,6 +208,27 @@ print(combined_plot)
 
 
 
+#########SATELLITE COMBINED#################
+#all taxa 
+allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST) + s(CUR) + s(CHLA), data = km_bm_sum)
+all_tax_plot_TSM <- draw(allbiom_sum.TSM, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - TSM")
+summary(allbiom_sum.TSM)
+
+
+allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST,CUR,CHLA), data = km_bm_sum)
+
+
+
+allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST, CUR, CHLA, k=10), 
+                       data = km_bm_sum, 
+                       na.action = na.exclude)
+
+allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ te(SST, CUR, CHLA), 
+                       data = km_bm_sum, 
+                       na.action = na.exclude)
+summary(allbiom_sum.TSM)
+
+
 
 
 
@@ -218,6 +240,8 @@ allbiom_sum.tmin <- gam(log(bm_sum_all_taxa) ~ s(Tmin),data = km_bm_sum)
 all_tax_plot_tmin <- draw(allbiom_sum.tmin, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Tmin")
 summary(allbiom_sum.tmin)
 gam.check(allbiom_sum.tmin)
+
+
 
 #O2_min
 allbiom_sum.O2_min <- gam(log(bm_sum_all_taxa) ~ s(O2_min),data = km_bm_sum)
@@ -349,6 +373,90 @@ gam.check(krillbiom_sum.Smax)
     title = "Sum Biomass (Logged) Krill",
     theme = theme(plot.title = element_text(size = 14, hjust = 0.5)))
   
+
+
+
+
+
+
+###################ADDITIVE MODELS SATELLITE###########
+#ALL TAXA - SST
+allbiom_additive_SST <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(allbiom_additive_SST, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa Additive model SST") + 
+  theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
+summary(allbiom_additive_SST)
+gam.check(allbiom_additive_SST)
+
+which.max(abs(residuals(allbiom_additive_SST)))
+
+#ALL TAXA - TSM 
+allbiom_additive_TSM <-gam(log(bm_sum_all_taxa) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(allbiom_additive_TSM, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa Additive model TSM") + 
+  theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
+summary(allbiom_additive_TSM)
+gam.check(allbiom_additive_TSM)
+
+
+#Fish - SST
+fish_additive_SST<- gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(fish_additive_SST, residuals = TRUE) + ggtitle("Biomass (Log) Fish - Additive model SST") + 
+  theme(plot.title = element_text(hjust = -6.5 , vjust =-25))
+summary(fish_additive_SST)
+gam.check(fish_additive_SST)
+
+#FISH - TSM
+fish_additive_TSM <- gam(log(bm_sum_fish) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(fish_additive_TSM, residuals = TRUE) + ggtitle("Biomass (Log) Fish - Additive model TSM") + 
+  theme(plot.title = element_text(hjust = -14 , vjust =-25))
+summary(fish_additive_TSM)
+gam.check(fish_additive_TSM)
+
+
+#Cephalopods - SST
+ceph_additive_SST <- gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(ceph_additive_SST, residuals = TRUE) + ggtitle("Biomass (Log) Ceph - Additive model SST") + 
+  theme(plot.title = element_text(hjust = -18, vjust = -25))
+summary(ceph_additive_SST)
+gam.check(ceph_additive_SST)
+
+#Cephalopods - TSM 
+ceph_additive_TSM <- gam(log(bm_sum_ceph) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(ceph_additive_TSM, residuals = TRUE) + ggtitle("Biomass (Log) Ceph - Additive model TSM") + 
+  theme(plot.title = element_text(hjust = -15, vjust = -25))
+summary(ceph_additive_TSM)
+gam.check(ceph_additive_TSM)
+
+
+#Krill - SST
+krill_additive_SST <- gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(krill_additive_SST, residuals = TRUE) + ggtitle("Biomass (Logged) Krill - Additive model SST") + 
+  theme(plot.title = element_text(hjust = -9.5, vjust = -20))
+summary(krill_additive_SST)
+gam.check(krill_additive_SST)
+
+#KRILL - TSM 
+krill_additive_TSM <- gam(log(bm_sum_krill) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
+draw(krill_additive_TSM, residuals = TRUE) + ggtitle("Biomass (Logged) Krill - Additive model TSM") + 
+  theme(plot.title = element_text(hjust = -8.5, vjust = -20))
+summary(krill_additive_TSM)
+gam.check(krill_additive_TSM)
+
+
+
+#trying to work out where that residual came from 
+
+
+
+which.max(abs(residuals(allbiom_additive_SST)))
+which.max(abs(residuals(fish_additive_SST)))
+
+#make a new dataframe including teh columns bm_sum_all_taxa and SST 
+
+
+km_bm_sum_residual_fix <- km_bm_sum %>% select(bm_sum_all_taxa,bm_sum_fish, SST, TSM, CHLA, CUR)
+
+
+
 
 
 ################ONLY UPPER 200m ###############
