@@ -2,6 +2,7 @@ library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(ggtext)
+library(tidyr)
 
 ##TOTAL TAXA BIOMASSS##
 #setting up directory 
@@ -404,13 +405,92 @@ max(km$bm_g_m3, na.rm = TRUE)
 min(km$bm_g_m3, na.rm = TRUE)
 
 
+#CREATING HEAT MAPS FOR LUNAR PHASES 
 
 
 
+create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "white") {
+  # Ensure the depth is treated as a factor to maintain the order
+  data$depth <- factor(data$depth, levels = unique(data$depth))
+  
+  # Select relevant columns and rename the taxon column to a standard name
+  heatmap_data <- data %>%
+    select(midoc.stn, depth, lunar_fraction, !!sym(taxon_column)) %>%
+    rename(biomass = !!sym(taxon_column))
+  
+  # Ensure all combinations of midoc.stn and depth are represented
+  heatmap_data <- heatmap_data %>%
+    complete(midoc.stn, depth, fill = list(biomass = NA))
+  
+  # Create a custom order for midoc.stn based on lunar_fraction
+  heatmap_data <- heatmap_data %>%
+    arrange(lunar_fraction)
+  
+  # Convert midoc.stn to a factor with levels in the desired order
+  heatmap_data$midoc.stn <- factor(heatmap_data$midoc.stn, levels = unique(heatmap_data$midoc.stn))
+  
+  # Create a named vector of HTML-formatted labels for the x-axis
+  label_midoc_stn <- function(x) {
+    lunar_frac <- heatmap_data$lunar_fraction[heatmap_data$midoc.stn == x][1]
+    paste0(sub("MIDOC", "", x))
+    #"<br>(", round(lunar_frac, 2), ")")
+  }
+  
+  midoc_labels <- sapply(levels(heatmap_data$midoc.stn), label_midoc_stn)
+  names(midoc_labels) <- levels(heatmap_data$midoc.stn)
+  
+  # Identify NA values in the dataset
+  na_data <- heatmap_data %>% filter(is.na(biomass))
+  
+  # Create the heatmap using ggplot2
+  ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = biomass)) +
+    geom_tile(color = "white") +
+    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") +
+    geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) +
+    labs(title = title, x = "Midoc Station (Lunar Fraction)", y = "Depth (m)", fill = "Biomass (g/m³)") +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 40), size = 14),
+      axis.title.y = element_text(margin = margin(t = 40), size = 14),
+      axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, color = "black"),
+      axis.text.y = element_text(size = 12, color = "black"),
+      axis.ticks.x = element_line(linewidth = 0.5),
+      axis.ticks.length = unit(5, "pt"),
+      panel.background = element_rect(fill = panel_bg_color, color = NA),
+      panel.grid = element_blank(),
+      legend.position = "right",
+      legend.title = element_text(size = 15),
+      legend.text = element_text(size = 12)
+    ) + 
+    scale_x_discrete(labels = midoc_labels) +
+    scale_y_discrete(limits = rev(levels(heatmap_data$depth))) +
+    coord_fixed(ratio = 4)
+}
+
+all_taxa_heatmap_lunar <- create_lunar_heatmap(km_bm_depth, "bm_depth_all_taxa", "Heat Map of All Taxa Biomass - Lunar Fraction")
+all_taxa_heatmap
+fish_heatmap_lunar <- create_lunar_heatmap(km_bm_depth, "bm_depth_fish", "Heat Map of Fish Biomass - Lunar Fraction")
+ceph_heatmap_lunar <- create_lunar_heatmap(km_bm_depth, "bm_depth_ceph", "Heat Map of Cephalopod Biomass - Lunar Fraction")
 
 
 
+#saving for all taxa 
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_Lunar_All_Taxa.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggplot2::ggsave(filename = full_output_path, plot = all_taxa_heatmap_lunar, width =10, height =, dpi = 300, bg = "white")
 
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_Lunar_Fish.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = fish_heatmap_lunar, width =10, height =, dpi = 300, bg = "white")
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_Lunar_Cephalopods.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = ceph_heatmap_lunar, width =10, height =, dpi = 300, bg = "white")
 
 
 
@@ -423,235 +503,235 @@ min(km$bm_g_m3, na.rm = TRUE)
 ##TAXA SPECIFIC BIOMASS##
 
 #FISH#
-
-
-# Filter the dataframe to include only rows where tax.grp is "fish"
-km_fish <- subset(km, tax.grp == "fish")
-
-# Select relevant columns from the filtered dataframe
-km_heat_fish <- km_fish[, c("midoc.stn", "depth", "bm_g_m3")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_fish <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_fish, sum)
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_fish, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Fish Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
-
-
-#CEPHALOPODS#
-
-# Filter the dataframe to include only rows where tax.grp is "cephalopods"
-km_cephalopods <- subset(km, tax.grp == "cephalopods")
-
-# Select relevant columns from the filtered dataframe
-km_heat_cephalopods <- km_cephalopods[, c("midoc.stn", "depth", "bm_g_m3")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_cephalopods <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cephalopods, sum)
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_cephalopods, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Cephalopod Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
-
-#CNIDARIANS#
-# Filter the dataframe to include only rows where tax.grp is "cnidarians"
-km_cnidarians <- subset(km, tax.grp == "cnidarians")
-
-# Select relevant columns from the filtered dataframe
-km_heat_cnidarians <- km_cnidarians[, c("midoc.stn", "depth", "bm_g_m3")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_cnidarians <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cnidarians, sum)
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_cnidarians, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Cnidarian Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
-
-#KRILL#
-# Filter the dataframe to include only rows where tax.grp is "krill"
-km_krill <- subset(km, tax.grp == "krill")
-
-# Select relevant columns from the filtered dataframe
-km_heat_krill <- km_krill[, c("midoc.stn", "depth", "bm_g_m3")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_krill <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_krill, sum)
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_krill, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Krill Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
-
-#SALPS#
-# Filter the dataframe to include only rows where tax.grp is "salps"
-km_salps <- subset(km, tax.grp == "salps")
-
-# Select relevant columns from the filtered dataframe
-km_heat_salps <- km_salps[, c("midoc.stn", "depth", "bm_g_m3")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_salps <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_salps, sum)
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_salps, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Salps Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
-
-
-
-#TESTING OUT START TIME 
-
-# Convert start_time to POSIXct for easier manipulation
-km$start_time <- as.POSIXct(km$start_time, format="%Y-%m-%d %H:%M:%S")
-
-# Filter the dataframe to include only rows where tax.grp is "fish"
-km_fish <- subset(km, tax.grp == "fish")
-
-# Calculate the average start time for each midoc.stn and depth
-average_times <- km_fish %>%
-  group_by(midoc.stn, depth) %>%
-  summarize(avg_start_time = mean(as.numeric(start_time)),
-            bm_g_m3 = sum(bm_g_m3, na.rm = TRUE)) %>%
-  ungroup()
-
-# Convert avg_start_time back to POSIXct for better readability if needed
-average_times$avg_start_time <- as.POSIXct(average_times$avg_start_time, origin="1970-01-01")
-
-# Create the heatmap using ggplot2
-ggplot(average_times, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Fish Biomass by Midoc Station, Depth, and Start Time", 
-       x = "Midoc Station", 
-       y = "Depth",
-       fill = "Biomass (g/m3)") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
-  facet_wrap(~ avg_start_time) # Facet by the average start time
-
-
-
-#FISH BIOMASS by time of day 
-
-
-#Testing again:
-# Load necessary libraries
-library(ggplot2)
-library(ggtext)
-
-
-
-# Filter the dataframe to include only rows where tax.grp is "fish"
-km_fish <- subset(km, tax.grp == "fish")
-
-# Select relevant columns from the filtered dataframe
-km_heat_fish <- km_fish[, c("midoc.stn", "depth", "bm_g_m3", "DNC.visual")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_fish <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_fish, sum)
-
-# Ensure the depth is treated as a factor to maintain the order
-depth_bins <- c("0-1000m", "1000-800m", "800-600m", "600-400m", "400-200m", "200-0m")
-heatmap_data_fish$depth <- factor(heatmap_data_fish$depth, levels = depth_bins)
-
-# Merge the DNC.visual back into the aggregated data
-heatmap_data_fish <- merge(heatmap_data_fish, km_heat_fish[, c("midoc.stn", "DNC.visual")], by = "midoc.stn")
-
-# Create a custom order for midoc.stn based on DNC.visual
-heatmap_data_fish <- heatmap_data_fish[order(factor(heatmap_data_fish$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
-
-# Convert midoc.stn to a factor with levels in the desired order
-heatmap_data_fish$midoc.stn <- factor(heatmap_data_fish$midoc.stn, levels = unique(heatmap_data_fish$midoc.stn))
-
-# Create a named vector of HTML-formatted labels for the x-axis
-midoc_labels <- paste0(
-  "<span style='color:", 
-  ifelse(heatmap_data_fish$DNC.visual == "D", "orange", 
-         ifelse(heatmap_data_fish$DNC.visual == "MC", "violet", 
-                ifelse(heatmap_data_fish$DNC.visual == "N", "darkblue", "red"))),
-  "'>",
-  heatmap_data_fish$midoc.stn,
-  "</span>"
-)
-
-# Ensure unique labels for the x-axis
-names(midoc_labels) <- heatmap_data_fish$midoc.stn
-unique_midoc_labels <- midoc_labels[!duplicated(names(midoc_labels))]
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_fish, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Fish Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_markdown(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
-  scale_x_discrete(labels = unique_midoc_labels) # Apply the custom colored labels
-
-
-#cephalopods
-
-# Filter the dataframe to include only rows where tax.grp is "cephalopod"
-km_cephalopod <- subset(km, tax.grp == "cephalopods")
-
-# Select relevant columns from the filtered dataframe
-km_heat_cephalopod <- km_cephalopod[, c("midoc.stn", "depth", "bm_g_m3", "DNC.visual")]
-
-# Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
-heatmap_data_cephalopod <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cephalopod, sum)
-
-# Ensure the depth is treated as a factor to maintain the order
-depth_bins <- c("0-1000m", "1000-800m", "800-600m", "600-400m", "400-200m", "200-0m")
-heatmap_data_cephalopod$depth <- factor(heatmap_data_cephalopod$depth, levels = depth_bins)
-
-# Merge the DNC.visual back into the aggregated data
-heatmap_data_cephalopod <- merge(heatmap_data_cephalopod, km_heat_cephalopod[, c("midoc.stn", "DNC.visual")], by = "midoc.stn")
-
-# Create a custom order for midoc.stn based on DNC.visual
-heatmap_data_cephalopod <- heatmap_data_cephalopod[order(factor(heatmap_data_cephalopod$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
-
-# Convert midoc.stn to a factor with levels in the desired order
-heatmap_data_cephalopod$midoc.stn <- factor(heatmap_data_cephalopod$midoc.stn, levels = unique(heatmap_data_cephalopod$midoc.stn))
-
-# Create a named vector of HTML-formatted labels for the x-axis
-midoc_labels <- paste0(
-  "<span style='color:", 
-  ifelse(heatmap_data_cephalopod$DNC.visual == "D", "orange", 
-         ifelse(heatmap_data_cephalopod$DNC.visual == "MC", "violet", 
-                ifelse(heatmap_data_cephalopod$DNC.visual == "N", "darkblue", "red"))),
-  "'>",
-  heatmap_data_cephalopod$midoc.stn,
-  "</span>"
-)
-
-# Ensure unique labels for the x-axis
-names(midoc_labels) <- heatmap_data_cephalopod$midoc.stn
-unique_midoc_labels <- midoc_labels[!duplicated(names(midoc_labels))]
-
-# Create the heatmap using ggplot2
-ggplot(heatmap_data_cephalopod, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
-  geom_tile() + # Use tiles to represent the heatmap
-  scale_fill_gradient(low = "yellow", high = "red") + # Set the gradient colors for the fill
-  labs(title = "Heat Map of Cephalopod Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
-  theme_minimal() + # Use a minimal theme for the plot
-  theme(axis.text.x = element_markdown(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
-  scale_x_discrete(labels = unique_midoc_labels) # Apply the custom colored labels
-
+# 
+# 
+# # Filter the dataframe to include only rows where tax.grp is "fish"
+# km_fish <- subset(km, tax.grp == "fish")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_fish <- km_fish[, c("midoc.stn", "depth", "bm_g_m3")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_fish <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_fish, sum)
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_fish, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Fish Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+# 
+# 
+# #CEPHALOPODS#
+# 
+# # Filter the dataframe to include only rows where tax.grp is "cephalopods"
+# km_cephalopods <- subset(km, tax.grp == "cephalopods")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_cephalopods <- km_cephalopods[, c("midoc.stn", "depth", "bm_g_m3")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_cephalopods <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cephalopods, sum)
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_cephalopods, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Cephalopod Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+# 
+# #CNIDARIANS#
+# # Filter the dataframe to include only rows where tax.grp is "cnidarians"
+# km_cnidarians <- subset(km, tax.grp == "cnidarians")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_cnidarians <- km_cnidarians[, c("midoc.stn", "depth", "bm_g_m3")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_cnidarians <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cnidarians, sum)
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_cnidarians, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Cnidarian Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+# 
+# #KRILL#
+# # Filter the dataframe to include only rows where tax.grp is "krill"
+# km_krill <- subset(km, tax.grp == "krill")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_krill <- km_krill[, c("midoc.stn", "depth", "bm_g_m3")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_krill <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_krill, sum)
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_krill, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Krill Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+# 
+# #SALPS#
+# # Filter the dataframe to include only rows where tax.grp is "salps"
+# km_salps <- subset(km, tax.grp == "salps")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_salps <- km_salps[, c("midoc.stn", "depth", "bm_g_m3")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_salps <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_salps, sum)
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_salps, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Salps Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate x-axis labels for better readability
+# 
+# 
+# 
+# #TESTING OUT START TIME 
+# 
+# # Convert start_time to POSIXct for easier manipulation
+# km$start_time <- as.POSIXct(km$start_time, format="%Y-%m-%d %H:%M:%S")
+# 
+# # Filter the dataframe to include only rows where tax.grp is "fish"
+# km_fish <- subset(km, tax.grp == "fish")
+# 
+# # Calculate the average start time for each midoc.stn and depth
+# average_times <- km_fish %>%
+#   group_by(midoc.stn, depth) %>%
+#   summarize(avg_start_time = mean(as.numeric(start_time)),
+#             bm_g_m3 = sum(bm_g_m3, na.rm = TRUE)) %>%
+#   ungroup()
+# 
+# # Convert avg_start_time back to POSIXct for better readability if needed
+# average_times$avg_start_time <- as.POSIXct(average_times$avg_start_time, origin="1970-01-01")
+# 
+# # Create the heatmap using ggplot2
+# ggplot(average_times, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Fish Biomass by Midoc Station, Depth, and Start Time", 
+#        x = "Midoc Station", 
+#        y = "Depth",
+#        fill = "Biomass (g/m3)") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
+#   facet_wrap(~ avg_start_time) # Facet by the average start time
+# 
+# 
+# 
+# #FISH BIOMASS by time of day 
+# 
+# 
+# #Testing again:
+# # Load necessary libraries
+# library(ggplot2)
+# library(ggtext)
+# 
+# 
+# 
+# # Filter the dataframe to include only rows where tax.grp is "fish"
+# km_fish <- subset(km, tax.grp == "fish")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_fish <- km_fish[, c("midoc.stn", "depth", "bm_g_m3", "DNC.visual")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_fish <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_fish, sum)
+# 
+# # Ensure the depth is treated as a factor to maintain the order
+# depth_bins <- c("0-1000m", "1000-800m", "800-600m", "600-400m", "400-200m", "200-0m")
+# heatmap_data_fish$depth <- factor(heatmap_data_fish$depth, levels = depth_bins)
+# 
+# # Merge the DNC.visual back into the aggregated data
+# heatmap_data_fish <- merge(heatmap_data_fish, km_heat_fish[, c("midoc.stn", "DNC.visual")], by = "midoc.stn")
+# 
+# # Create a custom order for midoc.stn based on DNC.visual
+# heatmap_data_fish <- heatmap_data_fish[order(factor(heatmap_data_fish$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
+# 
+# # Convert midoc.stn to a factor with levels in the desired order
+# heatmap_data_fish$midoc.stn <- factor(heatmap_data_fish$midoc.stn, levels = unique(heatmap_data_fish$midoc.stn))
+# 
+# # Create a named vector of HTML-formatted labels for the x-axis
+# midoc_labels <- paste0(
+#   "<span style='color:", 
+#   ifelse(heatmap_data_fish$DNC.visual == "D", "orange", 
+#          ifelse(heatmap_data_fish$DNC.visual == "MC", "violet", 
+#                 ifelse(heatmap_data_fish$DNC.visual == "N", "darkblue", "red"))),
+#   "'>",
+#   heatmap_data_fish$midoc.stn,
+#   "</span>"
+# )
+# 
+# # Ensure unique labels for the x-axis
+# names(midoc_labels) <- heatmap_data_fish$midoc.stn
+# unique_midoc_labels <- midoc_labels[!duplicated(names(midoc_labels))]
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_fish, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "white", high = "blue") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Fish Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_markdown(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
+#   scale_x_discrete(labels = unique_midoc_labels) # Apply the custom colored labels
+# 
+# 
+# #cephalopods
+# 
+# # Filter the dataframe to include only rows where tax.grp is "cephalopod"
+# km_cephalopod <- subset(km, tax.grp == "cephalopods")
+# 
+# # Select relevant columns from the filtered dataframe
+# km_heat_cephalopod <- km_cephalopod[, c("midoc.stn", "depth", "bm_g_m3", "DNC.visual")]
+# 
+# # Aggregate the biomass data (bm_g_m3) by midoc.stn and depth, summing the biomass
+# heatmap_data_cephalopod <- aggregate(bm_g_m3 ~ midoc.stn + depth, data = km_heat_cephalopod, sum)
+# 
+# # Ensure the depth is treated as a factor to maintain the order
+# depth_bins <- c("0-1000m", "1000-800m", "800-600m", "600-400m", "400-200m", "200-0m")
+# heatmap_data_cephalopod$depth <- factor(heatmap_data_cephalopod$depth, levels = depth_bins)
+# 
+# # Merge the DNC.visual back into the aggregated data
+# heatmap_data_cephalopod <- merge(heatmap_data_cephalopod, km_heat_cephalopod[, c("midoc.stn", "DNC.visual")], by = "midoc.stn")
+# 
+# # Create a custom order for midoc.stn based on DNC.visual
+# heatmap_data_cephalopod <- heatmap_data_cephalopod[order(factor(heatmap_data_cephalopod$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
+# 
+# # Convert midoc.stn to a factor with levels in the desired order
+# heatmap_data_cephalopod$midoc.stn <- factor(heatmap_data_cephalopod$midoc.stn, levels = unique(heatmap_data_cephalopod$midoc.stn))
+# 
+# # Create a named vector of HTML-formatted labels for the x-axis
+# midoc_labels <- paste0(
+#   "<span style='color:", 
+#   ifelse(heatmap_data_cephalopod$DNC.visual == "D", "orange", 
+#          ifelse(heatmap_data_cephalopod$DNC.visual == "MC", "violet", 
+#                 ifelse(heatmap_data_cephalopod$DNC.visual == "N", "darkblue", "red"))),
+#   "'>",
+#   heatmap_data_cephalopod$midoc.stn,
+#   "</span>"
+# )
+# 
+# # Ensure unique labels for the x-axis
+# names(midoc_labels) <- heatmap_data_cephalopod$midoc.stn
+# unique_midoc_labels <- midoc_labels[!duplicated(names(midoc_labels))]
+# 
+# # Create the heatmap using ggplot2
+# ggplot(heatmap_data_cephalopod, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
+#   geom_tile() + # Use tiles to represent the heatmap
+#   scale_fill_gradient(low = "yellow", high = "red") + # Set the gradient colors for the fill
+#   labs(title = "Heat Map of Cephalopod Biomass by Midoc Station and Depth", x = "Midoc Station", y = "Depth") + # Add labels and title
+#   theme_minimal() + # Use a minimal theme for the plot
+#   theme(axis.text.x = element_markdown(angle = 90, hjust = 1)) + # Rotate x-axis labels for better readability
+#   scale_x_discrete(labels = unique_midoc_labels) # Apply the custom colored labels
+# 
