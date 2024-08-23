@@ -388,6 +388,7 @@ summary(allbiom_additive_SST)
 gam.check(allbiom_additive_SST)
 
 which.max(abs(residuals(allbiom_additive_SST)))
+concurvity(allbiom_additive_SST)
 
 #ALL TAXA - TSM 
 allbiom_additive_TSM <-gam(log(bm_sum_all_taxa) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
@@ -445,8 +446,6 @@ gam.check(krill_additive_TSM)
 
 #trying to work out where that residual came from 
 
-
-
 which.max(abs(residuals(allbiom_additive_SST)))
 which.max(abs(residuals(fish_additive_SST)))
 
@@ -454,7 +453,47 @@ which.max(abs(residuals(fish_additive_SST)))
 
 
 km_bm_sum_residual_fix <- km_bm_sum %>% select(bm_sum_all_taxa,bm_sum_fish, SST, TSM, CHLA, CUR)
+km_bm_sum_residual_fix$bm_sum_all_taxa_log <- log(km_bm_sum_residual_fix$bm_sum_all_taxa)
 
+
+
+
+
+###################ADDITIVE MODELS IN SITU###########
+
+#ALL TAXA 
+#Tmin
+allbiom_additive_insitu <- gam(log(bm_sum_all_taxa) ~ s(Tmin) + s(O2_min), data = km_bm_sum)
+draw(allbiom_additive_insitu, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa - Additive model")  +
+  theme(plot.title = element_text(hjust = -7, vjust = 1))
+summary(allbiom_additive_insitu)
+gam.check(allbiom_additive_insitu)
+
+
+#Fish
+#Tmin
+fish_additive_insitu <- gam(log(bm_sum_fish) ~ s(Tmin) + s(O2_min), data = km_bm_sum)
+draw(fish_additive_insitu, residuals = TRUE) + ggtitle("Biomass (Log) Fish - Additive model")  +
+  theme(plot.title = element_text(hjust = -3.5, vjust = 1))
+summary(fish_additive_insitu)
+gam.check(fish_additive_insitu)
+
+
+#Cephalopods
+#Tmin
+ceph_additive_insitu <- gam(log(bm_sum_ceph) ~ s(Tmin) + s(O2_min), data = km_bm_sum)
+draw(ceph_additive_insitu, residuals = TRUE) + ggtitle("Biomass (Log) Cephalopods - Additive model")  +
+  theme(plot.title = element_text(hjust = -3.5, vjust = 1))
+summary(ceph_additive_insitu)
+gam.check(ceph_additive_insitu)
+
+#Krill
+#Tmin
+krill_additive_insitu <- gam(log(bm_sum_krill) ~ s(Tmin) + s(O2_min), data = km_bm_sum)
+draw(krill_additive_insitu, residuals = TRUE) + ggtitle("Biomass (Log) Krill - Additive model")  +
+  theme(plot.title = element_text(hjust = -3.5, vjust = 1))
+summary(krill_additive_insitu)
+gam.check(krill_additive_insitu)
 
 
 
