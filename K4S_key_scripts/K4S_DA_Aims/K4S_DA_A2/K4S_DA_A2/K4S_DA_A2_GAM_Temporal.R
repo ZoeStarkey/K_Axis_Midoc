@@ -7,6 +7,7 @@ library(patchwork)
 library(ggplot2)
 library(grid)
 library(lubridate)
+library(dplyr)
 
 usr <- Sys.info()["user"]
 d<- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_DA_A2")
@@ -23,6 +24,7 @@ km_bm_sum$day_fraction <- km_bm_sum$day_of_year + hour(km_bm_sum$start_time) / 2
 #adding day_fraction to km_bm_depth
 km_bm_depth$day_of_year <- yday(km_bm_depth$start_time)
 km_bm_depth$day_fraction <- km_bm_depth$day_of_year + hour(km_bm_depth$start_time) / 24
+
 
 
 
