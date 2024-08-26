@@ -20,6 +20,9 @@ dir.exists(d)
 par(mfrow=c(2,2))
 
 
+#removing midoc stations where SST is less than 0
+km_bm_sum <- km_bm_sum %>% filter(SST > 0)
+
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
@@ -208,27 +211,6 @@ print(combined_plot)
 
 
 
-#########SATELLITE COMBINED#################
-#all taxa 
-allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST) + s(CUR) + s(CHLA), data = km_bm_sum)
-all_tax_plot_TSM <- draw(allbiom_sum.TSM, residuals = TRUE) + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - TSM")
-summary(allbiom_sum.TSM)
-
-
-allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST,CUR,CHLA), data = km_bm_sum)
-
-
-
-allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ s(SST, CUR, CHLA, k=10), 
-                       data = km_bm_sum, 
-                       na.action = na.exclude)
-
-allbiom_sum.TSM <- gam(log(bm_sum_all_taxa) ~ te(SST, CUR, CHLA), 
-                       data = km_bm_sum, 
-                       na.action = na.exclude)
-summary(allbiom_sum.TSM)
-
-
 
 
 
@@ -381,14 +363,16 @@ gam.check(krillbiom_sum.Smax)
 
 ###################ADDITIVE MODELS SATELLITE###########
 #ALL TAXA - SST
+par(mfrow=c(2,2))
+
 allbiom_additive_SST <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA), data = km_bm_sum)
 draw(allbiom_additive_SST, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa Additive model SST") + 
   theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(allbiom_additive_SST)
 gam.check(allbiom_additive_SST)
 
-which.max(abs(residuals(allbiom_additive_SST)))
-concurvity(allbiom_additive_SST)
+#CHECKING AIC 
+AIC(allbiom_additive_SST, allbiom_additive_TSM, fish_additive_SST, fish_additive_TSM, ceph_additive_SST, ceph_additive_TSM, krill_additive_SST, krill_additive_TSM)
 
 #ALL TAXA - TSM 
 allbiom_additive_TSM <-gam(log(bm_sum_all_taxa) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
