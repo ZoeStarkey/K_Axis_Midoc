@@ -33,6 +33,7 @@ km_bm_sum <-km_bm_sum %>%
     everything()
   )
 
+km_bm_sum <- km_bm_sum %>% filter(SST > 0)
 #########TOTAL TAXA############ 
 
 #loading dataframe - values were logged and then summed 
