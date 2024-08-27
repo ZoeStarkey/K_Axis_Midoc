@@ -371,8 +371,6 @@ draw(allbiom_additive_SST, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa A
 summary(allbiom_additive_SST)
 gam.check(allbiom_additive_SST)
 
-#CHECKING AIC 
-AIC(allbiom_additive_SST, allbiom_additive_TSM, fish_additive_SST, fish_additive_TSM, ceph_additive_SST, ceph_additive_TSM, krill_additive_SST, krill_additive_TSM)
 
 #ALL TAXA - TSM 
 allbiom_additive_TSM <-gam(log(bm_sum_all_taxa) ~ s(TSM)+ s(CUR) + s(CHLA), data = km_bm_sum)
@@ -428,16 +426,15 @@ gam.check(krill_additive_TSM)
 
 
 
+#CHECKING AIC 
+AIC(allbiom_additive_SST, allbiom_additive_TSM, fish_additive_SST, fish_additive_TSM, ceph_additive_SST, ceph_additive_TSM, krill_additive_SST, krill_additive_TSM)
+
 #trying to work out where that residual came from 
 
-which.max(abs(residuals(allbiom_additive_SST)))
-which.max(abs(residuals(fish_additive_SST)))
-
-#make a new dataframe including teh columns bm_sum_all_taxa and SST 
 
 
-km_bm_sum_residual_fix <- km_bm_sum %>% select(bm_sum_all_taxa,bm_sum_fish, SST, TSM, CHLA, CUR)
-km_bm_sum_residual_fix$bm_sum_all_taxa_log <- log(km_bm_sum_residual_fix$bm_sum_all_taxa)
+km_bm_sum_residual <- km_bm_sum %>% select(bm_sum_all_taxa,bm_sum_fish, SST, TSM, CHLA, CUR)
+km_bm_sum_residual$bm_sum_all_taxa_log <- log(km_bm_sum_residual_fix$bm_sum_all_taxa)
 
 
 
@@ -479,6 +476,10 @@ draw(krill_additive_insitu, residuals = TRUE) + ggtitle("Biomass (Log) Krill - A
 summary(krill_additive_insitu)
 gam.check(krill_additive_insitu)
 
+
+
+#CHECKING AIC
+AIC(allbiom_additive_insitu, fish_additive_insitu, ceph_additive_insitu, krill_additive_insitu)
 
 
 
