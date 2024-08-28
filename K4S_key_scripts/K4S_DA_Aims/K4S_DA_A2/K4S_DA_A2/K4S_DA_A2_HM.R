@@ -480,12 +480,15 @@ output_filename <- "K4S_Plot_A2_HM_Lunar_All_Taxa.png"
 full_output_path <- file.path(output_directory, output_filename)
 ggplot2::ggsave(filename = full_output_path, plot = all_taxa_heatmap_lunar, width =10, height =, dpi = 300, bg = "white")
 
+
+#Saving for fish 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
 output_filename <- "K4S_Plot_A2_HM_Lunar_Fish.png"
 full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = fish_heatmap_lunar, width =10, height =, dpi = 300, bg = "white")
 
+#Saving for cephalopds
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
 output_filename <- "K4S_Plot_A2_HM_Lunar_Cephalopods.png"
 full_output_path <- file.path(output_directory, output_filename)
