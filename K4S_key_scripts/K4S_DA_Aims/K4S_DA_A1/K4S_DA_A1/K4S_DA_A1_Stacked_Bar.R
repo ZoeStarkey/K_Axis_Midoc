@@ -30,6 +30,9 @@ km_df <- km_df %>%
 exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps", "mixed/other invertebrates")
 km_df <-  km_df[!km_df$tax.grp %in% exclude_taxa, ]
 
+#capitalised taxon
+km_df$tax.grp <- tools::toTitleCase(km_df$tax.grp)
+
 library(RColorBrewer)
 
 # Define a color-blind friendly palette
@@ -42,14 +45,14 @@ ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp, )) +
   geom_bar(stat = "identity",) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, size = 20,  margin = margin(t = 0, r = 0, b = 0, l = 0)),
-    axis.text.y = element_text(size = 20),
-    axis.title.x = element_text(size = 20, margin = margin(t = 24)),
-    axis.title.y = element_text(size = 20, margin = margin(t = 24)),
+    axis.text.x = element_text(angle = 90, hjust = 0.5,vjust = 0.5, size = 40,  margin = margin(t = 0, r = 0, b = 0, l = 0)),
+    axis.text.y = element_text(size = 40),
+    axis.title.x = element_text(size = 50, margin = margin(t = 20)),
+    axis.title.y = element_text(size = 50, margin = margin(r = 20)),
     panel.grid.major.x = element_blank(),
     legend.position = "right",
-    legend.text = element_text(size = 20),
-    legend.title = element_text(size = 24)
+    legend.text = element_text(size = 30),
+    legend.title = element_text(size = 45)
   ) +
   scale_x_discrete(labels = label_midoc_stn) +
   scale_fill_manual(values = cb_palette) +
@@ -65,7 +68,7 @@ full_output_path <- file.path(output_directory, output_filename)
 
 
 # Save the plot
-ggsave(filename = full_output_path, plot = stacked_bar_plot, width =20, height = 12, dpi = 300, bg = "white")
+ggsave(filename = full_output_path, plot = stacked_bar_plot, width =30, height = 16, dpi = 300, bg = "white")
 
 
 
