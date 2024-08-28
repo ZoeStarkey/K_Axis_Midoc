@@ -358,7 +358,7 @@ plot_chla_biomass <- function(include_taxa, decimal_places = 2, output_directory
     geom_sf(data = f3$finished, color = "black", linewidth = 1) +
     geom_sf(data = f1$finished, color = "black", linewidth = 1) +
     ggnewscale::new_scale_fill() + 
-    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
     scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
                          name = 'Ice (%)',
                          guide = guide_colorbar(title.position = "left", 
