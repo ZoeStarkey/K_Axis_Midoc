@@ -128,19 +128,23 @@ cols2 <- colorRampPalette(c("lightyellow","#EEDC94" ,"orange", "red", "darkred")
 
 
 # ADD ICE (leftover from KAXIS_MAPS_2017)
-file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
-icefile <- raster(file_path)
-# Reproject the ice raster to the desired projection
-icefile_proj <- projectRaster(icefile, crs = prj)
+# file_path <- "~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/k-axis_data_ICE_LONGLAT_20160218.tif"
+# icefile <- raster(file_path)
+# # Reproject the ice raster to the desired projection
+# icefile_proj <- projectRaster(icefile, crs = prj)
+# 
+# # Convert to data frame for plotting
+# ice_df <- as.data.frame(rasterToPoints(icefile_proj))
+# 
+# # Replace 0 values with NA
+# ice_df[ice_df$layer == 0, "layer"] <- NA
+# 
+# ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
 
-# Convert to data frame for plotting
-ice_df <- as.data.frame(rasterToPoints(icefile_proj))
 
-# Replace 0 values with NA
-ice_df[ice_df$layer == 0, "layer"] <- NA
+#ADD ICE 
 
-ice_df <- ice_df[ice_df$k.axis_data_ICE_LONGLAT_20160218 > 25, ]
-
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/ice_df.rda")
 
 ####TAXA PLOT FOR ALL TAXA MINUS GELATINOUS 
 
@@ -332,7 +336,7 @@ plot_CS_biomass <- function(include_taxa = c("fish"), decimal_places = 3, output
     geom_sf(data = f3$finished, color = "black", linewidth = 1) +
     geom_sf(data = f1$finished, color = "black", linewidth = 1) +
     ggnewscale::new_scale_fill() + 
-    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 0.8) +
+    geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
     scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
                          name = 'Ice (%)',
                          guide = guide_colorbar(title.position = "left", 
