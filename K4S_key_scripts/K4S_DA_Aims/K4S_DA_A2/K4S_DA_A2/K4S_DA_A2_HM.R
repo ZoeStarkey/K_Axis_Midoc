@@ -3,6 +3,22 @@ library(reshape2)
 library(dplyr)
 library(ggtext)
 library(tidyr)
+library(readr)
+library(stars)
+library(sf)
+
+
+library(ggplot2)
+library(raster)
+library(RColorBrewer)
+library(rworldxtra)
+library(rworldmap)
+library(stars)
+library(orsifronts)
+library(dplyr)
+library(readr)
+library(scales)
+library(sp)
 
 ##TOTAL TAXA BIOMASSS##
 #setting up directory 
@@ -337,7 +353,7 @@ create_heatmap <- function(data, tax_group, title, panel_bg_color = "white") {
     geom_tile(color = "white") + # Use tiles to represent the heatmap, set color for tile borders
     scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") + # Set the gradient colors for the fill and color for NA values
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) + #
-    labs(title = title, x = "Midoc Station", y = "Depth (m)", fill = "Biomass (g/m³)") + # Add labels and title
+    labs(title = title, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") + # Add labels and title
     theme_minimal() +
     theme(
       axis.title.x = element_text(margin = margin(t = 40), size = 14), # Increase distance between x-axis label and axis
@@ -388,22 +404,26 @@ ggsave(filename = full_output_path, plot = cephalopods_heatmap, width =10, heigh
 
 
 #Combined plots 
+library(patchwork)
 #combined_heatmap <- (fish_heatmap | cephalopods_heatmap)
-combined_heatmap <-  total_biomass_day_heatmap / fish_heatmap / cephalopods_heatmap
+combined_heatmap <-   (fish_heatmap | cephalopods_heatmap)/ (fish_heatmap_lunar | ceph_heatmap_lunar)
 # Print the combined plot
 print(combined_heatmap)
 
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
-output_filename <- "K4S_Plot_A2_HM_Day_Fish_Cephalopods_Total.png"
+output_filename <- "K4S_Plot_A2_HM_Day_Lunar_Fish_Cephalopods_Total.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = combined_heatmap, width =12, height =15, dpi = 500, bg = "white")
+ggsave(filename = full_output_path, plot = combined_heatmap, width =15, height =10, dpi = 500, bg = "white")
 
 
 max(km$bm_g_m3, na.rm = TRUE)
 min(km$bm_g_m3, na.rm = TRUE)
 
+
+class(fish_heatmap)
+class(cephalopods_heatmap)
 
 #CREATING HEAT MAPS FOR LUNAR PHASES 
 
@@ -415,7 +435,7 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
   
   # Select relevant columns and rename the taxon column to a standard name
   heatmap_data <- data %>%
-    select(midoc.stn, depth, lunar_fraction, !!sym(taxon_column)) %>%
+    dplyr::select(midoc.stn, depth, lunar_fraction, !!sym(taxon_column)) %>%
     rename(biomass = !!sym(taxon_column))
   
   # Ensure all combinations of midoc.stn and depth are represented
@@ -447,7 +467,7 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
     geom_tile(color = "white") +
     scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") +
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) +
-    labs(title = title, x = "Midoc Station (Lunar Fraction)", y = "Depth (m)", fill = "Biomass (g/m³)") +
+    labs(title = title, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") +
     theme_minimal() +
     theme(
       axis.title.x = element_text(margin = margin(t = 40), size = 14),
