@@ -325,7 +325,7 @@ create_heatmap <- function(data, tax_group, title, panel_bg_color = "white") {
   heatmap_data <- merge(heatmap_data, unique(km_heat[, c("midoc.stn", "DNC.visual")]), by = "midoc.stn", all.x = TRUE)
   
   # Create a custom order for midoc.stn based on DNC.visual
-  heatmap_data <- heatmap_data[order(factor(heatmap_data$DNC.visual, levels = c("NC", "D", "MC", "N"))), ]
+  heatmap_data <- heatmap_data[order(factor(heatmap_data$DNC.visual, levels = c("MC", "D", "NC", "N" ))), ]
   
   # Convert midoc.stn to a factor with levels in the desired order
   heatmap_data$midoc.stn <- factor(heatmap_data$midoc.stn, levels = unique(heatmap_data$midoc.stn))
@@ -351,12 +351,14 @@ create_heatmap <- function(data, tax_group, title, panel_bg_color = "white") {
   # Create the heatmap using ggplot2
   ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
     geom_tile(color = "white") + # Use tiles to represent the heatmap, set color for tile borders
-    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") + # Set the gradient colors for the fill and color for NA values
+    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80", 
+                         guide = guide_colorbar(barheight = 15, barwidth = 2, title.position = "left")) + # Set the gradient colors for the fill and color for NA values
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) + #
-    labs(title = title, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") + # Add labels and title
+    labs(title = NULL, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") + # Add labels and title
     theme_minimal() +
     theme(
-      axis.title.x = element_text(margin = margin(t = 40), size = 14), # Increase distance between x-axis label and axis
+      plot.margin = margin(0,0,0,0),
+      axis.title.x = element_text(margin = margin(t = 15), size = 14), # Increase distance between x-axis label and axis
       axis.title.y = element_text(margin = margin(t = 40),size = 14),
       axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, , color = "black"), # Center x-axis labels over tick marks and increase text size
       axis.text.y = element_text(size = 12, color = "black"),
@@ -365,8 +367,9 @@ create_heatmap <- function(data, tax_group, title, panel_bg_color = "white") {
       panel.background = element_rect(fill = panel_bg_color, color = NA), # Set background color for the panel
       panel.grid = element_blank(), # Remove grid lines
       legend.position = "right",
-      legend.title = element_text(size = 15), # Increase legend title size
-      legend.text = element_text(size = 12)# Position legend to the right
+      legend.title = element_text(size = 15,angle = 90, hjust = 0.5), # Increase legend title size
+      legend.text = element_text(size = 12),
+     # legend,title.align =0.5 # Position legend to the right
     ) + 
     scale_x_discrete(labels = midoc_labels) +
     scale_y_discrete(limits = rev(levels(heatmap_data$depth))) +# Apply the custom HTML labels
@@ -415,7 +418,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A2_HM_Day_Lunar_Fish_Cephalopods_Total.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = combined_heatmap, width =15, height =10, dpi = 500, bg = "white")
+ggsave(filename = full_output_path, plot = combined_heatmap, width =20, height =10, dpi = 500, bg = "white")
 
 
 max(km$bm_g_m3, na.rm = TRUE)
@@ -465,13 +468,14 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
   # Create the heatmap using ggplot2
   ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = biomass)) +
     geom_tile(color = "white") +
-    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80") +
+    scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80",
+                         guide = guide_colorbar(barheight = 15, barwidth = 2, title.position = "left")) +
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) +
     labs(title = title, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") +
     theme_minimal() +
     theme(
-      axis.title.x = element_text(margin = margin(t = 40), size = 14),
-      axis.title.y = element_text(margin = margin(t = 40), size = 14),
+      axis.title.x = element_text(margin = margin(t = 15), size = 14),
+      axis.title.y = element_text(margin = margin(t = 40 ), size = 14),
       axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, color = "black"),
       axis.text.y = element_text(size = 12, color = "black"),
       axis.ticks.x = element_line(linewidth = 0.5),
@@ -479,7 +483,7 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
       panel.background = element_rect(fill = panel_bg_color, color = NA),
       panel.grid = element_blank(),
       legend.position = "right",
-      legend.title = element_text(size = 15),
+      legend.title = element_text(size = 15, angle = 90, hjust = 0.5),
       legend.text = element_text(size = 12)
     ) + 
     scale_x_discrete(labels = midoc_labels) +
@@ -518,10 +522,38 @@ ggsave(filename = full_output_path, plot = ceph_heatmap_lunar, width =10, height
 
 
 
+#making the bar plots
+plot_data <- km_bm_sum %>%
+  group_by(midoc.stn, DNC.visual) %>%
+  summarise(total_fish = sum(bm_sum_fish, na.rm = TRUE)) %>%
+  ungroup()
+
+dnc_order <- c("MC", "D", "NC", "N")
+
+bar_plot <- ggplot(plot_data, aes(x = reorder(midoc.stn, as.numeric(factor(DNC.visual, levels = dnc_order))), 
+                      y = total_fish, 
+                      fill = factor(DNC.visual, levels = dnc_order))) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("MC" = "pink", "D" = "#FFC000", "NC" = "#A52A2A", "N" = "darkblue")) +
+  labs(x = NULL,
+       y = expression(paste("Biomass (g m"^-3, ")")),
+       fill = "Time of Day" ) +
+  theme_minimal() +
+  theme(axis.text.y= element_text( hjust = 1, size = 12, color = "black" ),
+        plot.margin = margin(0,0,0,0),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank ()) + 
+  coord_fixed(ratio = 150)
 
 
 
+combined_plot <- bar / fish_heatmap +
+  plot_layout(heights = c(1, 4)) 
 
+combined_plot
 
 ##TAXA SPECIFIC BIOMASS##
 
