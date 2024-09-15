@@ -112,7 +112,7 @@ biomass_summary_fish <- km_bm_sum %>%
 
 print(biomass_summary_fish)
 
-
+sum(km_bm_sum$bm_sum_fish, na.rm = TRUE)
 
 #sum of day and night 0.1913
  
