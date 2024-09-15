@@ -445,9 +445,9 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
   heatmap_data <- heatmap_data %>%
     complete(midoc.stn, depth, fill = list(biomass = NA))
   
-  # Create a custom order for midoc.stn based on lunar_fraction
+  # Create a custom order for midoc.stn based on lunar_fraction (descending order)
   heatmap_data <- heatmap_data %>%
-    arrange(lunar_fraction)
+    arrange(desc(lunar_fraction))
   
   # Convert midoc.stn to a factor with levels in the desired order
   heatmap_data$midoc.stn <- factor(heatmap_data$midoc.stn, levels = unique(heatmap_data$midoc.stn))
@@ -478,8 +478,6 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
       axis.title.y = element_text(margin = margin(t = 40 ), size = 18),
       axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, color = "black"),
       axis.text.y = element_text(size = 15, color = "black"),
-      #axis.ticks.x = element_line(linewidth = 0.5),
-      #axis.ticks.length = unit(5, "pt"),
       panel.background = element_rect(fill = panel_bg_color, color = NA),
       panel.grid = element_blank(),
       legend.position = "right",
