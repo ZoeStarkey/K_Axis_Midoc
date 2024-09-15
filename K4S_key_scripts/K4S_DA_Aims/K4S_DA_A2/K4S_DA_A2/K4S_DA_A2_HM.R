@@ -358,17 +358,17 @@ create_heatmap <- function(data, tax_group, title, panel_bg_color = "white") {
     theme_minimal() +
     theme(
       plot.margin = margin(0,0,0,0),
-      axis.title.x = element_text(margin = margin(t = 15), size = 14), # Increase distance between x-axis label and axis
-      axis.title.y = element_text(margin = margin(t = 40),size = 14),
-      axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, , color = "black"), # Center x-axis labels over tick marks and increase text size
-      axis.text.y = element_text(size = 12, color = "black"),
-      axis.ticks.x = element_line(linewidth = 0.5), # Add tick marks on x-axis
-      axis.ticks.length = unit(5, "pt"), # Increase y-axis text size and set color to black
+      axis.title.x = element_text(margin = margin(t = 15), size = 18), # Increase distance between x-axis label and axis
+      axis.title.y = element_text(margin = margin(t = 40),size = 18),
+      axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 13, , color = "black"), # Center x-axis labels over tick marks and increase text size
+      axis.text.y = element_text(size = 15, color = "black"),
+     # axis.ticks.x = element_line(linewidth = 0.5), # Add tick marks on x-axis
+     # axis.ticks.length = unit(5, "pt"), # Increase y-axis text size and set color to black
       panel.background = element_rect(fill = panel_bg_color, color = NA), # Set background color for the panel
       panel.grid = element_blank(), # Remove grid lines
       legend.position = "right",
-      legend.title = element_text(size = 15,angle = 90, hjust = 0.5), # Increase legend title size
-      legend.text = element_text(size = 12),
+      legend.title = element_text(size = 18,angle = 90, hjust = 0.5), # Increase legend title size
+      legend.text = element_text(size = 14),
      # legend,title.align =0.5 # Position legend to the right
     ) + 
     scale_x_discrete(labels = midoc_labels) +
@@ -471,20 +471,20 @@ create_lunar_heatmap <- function(data, taxon_column, title, panel_bg_color = "wh
     scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80",
                          guide = guide_colorbar(barheight = 15, barwidth = 2, title.position = "left")) +
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) +
-    labs(title = title, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") +
+    labs(title = NULL, x = "Station", y = "Depth (m)", fill = "Biomass (g/m³)") +
     theme_minimal() +
     theme(
-      axis.title.x = element_text(margin = margin(t = 15), size = 14),
-      axis.title.y = element_text(margin = margin(t = 40 ), size = 14),
+      axis.title.x = element_text(margin = margin(t = 15), size = 18),
+      axis.title.y = element_text(margin = margin(t = 40 ), size = 18),
       axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.65, size = 12, color = "black"),
-      axis.text.y = element_text(size = 12, color = "black"),
-      axis.ticks.x = element_line(linewidth = 0.5),
-      axis.ticks.length = unit(5, "pt"),
+      axis.text.y = element_text(size = 15, color = "black"),
+      #axis.ticks.x = element_line(linewidth = 0.5),
+      #axis.ticks.length = unit(5, "pt"),
       panel.background = element_rect(fill = panel_bg_color, color = NA),
       panel.grid = element_blank(),
       legend.position = "right",
-      legend.title = element_text(size = 15, angle = 90, hjust = 0.5),
-      legend.text = element_text(size = 12)
+      legend.title = element_text(size = 18, angle = 90, hjust = 0.5),
+      legend.text = element_text(size = 14)
     ) + 
     scale_x_discrete(labels = midoc_labels) +
     scale_y_discrete(limits = rev(levels(heatmap_data$depth))) +
@@ -522,7 +522,8 @@ ggsave(filename = full_output_path, plot = ceph_heatmap_lunar, width =10, height
 
 
 
-#making the bar plots
+#######BAR PLOTS##########
+#fish day 
 plot_data <- km_bm_sum %>%
   group_by(midoc.stn, DNC.visual) %>%
   summarise(total_fish = sum(bm_sum_fish, na.rm = TRUE)) %>%
@@ -530,11 +531,11 @@ plot_data <- km_bm_sum %>%
 
 dnc_order <- c("MC", "D", "NC", "N")
 
-bar_plot <- ggplot(plot_data, aes(x = reorder(midoc.stn, as.numeric(factor(DNC.visual, levels = dnc_order))), 
+bar_plot_fish_day <- ggplot(plot_data, aes(x = reorder(midoc.stn, as.numeric(factor(DNC.visual, levels = dnc_order))), 
                       y = total_fish, 
                       fill = factor(DNC.visual, levels = dnc_order))) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("MC" = "pink", "D" = "#FFC000", "NC" = "#A52A2A", "N" = "darkblue")) +
+  scale_fill_manual(values = c("MC" = "pink", "D" = "#FFC000", "NC" = "#A52A2A", "N" = "darkblue"), guide = "none") +
   labs(x = NULL,
        y = expression(paste("Biomass (g m"^-3, ")")),
        fill = "Time of Day" ) +
@@ -546,15 +547,137 @@ bar_plot <- ggplot(plot_data, aes(x = reorder(midoc.stn, as.numeric(factor(DNC.v
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank ()) + 
-  coord_fixed(ratio = 150)
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 141)
 
 
 
-combined_plot <- bar / fish_heatmap +
+combined_plot_fish_day <- bar_plot_fish_day / fish_heatmap +
+  plot_layout(heights = c(1, 4)) 
+combined_plot_fish_day
+
+#cephalopods day
+plot_data <- km_bm_sum %>%
+  group_by(midoc.stn, DNC.visual) %>%
+  summarise(total_fish = sum(bm_sum_ceph, na.rm = TRUE)) %>%
+  ungroup()
+
+dnc_order <- c("MC", "D", "NC", "N")
+
+bar_plot_ceph_day <- ggplot(plot_data, aes(x = reorder(midoc.stn, as.numeric(factor(DNC.visual, levels = dnc_order))), 
+                                           y = total_fish, 
+                                           fill = factor(DNC.visual, levels = dnc_order))) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("MC" = "pink", "D" = "#FFC000", "NC" = "#A52A2A", "N" = "darkblue"), guide = "none") +
+  scale_y_continuous(
+    breaks = c(0.000, 0.001, 0.002)) +
+  labs(x = NULL,
+       y = expression(paste("Biomass (g m"^-3, ")")),
+       fill = "Time of Day" ) +
+  theme_minimal() +
+  theme(axis.text.y= element_text( hjust = 1, size = 12, color = "black" ),
+        plot.margin = margin(0,0,0,0),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank ()) + 
+  theme(legend.position = "none") +
+  coord_fixed(ratio =2422)
+
+
+bar_plot_ceph_day
+
+
+combined_plot_ceph_day <- bar_plot_ceph_day  / cephalopods_heatmap +
   plot_layout(heights = c(1, 4)) 
 
-combined_plot
+combined_plot_ceph_day 
 
+
+
+
+###FISH LUANR BAR PLOT
+bar_plot_lunar_fish <- ggplot(km_bm_sum_lunar, aes(x = midoc.stn, y = bm_sum_fish, fill = lunar_fraction)) +
+  geom_bar(stat = "identity", width = 0.9) +
+  scale_fill_gradient(low = "black", high = "lightgrey") +
+  labs( x = NULL,
+        y = expression(paste("Biomass (g ", m^-3, ")"))) +
+  theme_minimal() +
+  theme(axis.text.y= element_text( hjust = 1, size = 12, color = "black" ),
+        plot.margin = margin(0,0,0,0),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank ()) + 
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 141)
+
+combined_plot_fish_lunar <- bar_plot_lunar_fish / fish_heatmap_lunar +
+  plot_layout(heights = c(1, 4)) 
+combined_plot_fish_lunar
+
+fish_heatmap_lunar
+
+#CEPH LUNAR BAR PLOT 
+bar_plot_lunar_ceph <- ggplot(km_bm_sum_lunar, aes(x = midoc.stn, y = bm_sum_ceph, fill = lunar_fraction)) +
+  geom_bar(stat = "identity", width = 0.9) +
+  scale_fill_gradient(low = "black", high = "lightgrey") +
+  scale_y_continuous(
+    breaks = c(0.000, 0.001, 0.002)) +
+  labs( x = NULL,
+        y = expression(paste("Biomass (g ", m^-3, ")"))) +
+  theme_minimal() +
+  theme(axis.text.y= element_text( hjust = 1, size = 12, color = "black" ),
+        plot.margin = margin(0,0,0,0),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank ()) + 
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 2422)
+
+
+combined_plot_ceph_lunar <- bar_plot_lunar_ceph / ceph_heatmap_lunar +
+  plot_layout(heights = c(1, 4)) 
+combined_plot_ceph_lunar
+
+
+
+library(patchwork)
+#combined_heatmap <- (fish_heatmap | cephalopods_heatmap)
+combined_heatmap_bar <-   (combined_plot_fish_day | combined_plot_ceph_day)/ (combined_plot_fish_lunar | combined_plot_ceph_lunar)
+# Print the combined plot
+print(combined_heatmap_bar)
+
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_BAR_Fish_Ceph_solar_lunar.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = combined_heatmap_bar, width =20, height =12, dpi = 500, bg = "white")
+
+
+combined_heatmap_solar <-   (combined_plot_fish_day | combined_plot_ceph_day)
+
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_BAR_Fish_Ceph_solar.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = combined_heatmap_solar, width =25, height =8, dpi = 500, bg = "white")
+
+
+combined_heatmap_lunar <- (combined_plot_fish_lunar | combined_plot_ceph_lunar)
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A2_HM_BAR_Fish_Ceph_lunar.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = combined_heatmap_lunar, width =25, height =8, dpi = 500, bg = "white")
+
+
+ #COMBINING ALL PLOTS 
 ##TAXA SPECIFIC BIOMASS##
 
 #FISH#
