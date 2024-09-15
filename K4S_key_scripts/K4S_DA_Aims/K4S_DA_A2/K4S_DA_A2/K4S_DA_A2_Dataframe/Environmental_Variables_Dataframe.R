@@ -175,6 +175,23 @@ km_df <- km_df %>%
     start_time = as.POSIXct(start_time, tz = "UTC"),  # Convert start_time to POSIXct
     lunar_fraction = mapply(get_lunar_fraction, start_time, lat_start, lon_start)
   )
+#USING OCE
+
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
+
+get_lunar_fraction <- function(date, lat, lon) {
+  date_posix <- as.POSIXct(date, tz = "UTC")
+  moon_data <- oce::moonAngle(date_posix, longitude = lon, latitude = lat)
+  return(moon_data$illuminatedFraction)
+}
+
+km_bm_depth <- km_bm_depth  %>%
+  mutate(
+    lunar_fraction = mapply(get_lunar_fraction, start_time, lat_start, lon_start)
+  )
+
+s
+
 
 
 
