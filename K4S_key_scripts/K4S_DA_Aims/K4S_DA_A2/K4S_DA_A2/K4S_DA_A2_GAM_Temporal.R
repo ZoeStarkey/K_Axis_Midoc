@@ -197,11 +197,19 @@ gam.check(fish_depth.lunar.re$gam)
 
 #solar angle
 fish_depth.solar.re <- gamm(log(bm_depth_fish) ~ depth + s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
-draw(fish_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
-grid.text("Biomass (Logged) by depth + RE: Fish - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
+fish_depth_solar <- draw(fish_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
+#grid.text("Biomass (Logged) by depth + RE: Fish - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(fish_depth.solar.re$gam)
 summary(fish_depth.solar.re$lme) 
 gam.check(fish_depth.solar.re$gam)
+
+
+fish_depth_solar 
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A3/K4S_Plot_A3")
+output_filename <- "K4S_Plot_A3_fish_depth_solar..png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = fish_depth_solar , width =19, height =10, dpi = 500, bg = "white")
 
 
 #AIC 
