@@ -596,27 +596,36 @@ combined_plot_ceph_day
 
 
 ###FISH LUANR BAR PLOT
+km_bm_sum_lunar <- km_bm_sum_lunar %>%
+  arrange(desc(lunar_fraction))
+
+# Convert midoc.stn to a factor with levels in the desired order
+km_bm_sum_lunar$midoc.stn <- factor(km_bm_sum_lunar$midoc.stn, levels = km_bm_sum_lunar$midoc.stn)
+
+# Create the bar plot
 bar_plot_lunar_fish <- ggplot(km_bm_sum_lunar, aes(x = midoc.stn, y = bm_sum_fish, fill = lunar_fraction)) +
   geom_bar(stat = "identity", width = 0.9) +
   scale_fill_gradient(low = "black", high = "lightgrey") +
-  labs( x = NULL,
-        y = expression(paste("Biomass (g ", m^-3, ")"))) +
+  labs(x = NULL,
+       y = expression(paste("Biomass (g ", m^-3, ")"))) +
   theme_minimal() +
-  theme(axis.text.y= element_text( hjust = 1, size = 12, color = "black" ),
+  theme(axis.text.y = element_text(hjust = 1, size = 12, color = "black"),
         plot.margin = margin(0,0,0,0),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        panel.grid.minor.y = element_blank ()) + 
+        panel.grid.minor.y = element_blank()) + 
   theme(legend.position = "none") +
   coord_fixed(ratio = 141)
+
+
+bar_plot_lunar_fish
 
 combined_plot_fish_lunar <- bar_plot_lunar_fish / fish_heatmap_lunar +
   plot_layout(heights = c(1, 4)) 
 combined_plot_fish_lunar
 
-fish_heatmap_lunar
 
 #CEPH LUNAR BAR PLOT 
 bar_plot_lunar_ceph <- ggplot(km_bm_sum_lunar, aes(x = midoc.stn, y = bm_sum_ceph, fill = lunar_fraction)) +
@@ -637,6 +646,7 @@ bar_plot_lunar_ceph <- ggplot(km_bm_sum_lunar, aes(x = midoc.stn, y = bm_sum_cep
   theme(legend.position = "none") +
   coord_fixed(ratio = 2422)
 
+bar_plot_lunar_ceph
 
 combined_plot_ceph_lunar <- bar_plot_lunar_ceph / ceph_heatmap_lunar +
   plot_layout(heights = c(1, 4)) 
@@ -655,7 +665,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A2_HM_BAR_Fish_Ceph_solar_lunar.png"
 full_output_path <- file.path(output_directory, output_filename)
 
-ggsave(filename = full_output_path, plot = combined_heatmap_bar, width =20, height =12, dpi = 500, bg = "white")
+ggsave(filename = full_output_path, plot = combined_heatmap_bar, width =21, height =13, dpi = 500, bg = "white")
 
 
 combined_heatmap_solar <-   (combined_plot_fish_day | combined_plot_ceph_day)
@@ -665,7 +675,7 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A2_HM_BAR_Fish_Ceph_solar.png"
 full_output_path <- file.path(output_directory, output_filename)
 ggsave(filename = full_output_path, plot = combined_heatmap_solar, width =25, height =8, dpi = 500, bg = "white")
-
+  
 
 combined_heatmap_lunar <- (combined_plot_fish_lunar | combined_plot_ceph_lunar)
 
