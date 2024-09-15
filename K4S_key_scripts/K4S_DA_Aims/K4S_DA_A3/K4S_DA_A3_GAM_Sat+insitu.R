@@ -443,20 +443,23 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S
 km_bm_sum <- km_bm_sum %>% filter(SST > 0)
 
 allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
-draw(allbiom_additive_all_vars, residuals = TRUE) + ggtitle("Biomass (Log) All Taxa Additive model all vars") + 
+draw(allbiom_additive_all_vars, residuals = TRUE) +
+  #ggtitle("Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = -8, vjust = 9 ))
 summary(allbiom_additive_all_vars)
 gam.check(allbiom_additive_all_vars)
 
 fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
-draw(fish_additive_all_vars, residuals = TRUE) + ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
+draw(fish_additive_all_vars, residuals = TRUE) 
+#+ ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = 4, vjust = 9 ))
 summary(fish_additive_all_vars)
 gam.check(fish_additive_all_vars)
 
 ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
-draw(ceph_additive_all_vars, residuals = TRUE) + ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
-  theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
+draw(ceph_additive_all_vars, residuals = TRUE) 
+#+ ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
+ # theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(ceph_additive_all_vars)
 gam.check(ceph_additive_all_vars)
 
@@ -471,6 +474,26 @@ AIC(allbiom_additive_SST, allbiom_additive_TSM, allbiom_additive_all_vars, fish_
 
 
 
+
+
+
+###LM MODELS###########
+#ALL TAXA
+allbiom_lm <- lm(log(bm_sum_all_taxa) ~ bestley.zone, data = km_bm_sum)
+summary(allbiom_lm)
+
+#Fish
+fish_lm <- lm(log(bm_sum_fish) ~ bestley.zone, data = km_bm_sum)
+summary(fish_lm)
+
+#cephalopd
+ceph_lm <- lm(log(bm_sum_ceph) ~ bestley.zone, data = km_bm_sum)
+summary(ceph_lm)
+
+
+#krill
+ceph_lm <- lm(log(bm_sum_krill) ~ bestley.zone, data = km_bm_sum)
+summary(ceph_lm)
 ###################ADDITIVE MODELS IN SITU###########
 
 #ALL TAXA 
@@ -762,3 +785,15 @@ summary(surface_all_tax_SML$model)
 surface_all_tax_Smax <- gam_analysis(km_bm_surface, "bm_depth_all_ceph", "Smax")
 print(surface_all_tax_Smax$plot)
 summary(surface_all_tax_Smax$model)
+
+
+
+
+#produce an lm for bestley.zone and bm_sum_fish
+#lm for bestley.zone and bm_sum_fish
+lm_bm_fish <- lm(bm_sum_fish ~ bestley.zone, data = km_bm_sum)
+summary(lm_bm_fish)
+plot(lm_bm_fish)
+
+
+\
