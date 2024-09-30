@@ -165,7 +165,7 @@ sf::st_crs(f1$finished) <- 4326  #
 
 
 #TOTAL BIOMASS PLOT - only key taxon of interest
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps","mixed/other invertebrates")
 # 
 #Filter data for taxa not in the exclude list and aggregate biomass
 km_sf_total <- km_sf %>%
@@ -341,7 +341,7 @@ plot_chla_biomass <- function(include_taxa, decimal_places = 2, output_directory
   # Create the plot
   Chla_plot <- 
     ggplot() +
-    geom_raster(data = R_df, aes(x = x, y = y, fill = value)) +
+    geom_raster(data = R_df, aes(x = x, y = y, fill = value), alpha = 0.8) +
     scale_fill_gradientn(colors = ryb, breaks = log_zz, labels = sprintf("%.2f", zz),
                          limits = c(log(q1), log(q2)),
                          na.value = "grey85",
@@ -376,7 +376,7 @@ plot_chla_biomass <- function(include_taxa, decimal_places = 2, output_directory
     geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
     annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
     annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-    geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+    geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
     geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
     scale_fill_manual(
       values = c("white", "grey65", "grey30", "black"),
@@ -402,6 +402,8 @@ plot_chla_biomass <- function(include_taxa, decimal_places = 2, output_directory
       axis.text = element_text(size = 16),
       axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      panel.grid.major = element_line(color = "grey30", linetype = "solid"),  # Change graticule lines to grey
+      panel.grid.minor = element_line(color = "grey30", linetype = "solid"),
       plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
     ) +
     guides(
@@ -444,6 +446,7 @@ Chla_fish <- plot_chla_biomass(
   output_directory =  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA"), 
   output_filename = "K4S_Plot_A1_CHLA_Fish.png"
 )
+Chla_fish
 
 # Cephalopod plot
 Chla_cephalopods <- plot_chla_biomass(
@@ -460,6 +463,10 @@ Chla_krill <- plot_chla_biomass(
   output_directory =  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_CHLA"),
   output_filename = "K4S_Plot_A1_CHLA_Krill.png"
 )
+
+
+
+
 
 
 #EVERYTHING ELSE 
