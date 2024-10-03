@@ -15,6 +15,9 @@ setwd(d)
 dir.exists(d)
 
 
+#library for function for yday 
+library(lubridate)
+
 #making day fractional
 with(km_bm_sum, plot(day,lunar_fraction))
 
@@ -28,14 +31,18 @@ km_bm_depth$day_fraction <- km_bm_depth$day_of_year + hour(km_bm_depth$start_tim
 
 
 
+km_bm_sum_2$day_of_year <- yday(km_bm_sum_2$start_time)
+km_bm_sum_2$day_fraction <- km_bm_sum_2$day_of_year + hour(km_bm_sum$start_time) / 24
+
 ############. SUMMED BIOMASS. ##################
 # 1. SUMMED BIOMASS - Excluding Gelatinous 
 #Load in the dataframe 
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum_2.Rda")
 
 #Day
-allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day_fraction),data = km_bm_sum)
+allbiom_sum.day <- gam(log(bm_sum_all_taxa) ~ s(day_fraction),data = km_bm_sum_2)
 plot_object <- draw(allbiom_sum.day, residuals = TRUE)
 plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Day") 
 summary(allbiom_sum.day)
@@ -43,14 +50,14 @@ gam.check(allbiom_sum.day)
 par(mfrow=c(2,2))
 
 #Lunar fraction - illuminated disk 
-allbiom_sum.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum)
+allbiom_sum.lunar <- gam(log(bm_sum_all_taxa) ~ s(lunar_fraction),data = km_bm_sum_2)
 plot_object <- draw(allbiom_sum.lunar, residuals = TRUE) 
 plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Lunar Fraction")
 summary(allbiom_sum.lunar)
 gam.check(allbiom_sum.lunar)
 
 #Solar angle 
-allbiom_sum.solar <- gam(log(bm_sum_all_taxa) ~ s(altitude),data = km_bm_sum)
+allbiom_sum.solar <- gam(log(bm_sum_all_taxa) ~ s(altitude),data = km_bm_sum_2)
 plot_object <- draw(allbiom_sum.solar, residuals = TRUE) 
 plot_object + ggtitle("Sum Biomass (Logged) All Taxa (Exclude Gelatinous) - Solar Angle")
 summary(allbiom_sum.solar)
@@ -140,14 +147,14 @@ gam.check(krillbiom_sum.solar)
 ############. BIOMASS SEPARATED BY DEPTH. ##################
 #BIOMASS SEPARATED BY DEPTH - EXCLUDING GELATINOUS 
 #load in the dataframe 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth_2.Rda")
 
 #adding day_fraction to km_bm_depth
-km_bm_depth$day_of_year <- yday(km_bm_depth$start_time)
-km_bm_depth$day_fraction <- km_bm_depth$day_of_year + hour(km_bm_depth$start_time) / 24
+km_bm_depth_2$day_of_year <- yday(km_bm_depth_2$start_time)
+km_bm_depth_2$day_fraction <- km_bm_depth_2$day_of_year + hour(km_bm_depth_2$start_time) / 24
 
 #day
-allbiom_depth.day.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(day_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+allbiom_depth.day.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(day_fraction, by = depth),data = km_bm_depth_2, random = list(midoc.stn = ~ 1 ))
 draw(allbiom_depth.day.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
 grid.text("Biomass (Logged) by depth +RE: All Taxa (Exclude Gelat) - Day",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(allbiom_depth.day.re$gam)
@@ -157,7 +164,7 @@ gam.check(allbiom_depth.day.re$gam)
 
 
 #lunar fraction - illuminated disk
-allbiom_depth.lunar.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(lunar_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+allbiom_depth.lunar.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(lunar_fraction, by = depth),data = km_bm_depth_2, random = list(midoc.stn = ~ 1 ))
 draw(allbiom_depth.lunar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
 grid.text("Biomass (Logged) by depth + RE: All Taxa (Exclude Gelat) -Lunar",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(allbiom_depth.lunar.re$gam)
@@ -167,7 +174,7 @@ gam.check(allbiom_depth.lunar.re$gam)
 
 
 #solar angle 
-allbiom_depth.solar.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(altitude, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
+allbiom_depth.solar.re <- gamm(log(bm_depth_all_taxa) ~ depth + s(altitude, by = depth),data = km_bm_depth_2, random = list(midoc.stn = ~ 1 ))
 draw(allbiom_depth.solar.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
 grid.text("Biomass (Logged) by depth + RE: All Taxa (Exclude Gelat) - Solar Angle",  x = unit(0.19, "npc"), y = unit(0.05, "npc"), just = c("left", "bottom" ),  gp = gpar(fontsize = 14, fontface = "bold"))
 summary(allbiom_depth.solar.re$gam)
@@ -178,6 +185,10 @@ gam.check(allbiom_depth.solar.re$gam)
 
 #BIOMASS SEPARATED BY DEPTH - FISH
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
+
+km_bm_depth$day_of_year <- yday(km_bm_depth$start_time)
+km_bm_depth$day_fraction <- km_bm_depth$day_of_year + hour(km_bm_depth$start_time) / 24
+
 
 fish_depth.day.re <- gamm(log(bm_depth_fish) ~ depth + s(day_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
 draw(fish_depth.day.re, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
@@ -231,6 +242,7 @@ summary(fish_depth.solar.re.intercept$gam)
 
 
 #BIOMASS SEPARATED BY DEPTH - CEPHALOPODS
+library(gratia)
 
 #day 
 ceph_depth.day.re <- gamm(log(bm_depth_ceph) ~ depth + s(day_fraction, by = depth),data = km_bm_depth, random = list(midoc.stn = ~ 1 ))
