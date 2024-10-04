@@ -23,53 +23,53 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 # Customize each plot individually
 fish_SST <- modify_geom_point(p_list[[1]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   ) 
 fish_CUR <- modify_geom_point(p_list[[2]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text = element_text(color = "grey30"),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
     axis.title = element_text(color = "grey30")
   )
 fish_CHLA <- modify_geom_point(p_list[[3]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 fish_TSM <- modify_geom_point(p_list[[4]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL) +  # Remove the title
+  xlab("Time since melt (days)") +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
@@ -98,56 +98,56 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 # Customize each plot individually for cephalopod model
 ceph_SST <- modify_geom_point(p_list_ceph[[1]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 
 ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text = element_text(color = "grey30"),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.title = element_text(color = "grey30")
   )
 
 ceph_CHLA <- modify_geom_point(p_list_ceph[[3]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 
 ceph_TSM <- modify_geom_point(p_list_ceph[[4]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL) +  # Remove the title
+  xlab("Time since melt (days)") +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
@@ -175,61 +175,67 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 # Customize each plot individually for krill model
 krill_SST <- modify_geom_point(p_list_krill[[1]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)   +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 
 krill_CUR <- modify_geom_point(p_list_krill[[2]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text = element_text(color = "grey30"),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.title = element_text(color = "grey30")
   )
 
 krill_CHLA <- modify_geom_point(p_list_krill[[3]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+   labs(title = NULL, subtitle = NULL, caption = NULL) +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 
 krill_TSM <- modify_geom_point(p_list_krill[[4]], "grey40") + 
   theme_minimal() +
-  labs(title = NULL) +  # Remove the title
-  xlab(NULL) +
+  labs(title = NULL, subtitle = NULL, caption = NULL)+  # Remove the title
+  xlab("Time since melt (days)") +
   theme(
     panel.background = element_rect(fill = "grey90", color = NA),  # Dark grey for the plot area
     panel.grid.major = element_line(color = "white", size = 0.5),
-    panel.grid.minor = element_line(color = "white", size = 0.25),
     axis.text.x = element_text(size = 14, color = "black"),  # Increase x-axis text size
     axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
     axis.text = element_text(color = "grey30"),
     axis.title = element_text(color = "grey30")
   )
 
 # Combine the plots back into a grid layout
 satellite_vars_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_CHLA/ fish_TSM) | (ceph_SST / ceph_CUR / ceph_CHLA / ceph_TSM) | (krill_SST / krill_CUR / krill_CHLA / krill_TSM)
+
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A3/K4S_Plot_A3")
+output_filename <- "K4S_Plot_A3_sat_all.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = satellite_vars_fish_ceph_krill , width =11, height =12, dpi = 500, bg = "white")
 
 
