@@ -145,7 +145,8 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S
 
 
 ###########TOTAL BIOMASS PLOT EXCLUDING GELATINOUS ORGANISMS ################
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps","mixed/other invertebrates")
+
 # 
 #Filter data for taxa not in the exclude list and aggregate biomass
 km_sf_total <- km_sf %>%
@@ -181,7 +182,7 @@ TSM_total <-
   ggplot() +
   # Base layer for time since melt
   geom_sf(data = wcp_sf, fill = NA) +
-  geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.7, show.legend = TRUE) +
+  geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.8) +
     scale_fill_cmocean( name = "curl", na.value = NA,
       guide = guide_colorbar(
         title = "Days",
@@ -228,7 +229,7 @@ TSM_total <-
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+  geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
@@ -254,6 +255,8 @@ TSM_total <-
     axis.text = element_text(size = 16),
     axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    panel.grid.major = element_line(color = "grey60", linetype = "solid"),  # Change graticule lines to grey
+    panel.grid.minor = element_line(color = "grey60", linetype = "solid"),
     plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
   ) +
     guides(
@@ -329,7 +332,7 @@ plot_tsm_biomass <- function(include_taxa, decimal_places = 2, output_directory 
   TSM_plot <- 
     ggplot() +
     geom_sf(data = wcp_sf, fill = NA) +
-    geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.7, show.legend = TRUE) +
+    geom_stars(data = tsm_e_ll, aes(fill = scales::oob_squish((time_since_melt_20160216.nc), c(-1, 151))), alpha = 0.8) +
     scale_fill_cmocean(name = "curl", na.value = NA,
                        guide = guide_colorbar(
                          title = "Days",
@@ -365,7 +368,7 @@ plot_tsm_biomass <- function(include_taxa, decimal_places = 2, output_directory 
     geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
     annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
     annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-    geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+    geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
     geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
     scale_fill_manual(
       values = c("white", "grey65", "grey30", "black"),
@@ -379,7 +382,7 @@ plot_tsm_biomass <- function(include_taxa, decimal_places = 2, output_directory 
     coord_sf(crs = st_crs(prj), xlim = c(-500000, 1020000), ylim = c(-1000000, 600000)) +
     theme(
       legend.position = "right",
-      panel.grid = element_line(color = "gray80", linetype = "solid"),
+      panel.grid = element_line(color = "gray40", linetype = "solid"),
       panel.background = element_blank(),
       legend.background = element_blank(),
       legend.title = element_text(angle = 90, hjust = 0.5),
@@ -391,6 +394,8 @@ plot_tsm_biomass <- function(include_taxa, decimal_places = 2, output_directory 
       axis.text = element_text(size = 16),
       axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      panel.grid.major = element_line(color = "grey60", linetype = "solid"),  # Change graticule lines to grey
+      panel.grid.minor = element_line(color = "grey60", linetype = "solid"),
       plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
     ) +
     guides(
@@ -432,6 +437,7 @@ plot_tsm_biomass <- function(include_taxa, decimal_places = 2, output_directory 
 
 # Example usage:
 # Fish plot
+TSM_fish
 TSM_fish <- plot_tsm_biomass(
   include_taxa = c("fish"),
   decimal_places = 3,
@@ -454,6 +460,9 @@ TSM_krill <- plot_tsm_biomass(
   output_directory = paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_TSM"),
   output_filename = "K4S_Plot_A1_TSM_Krill.png"
 )
+
+
+
 
 
 
