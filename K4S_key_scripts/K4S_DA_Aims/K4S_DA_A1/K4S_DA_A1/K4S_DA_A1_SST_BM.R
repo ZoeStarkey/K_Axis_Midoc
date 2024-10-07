@@ -179,7 +179,7 @@ ryb <- colorRampPalette(rev(brewer.pal(11,"RdYlBu")))
 cols1 <- ryb(56); cols1 <- cols1[c(1:22, 24:56)] 
 
 #########CREATING THE TOTAL TAXA PLOT#############
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps","mixed/other invertebrates")
 # 
 #Filter data for taxa not in the exclude list and aggregate biomass
 km_sf_total <- km_sf %>%
@@ -212,11 +212,11 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 # Now create the plot
-#SST_total <- 
+SST_total <- 
   
   ggplot() +
   # Add the base raster layer for SST
-  geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
+  geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST), alpha = 0.8) +
   scale_fill_gradientn(colours = cols1,
                        limits = c(sstmin, sstmax),
                        na.value = "transparent",
@@ -260,7 +260,7 @@ km_sf_total <- km_sf_total %>%
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+  geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
@@ -286,6 +286,8 @@ km_sf_total <- km_sf_total %>%
     axis.text = element_text(size = 16),
     axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    panel.grid.major = element_line(color = "grey30", linetype = "solid"),  # Change graticule lines to grey
+    panel.grid.minor = element_line(color = "grey30", linetype = "solid"),
     plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
    
   ) +
@@ -356,7 +358,7 @@ plot_sst_biomass <- function(include_taxa, decimal_places = 2, output_directory 
   # Create the plot
   SST_plot <- 
     ggplot() +
-    geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST)) +
+    geom_raster(data = tmp_df, aes(x = Longitude, y = Latitude, fill = SST), alpha = 0.8)+
     scale_fill_gradientn(colours = cols1, 
                          limits = c(sstmin, sstmax), 
                          na.value = "transparent",
@@ -391,7 +393,7 @@ plot_sst_biomass <- function(include_taxa, decimal_places = 2, output_directory 
     geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
     annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
     annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-    geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+    geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
     geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
     scale_fill_manual(
       values = c("white", "grey65", "grey30", "black"),
@@ -416,6 +418,8 @@ plot_sst_biomass <- function(include_taxa, decimal_places = 2, output_directory 
       axis.text = element_text(size = 16),
       axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      panel.grid.major = element_line(color = "grey60", linetype = "solid"),  # Change graticule lines to grey
+      panel.grid.minor = element_line(color = "grey60", linetype = "solid"),
       plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
     ) +
     guides(
@@ -452,12 +456,13 @@ plot_sst_biomass <- function(include_taxa, decimal_places = 2, output_directory 
 
 # Example usage:
 # Fish plot
+
 SST_fish <- plot_sst_biomass(
   include_taxa = c("fish"),
   decimal_places = 3,
-  output_directory = paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_SST"),
-  output_filename = "K4S_Plot_A1_SST_Fish.png"
-)
+ output_directory = paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_SST"),
+ output_filename = "K4S_Plot_A1_SST_Fish.png")
+SST_fish
 
 # Cephalopod plot
 SST_cephalopods <- plot_sst_biomass(
