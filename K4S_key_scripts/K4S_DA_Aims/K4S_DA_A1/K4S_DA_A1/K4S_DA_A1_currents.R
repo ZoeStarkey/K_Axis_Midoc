@@ -150,7 +150,7 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S
 
 
 # Exclude gelatinous organisms and aggregate biomass
-exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps")
+exclude_taxa <- c("cnidarians", "salps", "mixed/other gelatinous", "mixed krill and salps","mixed/other invertebrates")
 # 
 #Filter data for taxa not in the exclude list and aggregate biomass
 km_sf_total <- km_sf %>%
@@ -185,7 +185,7 @@ km_sf_total <- km_sf_total %>%
 CS_total <- 
   ggplot() +
   # Add the base raster layer for current speed
-  geom_raster(data = mn_mag_df, aes(x = x, y = y, fill = value), interpolate = TRUE) +
+  geom_raster(data = mn_mag_df, aes(x = x, y = y, fill = value), alpha =0.8, interpolate = TRUE) +
   scale_fill_gradientn(colors = cols2(100), 
                        limits = c(0, 26), 
                        name = expression(paste("Current speed (cm ", s^-1, ")")),
@@ -225,7 +225,7 @@ CS_total <-
   geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
   annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
   annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-  geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+  geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
   geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black") +
   scale_fill_manual(
     values = c("white", "grey65", "grey30", "black"),
@@ -251,6 +251,8 @@ CS_total <-
     axis.text = element_text(size = 16),
     axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    panel.grid.major = element_line(color = "grey30", linetype = "solid"),  # Change graticule lines to grey
+    panel.grid.minor = element_line(color = "grey30", linetype = "solid"),
     plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
   ) +
   guides(
@@ -320,7 +322,7 @@ plot_CS_biomass <- function(include_taxa = c("fish"), decimal_places = 3, output
   # Create the plot
   CS_plot <- 
     ggplot() +
-    geom_raster(data = mn_mag_df, aes(x = x, y = y, fill = value), interpolate = TRUE) +
+    geom_raster(data = mn_mag_df, aes(x = x, y = y, fill = value), alpha =0.8, interpolate = TRUE) +
     scale_fill_gradientn(colors = cols2(100), 
                          limits = c(0, 26), 
                          name = expression(paste("Current speed (cm ", s^-1, ")")),
@@ -354,7 +356,7 @@ plot_CS_biomass <- function(include_taxa = c("fish"), decimal_places = 3, output
     geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
     annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
     annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
-    geom_sf(data = ktr_sf, size = 1, colour = "grey30") +
+    geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
     geom_sf(data = km_sf_total, aes(fill = fish_biomass_bin, size = fish_biomass_bin), shape = 21, color = "black") +
     scale_fill_manual(
       values = c("white", "grey65", "grey30", "black"),
@@ -380,6 +382,8 @@ plot_CS_biomass <- function(include_taxa = c("fish"), decimal_places = 3, output
       axis.text = element_text(size = 16),
       axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      panel.grid.major = element_line(color = "grey60", linetype = "solid"),  # Change graticule lines to grey
+      panel.grid.minor = element_line(color = "grey60", linetype = "solid"),
       plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
     ) +
     guides(
@@ -415,6 +419,7 @@ plot_CS_biomass <- function(include_taxa = c("fish"), decimal_places = 3, output
 }
 
 #Fish
+CS_fish
 CS_fish <- plot_CS_biomass(
   include_taxa = c("fish"),
   decimal_places = 3,
