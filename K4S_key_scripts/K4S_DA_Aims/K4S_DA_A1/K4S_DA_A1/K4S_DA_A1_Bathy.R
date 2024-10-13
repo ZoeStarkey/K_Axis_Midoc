@@ -158,7 +158,7 @@ cbct_sf <- st_as_sf(cbct)
 
 
 library(sf)
-bathy <- 
+#bathy <- 
 ggplot() +
   geom_raster(data = bathy_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = rev(RColorBrewer::brewer.pal(9, "Blues")), 
@@ -258,3 +258,114 @@ output_filename <- "K4S_Plot_A1_bathy.png"
 full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = bathy, width = 9, height = 8, bg = "white")
+
+
+
+
+###########
+
+
+bathy_grey <- 
+ggplot() +
+  geom_raster(data = bathy_df, aes(x = x, y = y, fill = value)) +
+  scale_fill_gradientn(
+                       colors = colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Greys")[1:7]))(100),
+                       breaks = c(-6000,-5000,-4000,-3000,-2000,-1000,0),
+                       limits = c(-6000, 0),
+                       na.value = "grey85",
+                       name = "Depth (m)",
+                       guide = guide_colorbar(title.position = "top",
+                                              title.hjust = 0.1 ,
+                                              title.vjust = 3,
+                                             # label.position = "right",
+                                              barwidth = 1,
+                                              barheight = 25,
+                                              order = 1,
+                                              frame.linewidth = 0.2,
+                                              ticks.colour = "black",
+                                              title.theme = element_text(size = 20, angle = 0),
+                                              label.theme = element_text(size = 18)))   +
+  geom_sf(data = cbct_sf, aes(), color = "grey60", size = 0.5, alpha = 0.7) +
+  # Add f3$finished and f1$finished 
+  #geom_sf(data = f3$finished, color = "purple", linewidth = 1) +
+ # geom_sf(data = f1$finished, color = "purple", linewidth = 1) +
+  
+  # Add ice layer
+  # ggnewscale::new_scale_fill() + 
+  # geom_tile(data = ice_df, aes(x = x, y = y, fill = k.axis_data_ICE_LONGLAT_20160218), alpha = 1) +
+  # scale_fill_gradientn(colors = palr::bathy_deep_pal(56), na.value = "transparent", limits = c(0, 100),
+  #                      name = 'Ice (%)',
+  #                      guide = guide_colorbar(title.position = "left", 
+  #                                             title.hjust = 0.5,
+  #                                             label.position = "right",
+  #                                             barwidth = 1,
+  #                                             barheight = 15,
+  #                                             order = 3,
+  #                                             frame.linewidth = 0.2,
+  #                                             title.theme = element_text(size = 14, angle = 90),
+  #                                             label.theme = element_text(size = 14))) +
+  # 
+  
+  #adding midoc stations
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wcp_sf, fill = NA, color = "black") +
+ # geom_sf(data = ofp_sf, color = "darkblue", linetype = "dashed", linewidth = 1.0) +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+  geom_sf(data = ktr_sf, size = 0.3, colour = "black") +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA)  +
+  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black", show.legend = FALSE) +
+  # geom_sf_text(data = km_sf_total, aes(label = midoc.n), 
+  #              size = 2.5, color = "white", fontface = "bold") +
+  # geom_text(data = km_sf_total, aes(x = lon_end, y = lat_end, label = midoc.n), size = 3, hjust = 0.5, vjust = 1) +
+  scale_fill_manual(
+    values = c("black", "black", "black", "black"),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  scale_size_manual(
+    values = c(4,4,4,4),
+    name = expression(paste("Biomass (g m"^-3, ")"))
+  ) +
+  
+  # guides(
+  #   fill = guide_legend(
+  #     title.position = "left", 
+  #     title.hjust = 0.5,
+  #    override.aes = list(size = c(8, 8, 8, 8)),
+  #     order = 1,
+  #     title.theme = element_text(size = 14, angle = 90),
+  #     keywidth = unit(1, "cm"),
+  #     keyheight = unit(1, "cm"),
+  #     default.unit = "cm",
+  #     background = element_rect(fill = "white", colour = "white")
+  #   ),
+  #   size = "none"  ) +
+  
+  # Add labels and set coordinate system
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 1200000)) +
+  theme(
+    legend.position = "right",
+    panel.grid = element_line(color = "gray80", linetype = "solid"),
+    panel.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.text = element_text(size = 25),
+    legend.box.background = element_blank(),
+    legend.byrow = TRUE,
+    strip.background = element_rect(fill = "white"),
+    axis.title = element_text(size = 20),  # Increased axis title size
+    axis.text = element_text(size = 20),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+  ) 
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
+output_filename <- "K4S_Plot_A1_bathy_grey_scale.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = bathy_grey, width = 8, height = 11, bg = NA)
+
