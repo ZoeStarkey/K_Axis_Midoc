@@ -441,29 +441,32 @@ km_bm_sum_residual$bm_sum_all_taxa_log <- log(km_bm_sum_residual_fix$bm_sum_all_
 ################ADDITIVE MODELS SATELLITE ALL VARIABLES##########################
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
 km_bm_sum <- km_bm_sum %>% filter(SST > 0)
+km_bm_sum <-  km_bm_sum %>% filter(days_since_melt <500)
 
-allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
+
+allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum)
 draw(allbiom_additive_all_vars, residuals = TRUE) +
   #ggtitle("Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = -8, vjust = 9 ))
 summary(allbiom_additive_all_vars)
 gam.check(allbiom_additive_all_vars)
 
-fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
+
+fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum)
 draw(fish_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = 4, vjust = 9 ))
 summary(fish_additive_all_vars)
 gam.check(fish_additive_all_vars)
 
-ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
+ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum)
 draw(ceph_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
  # theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(ceph_additive_all_vars)
 gam.check(ceph_additive_all_vars)
 
-krill_additive_all_vars <-gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum)
+krill_additive_all_vars <-gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum)
 draw(krill_additive_all_vars, residuals = TRUE) + ggtitle("Krill Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(krill_additive_all_vars)
@@ -472,10 +475,14 @@ gam.check(krill_additive_all_vars)
 
 AIC(allbiom_additive_SST, allbiom_additive_TSM, allbiom_additive_all_vars, fish_additive_SST, fish_additive_TSM, fish_additive_all_vars, ceph_additive_SST, ceph_additive_TSM, ceph_additive_all_vars, krill_additive_SST, krill_additive_TSM, krill_additive_all_vars)
 
+AIC(fish_additive_all_vars )
+AIC(ceph_additive_all_vars)
+AIC(krill_additive_all_vars)
 
+install.packages("maptools")
+library(maptools)
 
-
-
+citation("oce")
 
 ###LM MODELS###########
 #ALL TAXA
