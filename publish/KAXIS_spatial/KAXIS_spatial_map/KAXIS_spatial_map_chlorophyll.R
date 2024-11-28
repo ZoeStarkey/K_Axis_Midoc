@@ -62,9 +62,11 @@ ofp_sf <- st_as_sf(ofp)
 
 #load biomass data
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_data/KAXIS_data_processed/km_bm_sum_2.rda")
+km_bm_sum_2 <- st_as_sf(km_bm_sum_2, 
+                        coords = c("lon_start", "lat_start"), 
+                        crs = 4326) %>%  
+  st_transform(crs = prj)
 
-# Create a color palette
-ryb <- colorRampPalette(c("#31004a", "#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"))(51)
 #=============================================================================
 # 2. Spatial Data Processing
 #=============================================================================
@@ -92,6 +94,9 @@ ktr_sf <- st_as_sf(ktr)
 #=============================================================================
 # 3. Generating plot function 
 #=============================================================================
+# Create a color palette
+ryb <- colorRampPalette(c("#31004a", "#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"))(51)
+
 spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
   # Calculate bin breaks based on the actual data range
   n_bins <- 5
