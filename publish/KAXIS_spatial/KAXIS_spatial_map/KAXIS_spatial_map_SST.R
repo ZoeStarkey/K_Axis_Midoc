@@ -109,7 +109,7 @@ ktr_sf <- st_as_sf(ktr)
 # 3. Generating plot function 
 #=============================================================================
 
-spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
+spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
   # Calculate bin breaks based on the actual data range
   n_bins <- 5
   bin_range <- range(data[[biomass_column]], na.rm = TRUE)
