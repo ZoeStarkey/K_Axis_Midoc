@@ -92,6 +92,10 @@ ktr <- readRDS("KAXIS_spatial/KAXIS_raster/nav_reduced.rds")
 ktr <- ll2prj(ktr, loncol="LONGITUDE", latcol="LATITUDE")
 ktr_sf <- st_as_sf(ktr)
 
+#=============================================================================
+# 3. Generating plot function 
+#=============================================================================
+
 # Create a color palette for current speed
 cols2 <- colorRampPalette(c("lightyellow","#EEDC94" ,"orange", "red", "darkred"))
 
