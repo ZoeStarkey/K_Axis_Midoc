@@ -105,7 +105,9 @@ ktr <- readRDS("KAXIS_spatial/KAXIS_raster/nav_reduced.rds")
 ktr <- ll2prj(ktr, loncol="LONGITUDE", latcol="LATITUDE")
 ktr_sf <- st_as_sf(ktr)
 
-
+#=============================================================================
+# 3. Generating plot function 
+#=============================================================================
 
 spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
   # Calculate bin breaks based on the actual data range
@@ -265,10 +267,10 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
 #=============================================================================
 # Example usage for different taxa:
 # All taxa (excluding salps + cnidarians)
-current_spatial_plot_all_taxa <- spatial_map_currents(km_bm_sum_2, "bm_sum_all_taxa", decimal_places = 2) 
+current_spatial_plot_all_taxa <- spatial_map_SST(km_bm_sum_2, "bm_sum_all_taxa", decimal_places = 2) 
 # Fish
-current_spatial_plot_fish <- spatial_map_currents(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
+current_spatial_plot_fish <- spatial_map_SST(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
 # Cephalopods
-current_spatial_plot_ceph <- spatial_map_currents(km_bm_sum_2, "bm_sum_ceph", decimal_places = 4)
+current_spatial_plot_ceph <- spatial_map_SST(km_bm_sum_2, "bm_sum_ceph", decimal_places = 4)
 # Krill
-current_spatial_plot_krill <- spatial_map_currents(km_bm_sum_2, "bm_sum_krill", decimal_places = 3)
+current_spatial_plot_krill <- spatial_map_SST(km_bm_sum_2, "bm_sum_krill", decimal_places = 3)
