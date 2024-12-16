@@ -293,4 +293,3 @@ create_lunar_bar_plot <- function(data, biomass_column) {
 fish_lunar_bar <- create_lunar_bar_plot(km_bm_depth_2, "bm_depth_fish")
 cephalopods_lunar_bar <- create_lunar_bar_plot(km_bm_depth_2, "bm_depth_ceph")
 
-
