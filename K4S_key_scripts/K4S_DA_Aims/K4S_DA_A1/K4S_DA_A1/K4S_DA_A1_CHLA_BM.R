@@ -95,7 +95,9 @@ ktr_sf <- st_as_sf(ktr)
 
 #Setting up km 
 km <- readRDS("../derived data/midoc_stations_checked.rds")
+
 km$midoc.n <- as.numeric(substr(km$midoc.stn, 6,7))
+
 tmp <- read_csv("../source data/midoc_stations_zones.csv")
 km <- inner_join(km, tmp); rm(tmp)
 tmp <- read_csv(("../source data/midoc_crepuscular.csv"))
@@ -197,7 +199,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 
-Chla_total <-
+#Chla_total <-
 ggplot() +
   # Add the base raster layer
   geom_raster(data = R_df, aes(x = x, y = y, fill = value), alpha = 0.8) +

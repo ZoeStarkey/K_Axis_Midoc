@@ -212,7 +212,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 # Now create the plot
-SST_total <- 
+#SST_total <- 
   
   ggplot() +
   # Add the base raster layer for SST

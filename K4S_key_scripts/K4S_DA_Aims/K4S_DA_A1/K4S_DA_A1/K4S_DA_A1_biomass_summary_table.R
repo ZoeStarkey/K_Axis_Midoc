@@ -65,3 +65,6 @@ biomass_table <- km_df %>%
 
 # Display the table
 print(biomass_table)
+
+#download the biomass table as a csv
+write.csv(biomass_table, "~/Desktop/biomass_table.csv", row.names = FALSE)

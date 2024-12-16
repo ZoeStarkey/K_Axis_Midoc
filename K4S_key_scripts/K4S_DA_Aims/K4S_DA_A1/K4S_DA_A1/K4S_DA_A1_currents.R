@@ -182,7 +182,7 @@ km_sf_total <- km_sf_total %>%
                            include.lowest = TRUE))
 
 # Now create the plot
-CS_total <- 
+#CS_total <- 
   ggplot() +
   # Add the base raster layer for current speed
   geom_raster(data = mn_mag_df, aes(x = x, y = y, fill = value), alpha =0.8, interpolate = TRUE) +
