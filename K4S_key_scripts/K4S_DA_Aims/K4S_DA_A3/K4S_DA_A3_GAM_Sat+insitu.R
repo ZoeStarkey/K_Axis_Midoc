@@ -439,12 +439,12 @@ km_bm_sum_residual$bm_sum_all_taxa_log <- log(km_bm_sum_residual_fix$bm_sum_all_
 
 
 ################ADDITIVE MODELS SATELLITE ALL VARIABLES##########################
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
-km_bm_sum <- km_bm_sum %>% filter(SST > 0)
-km_bm_sum <-  km_bm_sum %>% filter(days_since_melt <500)
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum_2.Rda")
+km_bm_sum_2 <- km_bm_sum_2 %>% filter(SST > 0)
+km_bm_sum_2 <-  km_bm_sum %>% filter(days_since_melt <500)
 
 
-allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum)
+allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
 draw(allbiom_additive_all_vars, residuals = TRUE) +
   #ggtitle("Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = -8, vjust = 9 ))
