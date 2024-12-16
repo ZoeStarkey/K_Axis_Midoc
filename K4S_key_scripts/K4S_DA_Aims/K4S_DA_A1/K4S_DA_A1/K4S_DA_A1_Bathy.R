@@ -369,3 +369,87 @@ full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = bathy_grey, width = 8, height = 11, bg = NA)
 
+
+
+#BATHY Lunar fraction
+km_sf_total_df <- km_sf_total %>% st_drop_geometry()
+
+# Now, join km_sf_total_df with km_bm_sum
+km_sf_total_df_joined <- km_sf_total_df %>%
+  left_join(km_bm_sum %>% select(midoc.stn, lunar_fraction), by = "midoc.stn")
+
+# Convert back to an sf object
+km_sf_total_updated <- st_sf(km_sf_total_df_joined, geometry = st_geometry(km_sf_total))
+
+bathy_lunar <-
+ggplot() +
+  geom_raster(data = bathy_df, aes(x = x, y = y, fill = value)) +
+  scale_fill_gradientn(
+    colors = colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Blues")[1:7]))(100),
+    breaks = c(-6000,-5000,-4000,-3000,-2000,-1000,0),
+    limits = c(-6000, 0),
+    na.value = "grey85",
+    name = "Depth (m)",
+    guide = guide_colorbar(title.position = "top",
+                           title.hjust = 0.1,
+                           title.vjust = 3,
+                           barwidth = 1,
+                           barheight = 20,
+                           order = 1,
+                           frame.linewidth = 0.2,
+                           ticks.colour = "black",
+                           title.theme = element_text(size = 20, angle = 0),
+                           label.theme = element_text(size = 18))) +
+  geom_sf(data = cbct_sf, aes(), color = "grey60", size = 0.5, alpha = 0.7) +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wcp_sf, fill = NA, color = "black") +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  annotate("segment", x = xx, xend = xx, y = min(yy), yend = max(yy), color = "gray40", linetype = "dashed") +
+  annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx), color = "gray40", linetype = "dashed") +
+  geom_sf(data = ktr_sf, size = 0.3, colour = "black") +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = wp_sf, fill = "dark grey", color = NA) +
+  geom_sf(data = km_sf_total_updated, aes(fill = lunar_fraction, size = biomass_bin), shape = 21, color = "black") +
+  scale_fill_gradientn(
+    colors = c("black", "white"),
+    limits = c(0, 1),
+    na.value = "grey50",
+    name = "Lunar Phase",
+    guide = "none"
+    # guide = guide_colorbar(title.position = "left",
+    #                        title.hjust = 0.5,
+    #                        barwidth = 1,
+    #                        barheight = 15,
+    #                        frame.linewidth = 0.2,
+    #                        title.theme = element_text(size = 14, angle = 90),
+    #                        label.theme = element_text(size = 14))
+  ) +
+  scale_size_manual(
+    values = c(6,6,6,6),
+    guide = "none"  # This removes the legend for biomass
+  ) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(crs = st_crs(prj), xlim = c(-600000, 1200000), ylim = c(-1000000, 700000)) +
+  theme(
+    legend.position = "right",
+    panel.grid = element_line(color = "gray80", linetype = "solid"),
+    panel.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(angle = 90, hjust = 0.5),
+    legend.text = element_text(size = 25),
+    legend.box.background = element_blank(),
+    legend.byrow = TRUE,
+    strip.background = element_rect(fill = "white"),
+    axis.title = element_text(size = 20),
+    axis.text = element_text(size = 20),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+  )
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
+output_filename <- "K4S_Plot_A1_bathy_lunar.png"
+full_output_path <- file.path(output_directory, output_filename)
+
+ggsave(filename = full_output_path, plot = bathy_lunar, width = 8, height = 11, bg = NA)
+
