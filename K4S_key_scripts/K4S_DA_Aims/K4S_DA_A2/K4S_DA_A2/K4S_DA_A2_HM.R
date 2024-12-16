@@ -752,10 +752,11 @@ create_heatmap_solar <- function(data, tax_group, title, panel_bg_color = "white
   na_data <- heatmap_data %>% filter(is.na(bm_g_m3))
   
   # Create the heatmap using ggplot2
+  # Create the heatmap using ggplot2
   ggplot(heatmap_data, aes(x = midoc.stn, y = depth, fill = bm_g_m3)) +
     geom_tile(color = "white") +
     scale_fill_viridis_c(option = "rocket", direction = -1, na.value = "grey80", 
-                         guide = guide_colorbar(barheight = 15, barwidth = 2, title.position = "left")) +
+                         guide = guide_colorbar(barheight = 2, barwidth = 20, title.position = "top",  ticks.linewidth = 1.5)) +
     geom_text(data = na_data, aes(label = "\u0336\ "), size = 3, color = "black", na.rm = TRUE) +
     labs(title = NULL, x = "Station (with Solar Angle)", y = "Depth (m)", fill = "Biomass (g/m³)") +
     theme_minimal() +
@@ -767,9 +768,11 @@ create_heatmap_solar <- function(data, tax_group, title, panel_bg_color = "white
       axis.text.y = element_text(size = 15, color = "black"),
       panel.background = element_rect(fill = panel_bg_color, color = NA),
       panel.grid = element_blank(),
-      legend.position = "right",
-      legend.title = element_text(size = 18,angle = 90, hjust = 0.5),
+      legend.position = "bottom",
+      legend.box = "horizontal",
+      legend.title = element_text(size = 18, angle = 0, hjust = 0.5),
       legend.text = element_text(size = 14),
+      legend.margin = margin(t = 20, r = 0, b = 0, l = 0),
     ) + 
     scale_x_discrete(labels = midoc_labels) +
     scale_y_discrete(limits = rev(levels(heatmap_data$depth))) +
