@@ -1,4 +1,20 @@
 
+
+
+
+
+library(dplyr)
+library(mgcv)
+library(gamm4)
+library(gratia)
+library(patchwork)
+library(ggplot2)
+library(grid)
+
+load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum.Rda")
+km_bm_sum <- km_bm_sum %>% filter(SST > 0)
+
+
 #TEST 3
 # Fit the GAM model
 fish_additive_all_vars <- gam(log(bm_sum_fish) ~ s(SST) + s(CUR) + s(CHLA) + s(TSM), data = km_bm_sum)
@@ -237,5 +253,14 @@ output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axi
 output_filename <- "K4S_Plot_A3_sat_all.png"
 full_output_path <- file.path(output_directory, output_filename)
 ggsave(filename = full_output_path, plot = satellite_vars_fish_ceph_krill , width =11, height =12, dpi = 500, bg = "white")
+
+
+#combining stat signifcant for powerpoint 
+statistically_sig_fish_krill <- (fish_SST|krill_CUR|krill_CHLA)
+statistically_sig_fish_krill
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A3/K4S_Plot_A3")
+output_filename <- "K4S_Plot_A3_sat_all_powerpoint.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = statistically_sig_fish_krill , width =10, height =2.5, dpi = 500, bg = "white")
 
 
