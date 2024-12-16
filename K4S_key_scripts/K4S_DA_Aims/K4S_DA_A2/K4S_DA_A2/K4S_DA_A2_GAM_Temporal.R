@@ -205,7 +205,7 @@ summary(fish_depth.lunar.re$gam)
 summary(fish_depth.lunar.re$lme)
 gam.check(fish_depth.lunar.re$gam)
 
-
+fish_depth_lunar
 
 
 #solar angle
@@ -314,6 +314,10 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S
 km_bm_surface <- km_bm_depth %>%
   filter(depth == "0-200")
 
+#sum of krill in km_bm_surface
+sum(km_bm_surface$bm_depth_krill, na.rm = TRUE)
+sum(km_bm_depth$bm_depth_krill, na.rm = TRUE)
+
 #day
 krill_surface.day.gam <- gam(log(bm_depth_krill) ~ s(day_fraction),data = km_bm_surface)
 draw(krill_surface.day.gam, residuals = TRUE) + theme(plot.margin = margin(t = 30, r = 20, b = 40, l = 20, unit = "pt"))
@@ -338,5 +342,26 @@ gam.check(krill_surface.solar.gam)
 
 
 
+#sum of krill biomass in the 200-400m range 
+sum(km_bm_depth$bm_depth_krill, na.rm = TRUE) #1 0.02889723
 
+km_bm_surface <- km_bm_depth %>%
+  filter(depth == "0-200")
+sum(km_bm_surface$bm_depth_krill, na.rm = TRUE) 
 
+km_bm_mid <- km_bm_depth %>%
+  filter(depth == "200-400")
+sum(km_bm_mid$bm_depth_krill, na.rm = TRUE) 
+
+km_bm_600 <- km_bm_depth %>%
+  filter(depth == "400-600")
+sum(km_bm_600$bm_depth_krill, na.rm = TRUE)
+
+#sum of krill from 0-600m
+sum(km_bm_surface$bm_depth_krill, na.rm = TRUE) + sum(km_bm_mid$bm_depth_krill, na.rm = TRUE) + sum(km_bm_600$bm_depth_krill, na.rm = TRUE) 
+
+#sum of all krill
+sum(km_bm_depth$bm_depth_krill, na.rm = TRUE)
+
+#sum of krill 0-400
+sum(km_bm_surface$bm_depth_krill, na.rm = TRUE) + sum(km_bm_mid$bm_depth_krill, na.rm = TRUE)
