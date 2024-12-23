@@ -52,7 +52,7 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster
 sst <- sstGHR
 rm(sstGHR)
 
-dts <- as.POSIXlt(seq(as.Date("2016-01-18"), as.Date("2016-02-18"), by = "1 day"), tz = "UTC")
+dts <- as.POSIXlt(seq(as.Date("2016-01-18"), as.Date("2016-02-18"), by = "1 day"), tz = "GMT")
 bx <- c(60, 95, -70, -51)
 cx <- 0.8;
 
@@ -164,7 +164,7 @@ km_df$CUR <- raster::extract(mn_mag_proj, km_sp)
 
 # Lunar Fraction
 get_lunar_fraction <- function(date, lat, lon) {
-  moon_data <- moonAngle(as.POSIXct(date, tz = "UTC"), longitude = lon, latitude = lat)
+  moon_data <- moonAngle(as.POSIXct(date, tz = "GMT"), longitude = lon, latitude = lat)
   lunar_fraction <- moon_data$illuminatedFraction
   return(lunar_fraction)
 }
@@ -172,7 +172,7 @@ get_lunar_fraction <- function(date, lat, lon) {
 # Apply the function to each row in the dataframe
 km_df <- km_df %>%
   mutate(
-    start_time = as.POSIXct(start_time, tz = "UTC"),  # Convert start_time to POSIXct
+    start_time = as.POSIXct(start_time, tz = "GMT"),  # Convert start_time to POSIXct
     lunar_fraction = mapply(get_lunar_fraction, start_time, lat_start, lon_start)
   )
 #USING OCE
@@ -180,7 +180,7 @@ km_df <- km_df %>%
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_depth.Rda")
 
 get_lunar_fraction <- function(date, lat, lon) {
-  date_posix <- as.POSIXct(date, tz = "UTC")
+  date_posix <- as.POSIXct(date, tz = "GMT")
   moon_data <- oce::moonAngle(date_posix, longitude = lon, latitude = lat)
   return(moon_data$illuminatedFraction)
 }
@@ -199,7 +199,7 @@ s
 #Solar Angle
 # Ensure start_time is converted to POSIXct
 km_df <- km_df %>%
-  mutate(start_time = as.POSIXct(start_time, tz="UTC"))
+  mutate(start_time = as.POSIXct(start_time, tz="GMT"))
 
 # Add solar position columns
 km_df <- km_df %>%
