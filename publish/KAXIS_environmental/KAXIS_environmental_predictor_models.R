@@ -31,7 +31,7 @@ draw(allbiom_additive_all_vars, residuals = TRUE) +
 summary(allbiom_additive_all_vars)
 gam.check(allbiom_additive_all_vars)
 
-#Fish biomass (excluding gelatinous)
+#Fish biomass
 fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
 draw(fish_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
@@ -39,7 +39,7 @@ theme(plot.title = element_text(hjust = 4, vjust = 9 ))
 summary(fish_additive_all_vars)
 gam.check(fish_additive_all_vars)
 
-#cephalopod biomass (excluding gelatinous)
+#cephalopod biomass 
 ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
 draw(ceph_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
