@@ -72,7 +72,9 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 
 #3.1 Preparing fish plots for presentation 
 
- modify_geom_point(p_list_fish[[1]], "black") + 
+ 
+#fish_SST <-
+modify_geom_point(p_list_fish[[1]], "black") + 
   theme_minimal() +
   labs(title = "Fish", subtitle = NULL, caption = NULL)  +
   xlab("Sea surface temperature (°C)")+
@@ -84,20 +86,13 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
     axis.text = element_text(size = 14, color = "black"), 
     axis.title = element_text(size = 15, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5)
-  ) +
- annotate(
-     'text',
-     x = Inf,
-     y = Inf,
-     label = '*',
-     colour = "red",
-     size = 30,
-     hjust = 2,
-     vjust = 1.5
-   )
- 
+  ) 
+# annotate("rect", xmin=c(2.0), xmax=c(2.2), ymin=c(1.1) , ymax=c(1.54), alpha=0.8, color="black",linewidth=1.5, fill="white") + 
+# annotate('text', x = 2.11, y = 1.18 ,label = '*', colour = "red", size = 17)
 
-
+  
+  
+  
 fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  
@@ -237,7 +232,8 @@ krill_chl_rs <- modify_geom_point(p_list_krill[[3]], "black") +
     axis.title.x = element_text(size = 15, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
-  )
+  ) +
+  annotate("text",  x=Inf, y = Inf, label = "*", vjust=1.5, hjust=1.3, colour = "red", size = 17)
 
 krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
   theme_minimal() +
@@ -256,11 +252,11 @@ krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
 (krill_SST/ krill_CUR/ krill_chl_rs/ krill_days_since_melt)
 
 #3.4 Combine all the plots
-environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
-
+environmental_predictor_fish_ceph_krill2 <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
+environmental_predictor_fish_ceph_krill2 
 #save the plot 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
-output_filename <- "KAXIS_environmental_predictor_GAM.png"
+output_filename <- "KAXIS_environmental_predictor_GAM2.png"
 full_output_path <- file.path(output_directory, output_filename)
-ggsave(filename = full_output_path, plot = environmental_predictor_fish_ceph_krill , width =11, height =12, dpi = 500, bg = "white")
-
+ggsave(filename = full_output_path, plot = environmental_predictor_fish_ceph_krill2 , width =11, height =13, dpi = 500, bg = "white")
+ 
