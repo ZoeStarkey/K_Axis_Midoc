@@ -150,7 +150,7 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 
 fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
   is_bottom <- i == length(p_list_fish_depth_solar_re) 
-  modify_geom_point(p_list_fish_depth_solar_re[[i]], "grey40") +
+  modify_geom_point(p_list_fish_depth_solar_re[[i]], "black") +
     theme_minimal() +
     labs(title = NULL, subtitle = NULL, caption = NULL) +
     {if(is_bottom) xlab("Solar angle (°)") else xlab(NULL)} +   # Only add xlab if it's the bottom plot
@@ -168,7 +168,7 @@ fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
 fish_lunar <- lapply(seq_along(p_list_fish_depth_lunar_re), function(i) {
   is_bottom <- i == length(p_list_fish_depth_lunar_re) 
   
-  modify_geom_point(p_list_fish_depth_lunar_re[[i]], "grey40") +
+  modify_geom_point(p_list_fish_depth_lunar_re[[i]], "black") +
     theme_minimal() +
     labs(title = NULL, subtitle = NULL, caption = NULL) +
     {if(is_bottom) xlab("Illuminated lunar fraction") else xlab(NULL)} +    # Only add xlab if it's the bottom plot
@@ -191,7 +191,35 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
 
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
-output_filename <- "K4S_Plot_A3_fish_depth_solar_lunar.png"
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+output_filename <- "KAXIS_fish_solar_lunar_plot.png"
 full_output_path <- file.path(output_directory, output_filename)
 ggsave(filename = full_output_path, plot = fish_depth_solar_lunar , width =10, height =13, dpi = 500, bg = "white")
+
+#3.4 creating the cephalopod lunar plots 
+ceph_lunar <- lapply(seq_along(p_list_ceph_depth_lumar_re ), function(i) {
+  is_middle <- i == 3
+  modify_geom_point(p_list_ceph_depth_lumar_re [[i]], "black") +
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL, caption = NULL) +
+    {if(is_middle) xlab("Illuminated lunar fraction") else xlab(NULL)} +   # Only add xlab if it's the bottom plot
+    ylab(paste(depth_ranges[i])) +
+    theme(
+      panel.grid = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 2),
+      axis.text = element_text(size = 14, color = "black"), 
+      axis.title = element_text(size = 14, colour = "black"),
+      axis.ticks = element_line(color = "black", size = 0.5),
+    )
+})
+
+ceph_depth_lunar <- 
+  ceph_lunar[[2]] /
+  ceph_lunar[[3]]  +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "none")
+
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+output_filename <- "KAXIS_ceph_lunar_plot.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = ceph_depth_lunar , width =9, height =9, dpi = 500, bg = "white")
