@@ -53,3 +53,198 @@ draw(krill_additive_all_vars, residuals = TRUE) + ggtitle("Krill Biomass (Log) A
   theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(krill_additive_all_vars)
 gam.check(krill_additive_all_vars)
+
+#=============================================================================
+# 3. Presentation 
+#=============================================================================
+# Extract the ggplot objects from draw()
+p_list_fish <- draw(fish_additive_all_vars, residuals = TRUE, return_objects = TRUE)
+p_list_ceph <- draw(ceph_additive_all_vars, residuals = TRUE, return_objects = TRUE)
+p_list_krill <- draw(krill_additive_all_vars, residuals = TRUE, return_objects = TRUE)
+modify_geom_point <- function(plot, new_color, new_size = 2) {
+  point_layer_index <- which(sapply(plot$layers, function(x) inherits(x$geom, "GeomPoint")))
+  # Update both the color and size of the points
+  plot$layers[[point_layer_index]]$aes_params$colour <- new_color
+  plot$layers[[point_layer_index]]$aes_params$size <- new_size
+  
+  return(plot)
+}
+
+#3.1 Preparing fish plots for presentation 
+
+fish_SST <- modify_geom_point(p_list_fish[[1]], "black") + 
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
+    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  ) 
+
+fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
+    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+fish_chl_rs <- modify_geom_point(p_list_fish[[3]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
+    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+fish_days_since_melt <- modify_geom_point(p_list_fish[[4]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Time since melt (days)") +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "black"),
+    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+# Combine the plots
+(fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) 
+
+#3.2 Preparing ceph plots for presentation 
+ceph_SST <- modify_geom_point(p_list_ceph[[1]], "black") + 
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+ceph_chl_rs <- modify_geom_point(p_list_ceph[[3]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+ceph_chl_rs
+
+ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Time since melt (days)") +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+# combine the plots
+(ceph_SST/ ceph_CUR/ ceph_chl_rs/ ceph_days_since_melt)
+
+#3.3 Preparing krill plots for presentation
+krill_SST <- modify_geom_point(p_list_krill[[1]], "black") + 
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Sea surface temperature (°C)")+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+krill_CUR <- modify_geom_point(p_list_krill[[2]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+krill_chl_rs <- modify_geom_point(p_list_krill[[3]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
+  theme_minimal() +
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  xlab("Time since melt (days)") +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, size = 2),
+    axis.text.x = element_text(size = 14, color = "black"), 
+    axis.text.y = element_text(size = 14, color = "black"), 
+    axis.title.x = element_blank (),
+    axis.ticks= element_line(color = "black", size = 0.5),
+  )
+
+# combine the plots
+(krill_SST/ krill_CUR/ krill_chl_rs/ krill_days_since_melt)
+
+#3.4 Combine all the plots
+environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
+environmental_predictor_fish_ceph_krill
