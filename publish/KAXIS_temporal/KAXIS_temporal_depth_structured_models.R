@@ -47,7 +47,7 @@ summary(fish_depth.lunar.re$lme)
 gam.check(fish_depth.lunar.re$gam)
 
 #=============================================================================
-# 2. Depth structured GAMMs for cephalopods
+# 3. Depth structured GAMMs for cephalopods
 #=============================================================================
 
 #day 
@@ -74,5 +74,115 @@ summary(ceph_depth.lunar.re$gam)
 summary(ceph_depth.lunar.re$lme)
 gam.check(ceph_depth.lunar.re$gam)
 
+#=============================================================================
+# 3. Presentation
+#=============================================================================
+p_list_fish_depth_solar_re <- draw(fish_depth.solar.re , residuals = TRUE, return_objects = TRUE)
+p_list_fish_depth_lunar_re <- draw(fish_depth.lunar.re , residuals = TRUE, return_objects = TRUE)
+p_list_ceph_depth_lumar_re <- draw(ceph_depth.lunar.re , residuals = TRUE, return_objects = TRUE)
+
+depth_ranges <- c("0-200", "200-400", "400-600", "600-800", "800-1000")
+
+modify_geom_point <- function(plot, new_color, new_size = 2) {
+  point_layer_index <- which(sapply(plot$layers, function(x) inherits(x$geom, "GeomPoint")))
+  plot$layers[[point_layer_index]]$aes_params$colour <- new_color
+  plot$layers[[point_layer_index]]$aes_params$size <- new_size
+  return(plot)
+}
+
+fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
+  modify_geom_point(p_list_fish_depth_solar_re[[i]], "black") +  
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL, caption = NULL) +
+    ylab(paste(depth_ranges[i], "m")) +
+    theme(
+      panel.grid = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 2),
+      axis.text = element_text(size = 14, color = "black"), 
+      axis.title = element_text(size = 14, colour = "black"),
+      axis.ticks= element_line(color = "black", size = 0.5),
+    )
+})
+fish_solar <- lapply(fish_solar, function(p) p + theme(plot.subtitle = element_blank(), axis.title.y = element_blank()))
+
+fish_lunar <- lapply(seq_along(p_list_fish_depth_lunar_re), function(i) {
+  modify_geom_point(p_list_fish_depth_lunar_re[[i]], "black") +  
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL, caption = NULL) +
+    ylab(paste(depth_ranges[i], "m")) +
+    theme(
+      panel.grid = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 2),
+      axis.text = element_text(size = 14, color = "black"), 
+      axis.title = element_text(size = 14, colour = "black"),
+      axis.ticks= element_line(color = "black", size = 0.5),
+    )
+})
+fish_lunar <- lapply(fish_lunar, function(p) p + theme(plot.subtitle = element_blank(), axis.title.y = element_blank()))
+
+fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
+  (fish_solar[[2]] | fish_lunar[[2]]) /
+  (fish_solar[[3]] | fish_lunar[[3]]) /
+  (fish_solar[[4]] | fish_lunar[[4]]) /
+  (fish_solar[[5]] | fish_lunar[[5]]) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "none")
+fish_depth_solar_lunar 
 
 
+#=============================================================================
+# 3. Presentation
+#=============================================================================
+p_list_fish_depth_solar_re <- draw(fish_depth.solar.re , residuals = TRUE, return_objects = TRUE)
+p_list_fish_depth_lunar_re <- draw(fish_depth.lunar.re , residuals = TRUE, return_objects = TRUE)
+p_list_ceph_depth_lumar_re <- draw(ceph_depth.lunar.re , residuals = TRUE, return_objects = TRUE)
+
+depth_ranges <- c("0-200", "200-400", "400-600", "600-800", "800-1000")
+
+modify_geom_point <- function(plot, new_color, new_size = 2) {
+  point_layer_index <- which(sapply(plot$layers, function(x) inherits(x$geom, "GeomPoint")))
+  plot$layers[[point_layer_index]]$aes_params$colour <- new_color
+  plot$layers[[point_layer_index]]$aes_params$size <- new_size
+  return(plot)
+}
+
+fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
+  modify_geom_point(p_list_fish_depth_solar_re[[i]], "grey40") +
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL, caption = NULL) +
+    xlab("Lunar fraction") +
+    ylab(paste(depth_ranges[i])) +
+    theme(
+      panel.grid = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 2),
+      axis.text = element_text(size = 14, color = "black"), 
+      axis.title = element_text(size = 14, colour = "black"),
+      axis.ticks= element_line(color = "black", size = 0.5)
+    )
+})
+
+fish_lunar <- lapply(seq_along(p_list_fish_depth_lunar_re), function(i) {
+  modify_geom_point(p_list_fish_depth_lunar_re [[i]], "grey40") +
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL, caption = NULL) +
+    xlab("Lunar fraction") +
+    theme(
+      panel.grid = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 2),
+      axis.text = element_text(size = 14, color = "black"), 
+      axis.title.x = element_text(size = 14, colour = "black"),
+      axis.title.y = element_blank(),
+      axis.ticks= element_line(color = "black", size = 0.5)
+    )
+})
+
+
+fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
+  (fish_solar[[2]] | fish_lunar[[2]]) /
+  (fish_solar[[3]] | fish_lunar[[3]]) /
+  (fish_solar[[4]] | fish_lunar[[4]]) /
+  (fish_solar[[5]] | fish_lunar[[5]]) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "none")
+
+fish_depth_solar_lunar
