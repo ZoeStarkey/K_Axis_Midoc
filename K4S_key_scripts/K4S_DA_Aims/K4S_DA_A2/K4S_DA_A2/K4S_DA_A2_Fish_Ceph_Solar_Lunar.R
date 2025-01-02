@@ -127,7 +127,13 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   theme(legend.position = "none")
 fish_depth_solar_lunar
 
-
+fish_depth_solar_lunar <- (fish_solar[[1]] /fish_solar[[2]] /fish_solar[[3]] /fish_solar[[4]] /fish_solar[[5]] ) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "none")
+fish_depth_solar_lunar 
+library(gridExtra)
+grid.arrange(grobs = plot_list, ncol = 2)
+fish_depth_solar_lunar 
 # 
 # 
 # 
