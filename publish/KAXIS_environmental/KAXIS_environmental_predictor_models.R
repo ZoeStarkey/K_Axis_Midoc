@@ -74,43 +74,43 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 
 fish_SST <- modify_geom_point(p_list_fish[[1]], "black") + 
   theme_minimal() +
-  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  labs(title = "FISH", subtitle = NULL, caption = NULL)  +
   xlab("Sea surface temperature (°C)")+
+  ylab("Sea surface temperature (°C)")+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 15, colour = "black"),
-    axis.title.y = element_text(size = 15, colour = "white"),
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title = element_text(size = 15, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
+    
   ) 
 
 fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme_minimal() +
-  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
-  xlab(expression(paste("Current speed (cm ", s^-1, ")")))+
+  labs(title = NULL, subtitle = NULL, caption = NULL)  +  
+  xlab(expression(paste("Current speed (cm ", s^-1, ")"))) +
+  ylab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 15, colour = "black"),
-    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title = element_text(size = 15, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
+
 fish_chl_rs <- modify_geom_point(p_list_fish[[3]], "black") +
   theme_minimal() +
-  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  labs(title = NULL, subtitle = NULL, caption = NULL)  + 
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
+  ylab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 15, colour = "black"),
-    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title = element_text(size = 15, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -118,13 +118,12 @@ fish_days_since_melt <- modify_geom_point(p_list_fish[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
+  ylab("Time since melt (days)") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 15, colour = "black"),
-    axis.title.y = element_text(size = 15, colour = "white"),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title = element_text(size = 15, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
