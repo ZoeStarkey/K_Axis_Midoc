@@ -247,7 +247,7 @@ krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
 
 #3.4 Combine all the plots
 environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
-environmental_predictor_fish_ceph_krill 
+
 #save the plot 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
 output_filename <- "KAXIS_environmental_predictor_GAM.png"
