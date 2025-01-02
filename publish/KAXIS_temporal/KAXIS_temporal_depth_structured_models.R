@@ -146,37 +146,43 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
   return(plot)
 }
 
+#3.1 creating the fish and solar angle plots 
+
 fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
+  is_bottom <- i == length(p_list_fish_depth_solar_re) 
   modify_geom_point(p_list_fish_depth_solar_re[[i]], "grey40") +
     theme_minimal() +
     labs(title = NULL, subtitle = NULL, caption = NULL) +
-    xlab("Lunar fraction") +
+    {if(is_bottom) xlab("Solar angle (°)") else xlab(NULL)} +   # Only add xlab if it's the bottom plot
     ylab(paste(depth_ranges[i])) +
     theme(
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 2),
       axis.text = element_text(size = 14, color = "black"), 
       axis.title = element_text(size = 14, colour = "black"),
-      axis.ticks= element_line(color = "black", size = 0.5)
+      axis.ticks = element_line(color = "black", size = 0.5),
     )
 })
 
+#3.2 creating the fish and lunar fraction plots 
 fish_lunar <- lapply(seq_along(p_list_fish_depth_lunar_re), function(i) {
-  modify_geom_point(p_list_fish_depth_lunar_re [[i]], "grey40") +
+  is_bottom <- i == length(p_list_fish_depth_lunar_re) 
+  
+  modify_geom_point(p_list_fish_depth_lunar_re[[i]], "grey40") +
     theme_minimal() +
     labs(title = NULL, subtitle = NULL, caption = NULL) +
-    xlab("Lunar fraction") +
+    {if(is_bottom) xlab("Illuminated lunar fraction") else xlab(NULL)} +    # Only add xlab if it's the bottom plot
     theme(
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 2),
       axis.text = element_text(size = 14, color = "black"), 
-      axis.title.x = element_text(size = 14, colour = "black"),
+      axis.title.x = if(is_bottom) element_text(size = 14) else element_blank(),
       axis.title.y = element_blank(),
-      axis.ticks= element_line(color = "black", size = 0.5)
+      axis.ticks = element_line(color = "black", size = 0.5)
     )
 })
 
-
+#3.3 combining the fish and solar angle and lunar fraction plots
 fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   (fish_solar[[2]] | fish_lunar[[2]]) /
   (fish_solar[[3]] | fish_lunar[[3]]) /
@@ -185,4 +191,7 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
 
-fish_depth_solar_lunar
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A2/K4S_Plot_A2")
+output_filename <- "K4S_Plot_A3_fish_depth_solar_lunar.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = fish_depth_solar_lunar , width =10, height =13, dpi = 500, bg = "white")
