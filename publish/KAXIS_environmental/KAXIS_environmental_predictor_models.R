@@ -72,9 +72,9 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 
 #3.1 Preparing fish plots for presentation 
 
-fish_SST <- modify_geom_point(p_list_fish[[1]], "black") + 
+ modify_geom_point(p_list_fish[[1]], "black") + 
   theme_minimal() +
-  labs(title = "FISH", subtitle = NULL, caption = NULL)  +
+  labs(title = "Fish", subtitle = NULL, caption = NULL)  +
   xlab("Sea surface temperature (°C)")+
   ylab("Sea surface temperature (°C)")+
   theme(
@@ -83,9 +83,20 @@ fish_SST <- modify_geom_point(p_list_fish[[1]], "black") +
     plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
     axis.text = element_text(size = 14, color = "black"), 
     axis.title = element_text(size = 15, colour = "black"),
-    axis.ticks= element_line(color = "black", size = 0.5),
-    
-  ) 
+    axis.ticks= element_line(color = "black", size = 0.5)
+  ) +
+ annotate(
+     'text',
+     x = Inf,
+     y = Inf,
+     label = '*',
+     colour = "red",
+     size = 30,
+     hjust = 2,
+     vjust = 1.5
+   )
+ 
+
 
 fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme_minimal() +
@@ -133,16 +144,17 @@ fish_days_since_melt <- modify_geom_point(p_list_fish[[4]], "black") +
 #3.2 Preparing ceph plots for presentation 
 ceph_SST <- modify_geom_point(p_list_ceph[[1]], "black") + 
   theme_minimal() +
-  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  labs(title = "Cephalopods", subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Sea surface temperature (°C)")+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
-  )
+  ) 
 
 ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "black") +
   theme_minimal() +
@@ -151,9 +163,9 @@ ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -164,13 +176,11 @@ ceph_chl_rs <- modify_geom_point(p_list_ceph[[3]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"),
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
-
-ceph_chl_rs
 
 ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
   theme_minimal() +
@@ -179,9 +189,9 @@ ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -191,16 +201,17 @@ ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
 #3.3 Preparing krill plots for presentation
 krill_SST <- modify_geom_point(p_list_krill[[1]], "black") + 
   theme_minimal() +
-  labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
+  labs(title = "Krill", subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Sea surface temperature (°C)")+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
-  )
+  ) 
 
 krill_CUR <- modify_geom_point(p_list_krill[[2]], "black") +
   theme_minimal() +
@@ -209,9 +220,9 @@ krill_CUR <- modify_geom_point(p_list_krill[[2]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -222,9 +233,9 @@ krill_chl_rs <- modify_geom_point(p_list_krill[[3]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -235,9 +246,9 @@ krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text.x = element_text(size = 14, color = "black"), 
-    axis.text.y = element_text(size = 14, color = "black"), 
-    axis.title.x = element_blank (),
+    axis.text = element_text(size = 14, color = "black"), 
+    axis.title.x = element_text(size = 15, colour = "white"),
+    axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -246,4 +257,10 @@ krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
 
 #3.4 Combine all the plots
 environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
-environmental_predictor_fish_ceph_krill
+
+#save the plot 
+output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+output_filename <- "KAXIS_environmental_predictor_GAM.png"
+full_output_path <- file.path(output_directory, output_filename)
+ggsave(filename = full_output_path, plot = environmental_predictor_fish_ceph_krill , width =11, height =12, dpi = 500, bg = "white")
+
