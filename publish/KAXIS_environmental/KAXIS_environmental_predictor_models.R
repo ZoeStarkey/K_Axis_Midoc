@@ -14,25 +14,18 @@ load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S
 #removing the outliers deviated substantially from the majority of SST values (0.7 to 2.2°C), preventing the GAMs from fitting reasonable smooths across all stations. 
 km_bm_sum_2 <- km_bm_sum_2 %>% filter(SST > 0)
 
-#days since melt is unusually high for MIDOC 27, averaging the results from nearby stations to get a better estimate 
-km_bm_sum_2_filtered <- km_bm_sum_2_filtered %>% filter(midoc.stn == "MIDOC26" | midoc.stn == "MIDOC28")
-  #average of 110.00001 days since ice melt (from MIDOC26) and 84.99997 days since ice melt (from MIDOC 28)
-  (110.00001+84.99997)/2 #=97.49999
-#input 97.49999 into the days since melt value for MIDOC27 in the km_bm_sum_2 
-km_bm_sum_2$days_since_melt[km_bm_sum_2$midoc.stn == "MIDOC27"] <- 97.49999
-
 #=============================================================================
 # 2. Depth integrated models for environmental predictors 
 #=============================================================================
 #All biomass (excluding gelatinous)
-allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
+allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
 draw(allbiom_additive_all_vars, residuals = TRUE) +
   theme(plot.title = element_text(hjust = -8, vjust = 9 ))
 summary(allbiom_additive_all_vars)
 gam.check(allbiom_additive_all_vars)
 
 #Fish biomass
-fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
+fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
 draw(fish_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
 theme(plot.title = element_text(hjust = 4, vjust = 9 ))
@@ -40,7 +33,7 @@ summary(fish_additive_all_vars)
 gam.check(fish_additive_all_vars)
 
 #cephalopod biomass 
-ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
+ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
 draw(ceph_additive_all_vars, residuals = TRUE) 
 #+ ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
 # theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
@@ -48,7 +41,7 @@ summary(ceph_additive_all_vars)
 gam.check(ceph_additive_all_vars)
 
 #krill biomass
-krill_additive_all_vars <-gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(chl_rs) +s(days_since_melt), data = km_bm_sum_2)
+krill_additive_all_vars <-gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
 draw(krill_additive_all_vars, residuals = TRUE) + ggtitle("Krill Biomass (Log) All Taxa Additive model all vars") + 
   theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(krill_additive_all_vars)
@@ -102,7 +95,7 @@ fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   )
 
 
-fish_chl_rs <- modify_geom_point(p_list_fish[[3]], "black") +
+fish_CHLA <- modify_geom_point(p_list_fish[[3]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  + 
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
@@ -115,7 +108,7 @@ fish_chl_rs <- modify_geom_point(p_list_fish[[3]], "black") +
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
-fish_days_since_melt <- modify_geom_point(p_list_fish[[4]], "black") +
+fish_TSM <- modify_geom_point(p_list_fish[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
@@ -129,7 +122,7 @@ fish_days_since_melt <- modify_geom_point(p_list_fish[[4]], "black") +
   )
 
 # Combine the plots
-(fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) 
+(fish_SST/ fish_CUR/ fish_CHLA/ fish_TSM) 
 
 #3.2 Preparing ceph plots for presentation 
 ceph_SST <- modify_geom_point(p_list_ceph[[1]], "black") + 
@@ -159,7 +152,7 @@ ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "black") +
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
-ceph_chl_rs <- modify_geom_point(p_list_ceph[[3]], "black") +
+ceph_CHLA <- modify_geom_point(p_list_ceph[[3]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
@@ -172,7 +165,7 @@ ceph_chl_rs <- modify_geom_point(p_list_ceph[[3]], "black") +
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
-ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
+ceph_TSM <- modify_geom_point(p_list_ceph[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
@@ -186,7 +179,7 @@ ceph_days_since_melt <- modify_geom_point(p_list_ceph[[4]], "black") +
   )
 
 # combine the plots
-(ceph_SST/ ceph_CUR/ ceph_chl_rs/ ceph_days_since_melt)
+(ceph_SST/ ceph_CUR/ ceph_CHLA/ ceph_TSM)
 
 #3.3 Preparing krill plots for presentation
 krill_SST <- modify_geom_point(p_list_krill[[1]], "black") + 
@@ -216,7 +209,7 @@ krill_CUR <- modify_geom_point(p_list_krill[[2]], "black") +
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
-krill_chl_rs <- modify_geom_point(p_list_krill[[3]], "black") +
+krill_CHLA <- modify_geom_point(p_list_krill[[3]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
@@ -229,7 +222,7 @@ krill_chl_rs <- modify_geom_point(p_list_krill[[3]], "black") +
     axis.ticks= element_line(color = "black", size = 0.5),
   ) 
 
-krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
+krill_TSM <- modify_geom_point(p_list_krill[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
@@ -243,10 +236,10 @@ krill_days_since_melt <- modify_geom_point(p_list_krill[[4]], "black") +
   )
 
 # combine the plots
-(krill_SST/ krill_CUR/ krill_chl_rs/ krill_days_since_melt)
+(krill_SST/ krill_CUR/ krill_CHLA/ krill_TSM)
 
 #3.4 Combine all the plots
-environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_chl_rs/ fish_days_since_melt) | (ceph_SST / ceph_CUR / ceph_chl_rs / ceph_days_since_melt) | (krill_SST / krill_CUR / krill_chl_rs/ krill_days_since_melt)
+environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_CHLA/ fish_TSM) | (ceph_SST / ceph_CUR / ceph_CHLA / ceph_TSM) | (krill_SST / krill_CUR / krill_CHLA/ krill_TSM)
 
 #save the plot 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
