@@ -71,7 +71,7 @@ modify_geom_point(p_list_fish[[1]], "black") +
   theme_minimal() +
   labs(title = "Fish", subtitle = NULL, caption = NULL)  +
   xlab("Sea surface temperature (°C)")+
-  ylab("Sea surface temperature (°C)")+
+ # ylab("Sea surface temperature (°C)")+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -85,7 +85,7 @@ fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  
   xlab(expression(paste("Current speed (cm ", s^-1, ")"))) +
-  ylab(expression(paste("Current speed (cm ", s^-1, ")")))+
+ # ylab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -99,7 +99,7 @@ fish_CHLA <- modify_geom_point(p_list_fish[[3]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  + 
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
-  ylab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
+ # ylab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -112,7 +112,7 @@ fish_TSM <- modify_geom_point(p_list_fish[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
-  ylab("Time since melt (days)") +
+ # ylab("Time since melt (days)") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
