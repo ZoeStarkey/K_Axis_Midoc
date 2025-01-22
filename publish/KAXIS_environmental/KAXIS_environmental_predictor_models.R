@@ -20,30 +20,28 @@ km_bm_sum_2 <- km_bm_sum_2 %>% filter(SST > 0)
 #All biomass (excluding gelatinous)
 allbiom_additive_all_vars <-gam(log(bm_sum_all_taxa) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
 draw(allbiom_additive_all_vars, residuals = TRUE) +
-  theme(plot.title = element_text(hjust = -8, vjust = 9 ))
+theme(plot.title = element_text(hjust = -8, vjust = 9 ))
 summary(allbiom_additive_all_vars)
 gam.check(allbiom_additive_all_vars)
 
 #Fish biomass
 fish_additive_all_vars <-gam(log(bm_sum_fish) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
-draw(fish_additive_all_vars, residuals = TRUE) 
-#+ ggtitle("Fish Biomass (Log) All Taxa Additive model all vars") + 
+draw(fish_additive_all_vars, residuals = TRUE) +
 theme(plot.title = element_text(hjust = 4, vjust = 9 ))
 summary(fish_additive_all_vars)
 gam.check(fish_additive_all_vars)
 
 #cephalopod biomass 
 ceph_additive_all_vars <-gam(log(bm_sum_ceph) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
-draw(ceph_additive_all_vars, residuals = TRUE) 
-#+ ggtitle("Cephalopod Biomass (Log) All Taxa Additive model all vars") + 
-# theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
+draw(ceph_additive_all_vars, residuals = TRUE) +
+theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(ceph_additive_all_vars)
 gam.check(ceph_additive_all_vars)
 
 #krill biomass
 krill_additive_all_vars <-gam(log(bm_sum_krill) ~ s(SST)+ s(CUR) + s(CHLA) +s(TSM), data = km_bm_sum_2)
-draw(krill_additive_all_vars, residuals = TRUE) + ggtitle("Krill Biomass (Log) All Taxa Additive model all vars") + 
-  theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
+draw(krill_additive_all_vars, residuals = TRUE) +
+theme(plot.title = element_text(hjust = -7.5, vjust = -20 ))
 summary(krill_additive_all_vars)
 gam.check(krill_additive_all_vars)
 
@@ -71,7 +69,6 @@ modify_geom_point(p_list_fish[[1]], "black") +
   theme_minimal() +
   labs(title = "Fish", subtitle = NULL, caption = NULL)  +
   xlab("Sea surface temperature (°C)")+
- # ylab("Sea surface temperature (°C)")+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -85,7 +82,6 @@ fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  
   xlab(expression(paste("Current speed (cm ", s^-1, ")"))) +
- # ylab(expression(paste("Current speed (cm ", s^-1, ")")))+
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -99,7 +95,6 @@ fish_CHLA <- modify_geom_point(p_list_fish[[3]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  + 
   xlab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
- # ylab(expression(paste("Chl-", italic("a"), " (mg ", m^-3, ")"))) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
@@ -112,7 +107,6 @@ fish_TSM <- modify_geom_point(p_list_fish[[4]], "black") +
   theme_minimal() +
   labs(title = NULL, subtitle = NULL, caption = NULL)  +  # Remove the title
   xlab("Time since melt (days)") +
- # ylab("Time since melt (days)") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
