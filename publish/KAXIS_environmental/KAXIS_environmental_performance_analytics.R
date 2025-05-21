@@ -11,7 +11,7 @@ library(grid)
 #load the data
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum_2.Rda")
 
-#removing the outliers deviated substantially from the majority of SST values (0.7 to 2.2°C), preventing the GAMs from fitting reasonable smooths across all stations. 
+#removing the outliers deviated substantially from the majority of SST values (0.7 to 2.2°C)
 km_bm_sum_2 <- km_bm_sum_2 %>% filter(SST > 0) 
 
 #environmental performance analytics for all taxa (excluding gelatinous)
