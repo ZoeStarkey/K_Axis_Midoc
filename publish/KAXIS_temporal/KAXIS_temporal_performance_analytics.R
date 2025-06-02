@@ -62,26 +62,27 @@ plot_ggcorr <- function(data, var_labels) {
              method = "square",
              type = "lower",
              lab = TRUE,
-             lab_size = 5, 
+             lab_size = 6,
+             lab_col = "black",
              tl.cex = 12,
              show.legend = TRUE) +
     scale_fill_gradient2(
-      low = "red", mid = "white", high = "blue",
+      low = "blue", mid = "white", high = "red",
       midpoint = 0,
       limits = c(-1, 1),
       name = "Correlation Coefficient",
       guide = guide_colorbar(
-        barheight = 25,
+        barheight = 35,
         title.position = "left",   
         label.position = "right"  
       )
     ) +
     theme(
-      axis.text.x = element_text(face = "bold"),
-      axis.text.y = element_text(face = "bold"),
-      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
-      legend.title = element_text(size = 14, hjust= 0.5, face = "bold",angle = 90),
-      legend.text  = element_text(size = 12)
+      axis.text.x = element_text(size = 16, colour = 'black'),
+      axis.text.y = element_text(size = 16, colour = 'black'),
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 20),
+      legend.title = element_text(size = 18, hjust = 0.5, face = "bold", angle = 90),
+      legend.text  = element_text(size = 16)
     )
 }
 
