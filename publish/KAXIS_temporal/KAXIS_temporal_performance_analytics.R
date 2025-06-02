@@ -4,7 +4,7 @@ library(mgcv)
 library(caret)
 library(dplyr)
 library(lubridate)
-
+library(corrplot)
 
 #load the data
 load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_DF/K4S_DA_DF/km_bm_sum_2.Rda")
@@ -43,3 +43,27 @@ temporal_PA_krill$bm_sum_krill <- log(temporal_PA_krill$bm_sum_krill)
 temporal_PA_krill <- temporal_PA_krill[complete.cases(temporal_PA_krill), ]
 #plot
 chart.Correlation(temporal_PA_krill, histogram=TRUE, pch=19, )
+
+
+
+###########################Plot heat maps#########################################
+
+#all taxa 
+cor_matrix <- cor(temporal_PA_all_taxa)
+new_labels_all_taxa <- c("Biomass (all taxa)", "Lunar fraction", "Solar Angle", "Solar Angle")
+# Apply labels to both row and column names
+rownames(cor_matrix) <- new_labels_all_taxa
+colnames(cor_matrix) <- new_labels_all_taxa
+
+# Plot
+corrplot(cor_matrix,
+         method = "color",
+         type = "lower",
+         col = colorRampPalette(c("blue", "white", "red"))(200),
+         tl.col = "black",
+         tl.cex = 1.3,
+         tl.srt = 0,
+         tl.offset = 1.2,
+         addCoef.col = "black",    # Add correlation values
+         number.cex = 1.2,         # <--- Increase this for bigger numbers
+         diag = FALSE)
