@@ -98,7 +98,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
                       color = "gray40", linetype = "dashed") +
     
     # KTR line
-    ggplot2::geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = 0.6, colour = "magenta") +
     
     # Biomass points (legend will match these sizes)
     ggplot2::geom_sf(
@@ -126,7 +126,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
       legend.key.height = grid::unit(0.3, "cm"),
       legend.key.width  = grid::unit(0.3, "cm"),
       legend.text       = ggplot2::element_text(size = 4),
-      legend.box.spacing = unit(0, "pt"),     # gap between panel and legend
+      legend.box.spacing = unit(8, "pt"),     # gap between panel and legend
       legend.margin      = margin(0,0,0,0),   # padding inside legend area
       legend.box.margin  = margin(0,0,0,0),
       plot.margin        = margin(2, 2, 2, 2, unit = "pt"),
@@ -271,7 +271,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
                       color = "gray40", linetype = "dashed") +
     
     # KTR line
-    ggplot2::geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = 0.6, colour = "magenta") +
     
     # Biomass points
     ggplot2::geom_sf(
@@ -299,7 +299,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
       legend.key.height  = grid::unit(0.3, "cm"),
       legend.key.width   = grid::unit(0.3, "cm"),
       legend.text        = ggplot2::element_text(size = 4),
-      legend.box.spacing = grid::unit(0, "pt"),
+      legend.box.spacing = grid::unit(8, "pt"),
       legend.margin      = ggplot2::margin(0, 0, 0, 0),
       legend.box.margin  = ggplot2::margin(0, 0, 0, 0),
       legend.title       = ggplot2::element_text(size = 8, angle = 90),
@@ -444,7 +444,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
                       color = "gray40", linetype = "dashed") +
     
     # KTR line (match TSM size)
-    ggplot2::geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = 0.6, colour = "magenta") +
     
     # Biomass points
     ggplot2::geom_sf(
@@ -472,7 +472,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
       legend.key.height  = grid::unit(0.3, "cm"),
       legend.key.width   = grid::unit(0.3, "cm"),
       legend.text        = ggplot2::element_text(size = 4),
-      legend.box.spacing = grid::unit(0, "pt"),
+      legend.box.spacing = grid::unit(8, "pt"),
       legend.margin      = ggplot2::margin(0, 0, 0, 0),
       legend.box.margin  = ggplot2::margin(0, 0, 0, 0),
       legend.title       = ggplot2::element_text(size = 8, angle = 90),
@@ -613,7 +613,7 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
                       color = "gray40", linetype = "dashed") +
     
     # KTR line (match TSM size)
-    ggplot2::geom_sf(data = ktr_sf, size = 1, colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = 0.6, colour = "magenta") +
     
     # Biomass points
     ggplot2::geom_sf(
@@ -640,10 +640,10 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(0.3, "cm"),
       legend.key.width   = grid::unit(0.3, "cm"),
-      legend.text        = ggplot2::element_text(size = 4),
-      legend.box.spacing = grid::unit(0, "pt"),
+      legend.text        = ggplot2::element_text(size = 4),,
       legend.margin      = ggplot2::margin(0, 0, 0, 0),
       legend.box.margin  = ggplot2::margin(0, 0, 0, 0),
+      legend.box.spacing = grid::unit(8, "pt"),
       legend.title       = ggplot2::element_text(size = 8, angle = 90),
       panel.grid         = ggplot2::element_line(color = "gray80", linetype = "solid"),
       strip.background   = ggplot2::element_rect(fill = "white"),
