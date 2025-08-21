@@ -269,3 +269,4 @@ current_spatial_plot_fish <- spatial_map_currents(km_bm_sum_2, "bm_sum_fish", de
 current_spatial_plot_ceph <- spatial_map_currents(km_bm_sum_2, "bm_sum_ceph", decimal_places = 4)
 # Krill
 current_spatial_plot_krill <- spatial_map_currents(km_bm_sum_2, "bm_sum_krill", decimal_places = 3)
+
