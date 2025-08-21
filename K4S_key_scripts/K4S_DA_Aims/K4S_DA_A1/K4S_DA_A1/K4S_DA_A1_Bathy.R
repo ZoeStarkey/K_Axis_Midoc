@@ -158,7 +158,7 @@ cbct_sf <- st_as_sf(cbct)
 
 
 library(sf)
-#bathy <- 
+bathy <- 
 ggplot() +
   geom_raster(data = bathy_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = rev(RColorBrewer::brewer.pal(9, "Blues")), 
@@ -254,14 +254,43 @@ ggplot() +
   ) 
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
-output_filename <- "K4S_Plot_A1_bathy.png"
+output_filename <- "K4S_Plot_A1_bathy.tiff"
 full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = bathy, width = 9, height = 8, bg = "white")
 
+output_directory <- paste0("/Users/", usr, "/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
+output_filename  <- "K4S_Plot_A1_bathy.tiff"
+full_output_path <- file.path(output_directory, output_filename)
 
 
+# install.packages("ragg")  # if needed
+library(ragg)
 
+output_directory <- paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
+full_output_path <- file.path(output_directory, "K4S_Plot_A1_bathy_fullpage_500dpi.tiff")
+
+
+w_px <- 3740
+h_px <- round(w_px * (1820/2048))  # maintain same aspect ≈ 3322 px
+
+ggsave(
+  filename = file.path(output_directory, "K4S_Plot_A1_bathy_fullpage.png"),
+  plot     = bathy,
+  device   = ragg::agg_png,
+  units    = "px", width = w_px, height = h_px,
+  res      = 500,
+  bg       = "white"
+)
+
+ggsave(
+  filename = file.path(output_directory, "K4S_Plot_A1_bathy_fullpage.tiff"),
+  plot     = bathy,
+  device   = ragg::agg_tiff,
+  units    = "px", width = w_px, height = h_px,
+  res      = 500, compression = "lzw",
+  bg       = "white"
+)
 ###########
 
 
@@ -452,4 +481,4 @@ output_filename <- "K4S_Plot_A1_bathy_lunar.png"
 full_output_path <- file.path(output_directory, output_filename)
 
 ggsave(filename = full_output_path, plot = bathy_lunar, width = 8, height = 11, bg = NA)
-
+# Save the plot as a TIFF file
