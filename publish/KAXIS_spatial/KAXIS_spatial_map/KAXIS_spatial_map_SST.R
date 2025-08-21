@@ -27,12 +27,12 @@ ll2prj <- function(dat, proj=prj, loncol="lon", latcol="lat"){
   dat <- spTransform(dat, CRS(prj))
   dat }
 #loading SST data
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_anim_data.RData")
+load("KAXIS_spatial/KAXIS_raster/KAXIS_anim_data.RData")
 SST <- sst
 SSH <- ssh
 SSHa <- ssha
 
-load("~/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/sophie_raster/KAXIS_anim_GHRSST.RData")
+load("KAXIS_spatial/KAXIS_raster/KAXIS_anim_GHRSST.RData")
 sst <- sstGHR
 rm(sstGHR)
 
@@ -105,6 +105,8 @@ ktr <- readRDS("KAXIS_spatial/KAXIS_raster/nav_reduced.rds")
 ktr <- ll2prj(ktr, loncol="LONGITUDE", latcol="LATITUDE")
 ktr_sf <- st_as_sf(ktr)
 
+ryb <- colorRampPalette(rev(brewer.pal(11,"RdYlBu")))
+cols1 <- ryb(56); cols1 <- cols1[c(1:22, 24:56)] 
 #=============================================================================
 # 3. Generating plot function 
 #=============================================================================
