@@ -266,4 +266,4 @@ tsm_spatial_plot_ceph <- spatial_map_TSM(km_bm_sum_2, "bm_sum_ceph", decimal_pla
 # Krill
 tsm_spatial_plot_krill <- spatial_map_TSM(km_bm_sum_2, "bm_sum_krill", decimal_places = 3)
 
-tsm_spatial_plot_fish
+
