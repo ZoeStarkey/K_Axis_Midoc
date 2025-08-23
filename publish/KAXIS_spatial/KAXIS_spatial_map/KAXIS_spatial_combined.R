@@ -693,7 +693,7 @@ ggsave(
   filename = "~/Desktop/combined_spatial_plots2.tiff",
   plot = combined,
   width = 285,      # mm (full double-column)
-  height = 220,     # mm (square-ish for 2x2 layout)
+  height = 240,     # mm (square-ish for 2x2 layout)
   units = "mm",
   dpi = 600,
   compression = "lzw"
