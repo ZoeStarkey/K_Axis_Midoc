@@ -4,7 +4,7 @@ SZ <- function(x) x * sf
 a <- 3
 b <- -2
 c <- 6
-d <- 6.5
+d <- 6
 
 library(patchwork)
 ## =========================
@@ -71,6 +71,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
       colors = palr::bathy_deep_pal(56),
       na.value = "transparent",
       limits = c(0, 100),
+      labels = c("0", "", "50", "", "100"),
       name = "Ice (%)",
       guide = ggplot2::guide_colorbar(
         title.position = "left",
@@ -95,7 +96,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx),
                       color = "gray40", linetype = "dashed") +
     
-    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.6), colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.2), colour = "magenta") +
     
     ggplot2::geom_sf(
       data = data_sf,
@@ -109,7 +110,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-500000, 1020000),
+                      xlim = c(-300000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -213,6 +214,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
       colors = palr::bathy_deep_pal(56),
       na.value = "transparent",
       limits = c(0, 100),
+      labels = c("0", "", "50", "", "100"),
       name = "Ice (%)",
       guide = ggplot2::guide_colorbar(
         title.position = "left",
@@ -237,7 +239,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx),
                       color = "gray40", linetype = "dashed") +
     
-    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.6), colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.2), colour = "magenta") +
     
     ggplot2::geom_sf(
       data = data_sf,
@@ -251,7 +253,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-500000, 1020000),
+                      xlim = c(-300000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -355,6 +357,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
       colors = palr::bathy_deep_pal(56),
       na.value = "transparent",
       limits = c(0, 100),
+      labels = c("0", "", "50", "", "100"),
       name = "Ice (%)",
       guide = ggplot2::guide_colorbar(
         title.position = "left",
@@ -379,7 +382,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx),
                       color = "gray40", linetype = "dashed") +
     
-    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.6), colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.2), colour = "magenta") +
     
     ggplot2::geom_sf(
       data = data_sf,
@@ -393,7 +396,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-500000, 1020000),
+                      xlim = c(-300000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -455,9 +458,13 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
   data_sf <- sf::st_transform(data, crs = prj)
   n_actual_bins <- length(unique(data_sf$biomass_bin))
   
-  size_values <- seq(SZ(3), SZ(8), length.out = n_actual_bins)
-  fill_values <- if (n_actual_bins <= 2) c("white", "black")[1:n_actual_bins]
-  else                    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  size_values <- seq(2, 5, length.out = n_actual_bins)
+  fill_values <- if(n_actual_bins <= 2) {
+    c("white", "black")[1:n_actual_bins]
+  } else {
+    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  }
+  
   
   p <- ggplot2::ggplot() +
     ggplot2::geom_raster(
@@ -496,6 +503,7 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
       colors = palr::bathy_deep_pal(56),
       na.value = "transparent",
       limits = c(0, 100),
+      labels = c("0", "", "50", "", "100"),
       name = "Ice (%)",
       guide = ggplot2::guide_colorbar(
         title.position = "left",
@@ -520,7 +528,7 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::annotate("segment", y = yy, yend = yy, x = min(xx), xend = max(xx),
                       color = "gray40", linetype = "dashed") +
     
-    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.6), colour = "magenta") +
+    ggplot2::geom_sf(data = ktr_sf, size = SZ(0.2), colour = "magenta") +
     
     ggplot2::geom_sf(
       data = data_sf,
@@ -534,7 +542,7 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-500000, 1020000),
+                      xlim = c(-300000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -580,7 +588,7 @@ current_spatial_plot_fish <- spatial_map_currents(km_bm_sum_2, "bm_sum_fish", de
 chla_spatial_plot_fish <- spatial_map_chla(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
 SST_spatial_plot_fish <- spatial_map_SST(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
 
-SST_spatial_plot_fish
+
 
 #TESTING COMBINED
 combined <- (
