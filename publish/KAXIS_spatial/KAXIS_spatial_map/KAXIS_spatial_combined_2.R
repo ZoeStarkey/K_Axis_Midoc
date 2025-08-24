@@ -2,7 +2,7 @@
 sf <- 190/285
 SZ <- function(x) x * sf
 
-
+library(patchwork)
 ## =========================
 ## TSM
 ## =========================
@@ -46,7 +46,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
         title.hjust    = 0.5,
         label.position = "right",
         barwidth  = SZ(0.7),
-        barheight = SZ(9),
+        barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
         title.theme = ggplot2::element_text(size = 5, angle = 90),
@@ -330,11 +330,11 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
         title.hjust    = 0.5,
         label.position = "right",
         barwidth  = SZ(0.7),
-        barheight = SZ(9),
+        barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = SZ(9), angle = 90),
-        label.theme = ggplot2::element_text(size = SZ(9))
+        title.theme = ggplot2::element_text(size = 5, angle = 90),
+        label.theme = ggplot2::element_text(size = 5)
       )
     ) +
     
@@ -360,8 +360,8 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(4),
         order = 3,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = SZ(9), angle = 90),
-        label.theme = ggplot2::element_text(size = SZ(9))
+        title.theme = ggplot2::element_text(size = 5, angle = 90),
+        label.theme = ggplot2::element_text(size = 5)
       )
     ) +
     
@@ -396,7 +396,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(SZ(0.3), "cm"),
       legend.key.width   = grid::unit(SZ(0.3), "cm"),
-      legend.text        = ggplot2::element_text(size = SZ(4)),
+      legend.text        = ggplot2::element_text(size = 5),
       legend.box.spacing = grid::unit(SZ(8), "pt"),
       legend.margin      = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.margin  = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
@@ -411,13 +411,13 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::guides(
       fill = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = SZ(9), angle = 90),
-        label.theme = ggplot2::element_text(size = SZ(9))
+        title.theme = ggplot2::element_text(size = 5, angle = 90),
+        label.theme = ggplot2::element_text(size = 5)
       ),
       size = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = SZ(9), angle = 90),
-        label.theme = ggplot2::element_text(size = SZ(9))
+        title.theme = ggplot2::element_text(size = 5, angle = 90),
+        label.theme = ggplot2::element_text(size = 5)
       )
     )
   
@@ -609,6 +609,16 @@ combined <- (
     plot.tag.position = c(0.1, 1.05),   # inside top-left (x,y in [0,1])
     plot.tag = element_text(size = 8, face = "bold", margin = margin(0,0,0,0))
   )
+
+ggsave(
+  filename = "~/Desktop/combined_spatial_plots_24_08.tiff",
+  plot = combined,
+  width = 190,                      # mm
+  height = 170,                # ≈ 160 mm
+  units = "mm",
+  dpi = 600,
+  compression = "lzw"
+)
 
 #TO DO: 
 #make titles bigger 
