@@ -31,9 +31,12 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
   data_sf <- sf::st_transform(data, crs = prj)
   n_actual_bins <- length(unique(data_sf$biomass_bin))
   
-  size_values <- seq(SZ(3), SZ(8), length.out = n_actual_bins)
-  fill_values <- if (n_actual_bins <= 2) c("white", "black")[1:n_actual_bins]
-  else                    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  size_values <- seq(2, 5, length.out = n_actual_bins)
+  fill_values <- if(n_actual_bins <= 2) {
+    c("white", "black")[1:n_actual_bins]
+  } else {
+    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  }
   
   p <- ggplot2::ggplot() +
     ggplot2::geom_sf(data = wcp_sf, fill = NA) +
@@ -110,7 +113,7 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-300000, 1020000),
+                      xlim = c(-500000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -173,9 +176,13 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
   data_sf <- sf::st_transform(data, crs = prj)
   n_actual_bins <- length(unique(data_sf$biomass_bin))
   
-  size_values <- seq(SZ(3), SZ(8), length.out = n_actual_bins)
-  fill_values <- if (n_actual_bins <= 2) c("white", "black")[1:n_actual_bins]
-  else                    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  size_values <- seq(2, 5, length.out = n_actual_bins)
+  fill_values <- if(n_actual_bins <= 2) {
+    c("white", "black")[1:n_actual_bins]
+  } else {
+    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  }
+  
   
   p <- ggplot2::ggplot() +
     ggplot2::geom_raster(
@@ -253,7 +260,7 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-300000, 1020000),
+                      xlim = c(-500000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -314,9 +321,13 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
   data_sf <- sf::st_transform(data, crs = prj)
   n_actual_bins <- length(unique(data_sf$biomass_bin))
   
-  size_values <- seq(SZ(3), SZ(8), length.out = n_actual_bins)
-  fill_values <- if (n_actual_bins <= 2) c("white", "black")[1:n_actual_bins]
-  else                    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  size_values <- seq(2, 5, length.out = n_actual_bins)
+  fill_values <- if(n_actual_bins <= 2) {
+    c("white", "black")[1:n_actual_bins]
+  } else {
+    c("white", "grey65", "grey30", "black")[1:n_actual_bins]
+  }
+  
   
   p <- ggplot2::ggplot() +
     ggplot2::geom_raster(
@@ -396,7 +407,7 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-300000, 1020000),
+                      xlim = c(-500000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -542,7 +553,7 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
     
     ggplot2::labs(x = "Longitude", y = "Latitude") +
     ggplot2::coord_sf(crs = sf::st_crs(prj),
-                      xlim = c(-300000, 1020000),
+                      xlim = c(-500000, 1020000),
                       ylim = c(-1000000, 600000)) +
     ggplot2::theme(
       legend.position    = "right",
@@ -597,7 +608,8 @@ combined <- (
   (
     chla_spatial_plot_fish | tsm_spatial_plot_fish
   ) +
-  plot_annotation(tag_levels = "A",
+  plot_annotation(tag_levels = "A",tag_prefix = "(",         # -> (A)
+                  tag_suffix = ")",  
                   theme = theme(plot.margin = margin(0,0,0,0))) &   # no outer padding
   theme(
     plot.tag.position = c(0.1, 1.05),   # inside top-left (x,y in [0,1])
@@ -610,7 +622,7 @@ ggsave(
   width = 190,                      # mm
   height = 170,                # ≈ 160 mm
   units = "mm",
-  dpi = 600,
+  dpi = 500,
   compression = "lzw"
 )
 
