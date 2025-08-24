@@ -1,6 +1,10 @@
 ## --- global scaling helpers (put once, above the functions) ---
 sf <- 190/285
 SZ <- function(x) x * sf
+a <- 3
+b <- -2
+c <- 6
+d <- 6.5
 
 library(patchwork)
 ## =========================
@@ -49,8 +53,8 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -76,8 +80,8 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(4),
         order = 3,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -112,12 +116,12 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(SZ(0.3), "cm"),
       legend.key.width   = grid::unit(SZ(0.3), "cm"),
-      legend.text        = ggplot2::element_text(size = SZ(4)),
+      legend.text        = ggplot2::element_text(size = c),
       legend.box.spacing = grid::unit(SZ(8), "pt"),
       legend.margin      = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.margin  = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       plot.margin        = ggplot2::margin(SZ(2), SZ(2), SZ(2), SZ(2), unit = "pt"),
-      legend.title       = ggplot2::element_text(size = 8, angle = 90),
+      legend.title       = ggplot2::element_text(size = d, angle = 90),
       panel.grid         = ggplot2::element_line(color = "gray80", linetype = "solid"),
       strip.background   = ggplot2::element_rect(fill = "white"),
       axis.title.x       = ggplot2::element_text(size = SZ(12), margin = ggplot2::margin(t = SZ(10))),
@@ -128,13 +132,13 @@ spatial_map_TSM <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::guides(
       fill = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       ),
       size = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5), angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d), angle = 90),
+        label.theme = ggplot2::element_text(size = c)
       
     )
   
@@ -191,8 +195,8 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
     )
     ) +
     
@@ -218,8 +222,8 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(4),
         order = 3,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -254,11 +258,11 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(SZ(0.3), "cm"),
       legend.key.width   = grid::unit(SZ(0.3), "cm"),
-      legend.text        = ggplot2::element_text(size = 5),
+      legend.text        = ggplot2::element_text(size = c),
       legend.box.spacing = grid::unit(SZ(8), "pt"),
       legend.margin      = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.margin  = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
-      legend.title       = ggplot2::element_text(size = SZ(9), angle = 90),
+     legend.title       = ggplot2::element_text(size = d, angle = 90, margin = margin(r=a)),
       panel.grid         = ggplot2::element_line(color = "gray80", linetype = "solid"),
       strip.background   = ggplot2::element_rect(fill = "white"),
       axis.title.x       = ggplot2::element_text(size = SZ(12), margin = ggplot2::margin(t = SZ(10))),
@@ -270,14 +274,14 @@ spatial_map_currents <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::guides(
       fill = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5),
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c),
         override.aes = list(size = size_values)
       ),
       size = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5) ))
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c) ))
       return(p)
 }
 
@@ -333,8 +337,8 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -360,8 +364,8 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(4),
         order = 3,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -396,11 +400,11 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(SZ(0.3), "cm"),
       legend.key.width   = grid::unit(SZ(0.3), "cm"),
-      legend.text        = ggplot2::element_text(size = 5),
+      legend.text        = ggplot2::element_text(size = c),
       legend.box.spacing = grid::unit(SZ(8), "pt"),
       legend.margin      = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.margin  = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
-      legend.title       = ggplot2::element_text(size = SZ(9), angle = 90),
+     legend.title       = ggplot2::element_text(size = d, angle = 90, margin = margin(r=a)),
       panel.grid         = ggplot2::element_line(color = "gray80", linetype = "solid"),
       strip.background   = ggplot2::element_rect(fill = "white"),
       axis.title.x       = ggplot2::element_text(size = SZ(12), margin = ggplot2::margin(t = SZ(10))),
@@ -411,13 +415,13 @@ spatial_map_chla <- function(data, biomass_column, decimal_places = 2) {
     ggplot2::guides(
       fill = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       ),
       size = ggplot2::guide_legend(
         title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     )
   
@@ -474,8 +478,8 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(7),
         order = 2,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90,margin = margin (r=a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -501,8 +505,8 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
         barheight = SZ(4),
         order = 3,
         frame.linewidth = SZ(0.2),
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.theme = ggplot2::element_text(size = d, angle = 90, margin = margin (r= a)),
+        label.theme = ggplot2::element_text(size = c)
       )
     ) +
     
@@ -537,11 +541,11 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
       legend.box         = "vertical",
       legend.key.height  = grid::unit(SZ(0.3), "cm"),
       legend.key.width   = grid::unit(SZ(0.3), "cm"),
-      legend.text        = ggplot2::element_text(size = 5),
+      legend.text        = ggplot2::element_text(size = c),
       legend.margin      = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.margin  = ggplot2::margin(SZ(0), SZ(0), SZ(0), SZ(0)),
       legend.box.spacing = grid::unit(SZ(8), "pt"),
-      legend.title       = ggplot2::element_text(size = 6, angle = 90),
+      legend.title       = ggplot2::element_text(size = d, angle = 90, margin = margin(r=a)),
       panel.grid         = ggplot2::element_line(color = "gray80", linetype = "solid"),
       strip.background   = ggplot2::element_rect(fill = "white"),
       axis.title.x       = ggplot2::element_text(size = SZ(12), margin = ggplot2::margin(t = SZ(10))),
@@ -552,17 +556,22 @@ spatial_map_SST <- function(data, biomass_column, decimal_places = 2) {
     ) +
     ggplot2::guides(
       fill = ggplot2::guide_legend(
-        title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5), angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
-      ,
+        title.position = "left",
+        title.hjust    = 0.5,
+        order         = 1,
+        title.theme   = ggplot2::element_text(size = d, angle = 90),
+        margin = ggplot2::margin(r = b),
+        label.theme   = ggplot2::element_text(size = c)
+      ),
       size = ggplot2::guide_legend(
-        title.position = "left", title.hjust = 0.5, order = 1,
-        title.theme = ggplot2::element_text(size = 5, angle = 90),
-        label.theme = ggplot2::element_text(size = 5)
+        title.position = "left",
+        title.hjust    = 0.5,
+        order         = 1,
+        title.theme   = ggplot2::element_text(size = d, angle = 90),
+        margin = ggplot2::margin(r = b),
+        label.theme   = ggplot2::element_text(size = c)
       )
     )
-  
   return(p)
 }
 
@@ -571,30 +580,7 @@ current_spatial_plot_fish <- spatial_map_currents(km_bm_sum_2, "bm_sum_fish", de
 chla_spatial_plot_fish <- spatial_map_chla(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
 SST_spatial_plot_fish <- spatial_map_SST(km_bm_sum_2, "bm_sum_fish", decimal_places = 3)
 
-combined <- (
-  SST_spatial_plot_fish | current_spatial_plot_fish
-) /
-  (
-    chla_spatial_plot_fish | tsm_spatial_plot_fish
-  ) +
-  plot_annotation(tag_levels = "A") &
-  theme(
-    plot.tag = element_text(size = 8, face = "bold"),
-    plot.margin = margin(t = -2, r = 4, b = -2, l = 4, unit = "pt") # add this line
-  )
-
-#combin
-
-ggsave(
-  filename = "~/Desktop/combined_spatial_plots_23_08.tiff",
-  plot = combined,
-  width = 190,                      # mm
-  height = 170,                # ≈ 160 mm
-  units = "mm",
-  dpi = 600,
-  compression = "lzw"
-)
-
+SST_spatial_plot_fish
 
 #TESTING COMBINED
 combined <- (
