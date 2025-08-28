@@ -126,6 +126,7 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   (fish_solar[[5]] | fish_lunar[[5]]) +
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
+
 fish_depth_solar_lunar 
 
 
@@ -195,6 +196,20 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
 
+fish_depth_solar_lunar <- cowplot::ggdraw(fish_depth_solar_lunar) +
+  cowplot::draw_plot_label(
+    label = c("(A)", "(B)"),
+    x = c(0.05, 0.52),   # move these right/left as you like
+    y = c(1.01, 1.01),   # near the top
+    hjust = 0, vjust = 1,
+    size = 12, fontface = "bold"
+  )
+
+fish_depth_solar_lunar<- fish_depth_solar_lunar +
+  plot_annotation() & 
+  theme(
+    plot.margin = margin(t = 10, r = 0, b = 0, l = 0)  # add 15 pts of top padding
+  )
 fish_depth_solar_lunar
 
 ggsave(
