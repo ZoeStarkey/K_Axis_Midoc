@@ -118,4 +118,3 @@ summary(krillbiom_sum.solar)
 gam.check(krillbiom_sum.solar)
 
 
-
