@@ -190,10 +190,22 @@ fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
 
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
-output_filename <- "KAXIS_fish_solar_lunar_plot.png"
-full_output_path <- file.path(output_directory, output_filename)
-ggsave(filename = full_output_path, plot = fish_depth_solar_lunar , width =10, height =13, dpi = 500, bg = "white")
+fish_depth_solar_lunar
+
+ggsave(
+  filename = "~/Desktop/fish_depth_solar_lunar.tiff",
+  plot = fish_depth_solar_lunar,
+  width = 190,      # mm (full double-column)
+  height = 240,     # mm (square-ish for 2x2 layout)
+  units = "mm",
+  dpi = 500,
+  compression = "lzw"
+)
+
+# output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+# output_filename <- "KAXIS_fish_solar_lunar_plot.png"
+# full_output_path <- file.path(output_directory, output_filename)
+# ggsave(filename = full_output_path, plot = fish_depth_solar_lunar , width =10, height =13, dpi = 500, bg = "white")
 
 #3.4 creating the cephalopod lunar plots 
 ceph_lunar <- lapply(seq_along(p_list_ceph_depth_lumar_re ), function(i) {
