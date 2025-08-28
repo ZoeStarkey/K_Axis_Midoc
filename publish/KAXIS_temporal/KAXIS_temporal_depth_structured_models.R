@@ -82,7 +82,7 @@ p_list_ceph_depth_lumar_re <- draw(ceph_depth.lunar.re , residuals = TRUE, retur
 
 depth_ranges <- c("0-200", "200-400", "400-600", "600-800", "800-1000")
 
-modify_geom_point <- function(plot, new_color, new_size = 2) {
+modify_geom_point <- function(plot, new_color, new_size = 1.5) {
   point_layer_index <- which(sapply(plot$layers, function(x) inherits(x$geom, "GeomPoint")))
   plot$layers[[point_layer_index]]$aes_params$colour <- new_color
   plot$layers[[point_layer_index]]$aes_params$size <- new_size
@@ -138,7 +138,7 @@ p_list_ceph_depth_lumar_re <- draw(ceph_depth.lunar.re , residuals = TRUE, retur
 
 depth_ranges <- c("0-200", "200-400", "400-600", "600-800", "800-1000")
 
-modify_geom_point <- function(plot, new_color, new_size = 2) {
+modify_geom_point <- function(plot, new_color, new_size = 1.5) {
   point_layer_index <- which(sapply(plot$layers, function(x) inherits(x$geom, "GeomPoint")))
   plot$layers[[point_layer_index]]$aes_params$colour <- new_color
   plot$layers[[point_layer_index]]$aes_params$size <- new_size
@@ -157,8 +157,8 @@ fish_solar <- lapply(seq_along(p_list_fish_depth_solar_re), function(i) {
     theme(
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 2),
-      axis.text = element_text(size = 14, color = "black"), 
-      axis.title = element_text(size = 14, colour = "black"),
+      axis.text = element_text(size = 10, color = "black"), 
+      axis.title = element_text(size = 12, colour = "black"),
       axis.ticks = element_line(color = "black", size = 0.5),
     )
 })
@@ -174,14 +174,19 @@ fish_lunar <- lapply(seq_along(p_list_fish_depth_lunar_re), function(i) {
     theme(
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 2),
-      axis.text = element_text(size = 14, color = "black"), 
-      axis.title.x = if(is_bottom) element_text(size = 14) else element_blank(),
+      axis.text = element_text(size = 10, color = "black"), 
+      axis.title.x = if(is_bottom) element_text(size = 12) else element_blank(),
       axis.title.y = element_blank(),
       axis.ticks = element_line(color = "black", size = 0.5)
     )
 })
 
+
+
 #3.3 combining the fish and solar angle and lunar fraction plots
+
+
+
 fish_depth_solar_lunar <- (fish_solar[[1]] | fish_lunar[[1]]) /
   (fish_solar[[2]] | fish_lunar[[2]]) /
   (fish_solar[[3]] | fish_lunar[[3]]) /
