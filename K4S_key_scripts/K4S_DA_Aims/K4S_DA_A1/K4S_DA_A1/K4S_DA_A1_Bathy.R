@@ -162,7 +162,7 @@ bathy <-
 ggplot() +
   geom_raster(data = bathy_df, aes(x = x, y = y, fill = value)) +
   scale_fill_gradientn(colors = rev(RColorBrewer::brewer.pal(9, "Blues")), 
-                       breaks = c(-8000,-7000,-6000,-5000,-4000,-3000,-2000,-1000,-500,0),
+                       breaks = c(-8000,-7000,-6000,-5000,-4000,-3000,-2000,-1000,0),
                        limits = c(-8000, 0),
                        na.value = "grey85",
                        name = "Bathymetry (m)",
@@ -170,15 +170,15 @@ ggplot() +
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 16,
+                                              barheight = 14,
                                               order = 2,
                                               frame.linewidth = 0.2,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14)))   +
+                                              title.theme = element_text(size = 10, angle = 90),
+                                              label.theme = element_text(size = 8)))   +
   geom_sf(data = cbct_sf, aes(), color = "grey60", size = 0.5, alpha = 0.7) +
   # Add f3$finished and f1$finished 
-  geom_sf(data = f3$finished, color = "purple", linewidth = 1) +
-  geom_sf(data = f1$finished, color = "purple", linewidth = 1) +
+  geom_sf(data = f3$finished, color = "purple", linewidth = 0.75) +
+  geom_sf(data = f1$finished, color = "purple", linewidth = 0.75) +
   
   # Add ice layer
   ggnewscale::new_scale_fill() + 
@@ -189,11 +189,11 @@ ggplot() +
                                               title.hjust = 0.5,
                                               label.position = "right",
                                               barwidth = 1,
-                                              barheight = 15,
+                                              barheight = 10,
                                               order = 3,
                                               frame.linewidth = 0.2,
-                                              title.theme = element_text(size = 14, angle = 90),
-                                              label.theme = element_text(size = 14))) +
+                                              title.theme = element_text(size = 10, angle = 90),
+                                              label.theme = element_text(size = 8))) +
  
   
   #adding midoc stations
@@ -206,7 +206,7 @@ ggplot() +
   geom_sf(data = ktr_sf, size = 1, colour = "black") +
   ggnewscale::new_scale_fill() +
   geom_sf(data = wp_sf, fill = "dark grey", color = NA)  +
-  geom_sf(data = km_sf_total, aes(fill = biomass_bin, size = biomass_bin), shape = 21, color = "black", show.legend = FALSE) +
+  geom_sf(data = km_sf_total, aes(fill = biomass_bin), shape = 21, color = "black", size = 6, show.legend = FALSE) +
   geom_sf_text(data = km_sf_total, aes(label = midoc.n), 
                size = 2.5, color = "white", fontface = "bold") +
  # geom_text(data = km_sf_total, aes(x = lon_end, y = lat_end, label = midoc.n), size = 3, hjust = 0.5, vjust = 1) +
@@ -235,23 +235,35 @@ ggplot() +
   
   # Add labels and set coordinate system
   labs(x = "Longitude", y = "Latitude") +
-  coord_sf(crs = st_crs(prj), xlim = c(-1000000, 1000000), ylim = c(-1000000, 1200000)) +
+  coord_sf(crs = st_crs(prj), xlim = c(-900000, 1000000), ylim = c(-1000000, 1200000)) +
   theme(
     legend.position = "right",
     panel.grid = element_line(color = "gray80", linetype = "solid"),
     panel.background = element_blank(),
     legend.background = element_blank(),
-    legend.title = element_text(angle = 90, hjust = 0.5),
-    legend.text = element_text(size = 14),
+    legend.title = element_text(angle = 90, hjust = 0.5, size = 10),
+    legend.text = element_text(size = 10),
     legend.box.background = element_blank(),
     legend.byrow = TRUE,
     strip.background = element_rect(fill = "white"),
-    axis.title = element_text(size = 20),  # Increased axis title size
-    axis.text = element_text(size = 16),
+    axis.title = element_text(size = 12),  # Increased axis title size
+    axis.text = element_text(size = 10),
     axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
     axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+    plot.margin = margin(t = -5, r = 10, b = -10, l = 10, unit = "pt")
   ) 
+
+#28/08/2025
+ggsave(
+  filename = "~/Desktop/bahty_plot.tiff",
+  plot = bathy ,
+  width = 190,      # mm (full double-column)
+  height = 190,     # mm (square-ish for 2x2 layout)
+  units = "mm",
+  dpi = 500,
+  compression = "lzw"
+)
+
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Bathy")
 output_filename <- "K4S_Plot_A1_bathy.tiff"
@@ -291,6 +303,11 @@ ggsave(
   res      = 500, compression = "lzw",
   bg       = "white"
 )
+
+
+
+
+
 ###########
 
 
