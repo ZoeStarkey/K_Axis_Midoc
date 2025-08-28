@@ -62,8 +62,9 @@ modify_geom_point <- function(plot, new_color, new_size = 2) {
 }
 
 #3.1 Preparing fish plots for presentation 
-
- 
+a <- 12 #plot title
+b <- 9 #axis text 
+c <- 10 #axis title
 fish_SST <-
 modify_geom_point(p_list_fish[[1]], "black") + 
   theme_minimal() +
@@ -72,9 +73,9 @@ modify_geom_point(p_list_fish[[1]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title = element_text(size = 14, colour = "black"),
+    plot.title = element_text(size = a, face = "bold", hjust = 0.5, vjust = 1),
+    axis.text = element_text(size = b, color = "black"), 
+    axis.title = element_text(size = c, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5)
   ) 
 
@@ -85,8 +86,8 @@ fish_CUR <- modify_geom_point(p_list_fish[[2]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title = element_text(size = 14, colour = "black"),
+     axis.text = element_text(size = b, color = "black"), 
+      axis.title = element_text(size = c, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -98,8 +99,8 @@ fish_CHLA <- modify_geom_point(p_list_fish[[3]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title = element_text(size = 14, colour = "black"),
+     axis.text = element_text(size = b, color = "black"), 
+    axis.title = element_text(size = c, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -110,8 +111,8 @@ fish_TSM <- modify_geom_point(p_list_fish[[4]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title = element_text(size = 14, colour = "black"),
+    axis.text = element_text(size = b, color = "black"), 
+    axis.title = element_text(size = c, colour = "black"),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
 
@@ -126,9 +127,9 @@ ceph_SST <- modify_geom_point(p_list_ceph[[1]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+    plot.title = element_text(size = a, face = "bold", hjust = 0.5, vjust = 1),
+     axis.text = element_text(size = b, color = "black"), 
+    axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   ) 
@@ -140,8 +141,8 @@ ceph_CUR <- modify_geom_point(p_list_ceph[[2]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
@@ -153,8 +154,8 @@ ceph_CHLA <- modify_geom_point(p_list_ceph[[3]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
@@ -166,8 +167,8 @@ ceph_TSM <- modify_geom_point(p_list_ceph[[4]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
@@ -183,9 +184,9 @@ krill_SST <- modify_geom_point(p_list_krill[[1]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, vjust = 1),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+    plot.title = element_text(size = a, face = "bold", hjust = 0.5, vjust = 1),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   ) 
@@ -197,8 +198,8 @@ krill_CUR <- modify_geom_point(p_list_krill[[2]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
@@ -210,8 +211,8 @@ krill_CHLA <- modify_geom_point(p_list_krill[[3]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   ) 
@@ -223,8 +224,8 @@ krill_TSM <- modify_geom_point(p_list_krill[[4]], "black") +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(color = "black", fill = NA, size = 2),
-    axis.text = element_text(size = 14, color = "black"), 
-    axis.title.x = element_text(size = 14, colour = "white"),
+     axis.text = element_text(size = b, color = "black"), 
+     axis.title.x = element_text(size = c, colour = "white"),
     axis.title.y = element_blank(),
     axis.ticks= element_line(color = "black", size = 0.5),
   )
@@ -235,9 +236,23 @@ krill_TSM <- modify_geom_point(p_list_krill[[4]], "black") +
 #3.4 Combine all the plots
 environmental_predictor_fish_ceph_krill <- (fish_SST/ fish_CUR/ fish_CHLA/ fish_TSM) | (ceph_SST / ceph_CUR / ceph_CHLA / ceph_TSM) | (krill_SST / krill_CUR / krill_CHLA/ krill_TSM)
 
+
+
 #save the plot 
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
-output_filename <- "KAXIS_environmental_predictor_GAM.png"
-full_output_path <- file.path(output_directory, output_filename)
-ggsave(filename = full_output_path, plot = environmental_predictor_fish_ceph_krill , width =11, height =13, dpi = 500, bg = "white")
- 
+
+ggsave(
+  filename = "~/Desktop/environmental_predictor_fish_ceph_krill .tiff",
+  plot = environmental_predictor_fish_ceph_krill ,
+  width = 190,      # mm (full double-column)
+  height = 240,     # mm (square-ish for 2x2 layout)
+  units = "mm",
+  dpi = 500,
+  compression = "lzw"
+)
+
+
+# output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+# output_filename <- "KAXIS_environmental_predictor_GAM.png"
+# full_output_path <- file.path(output_directory, output_filename)
+# ggsave(filename = full_output_path, plot = environmental_predictor_fish_ceph_krill , width =11, height =13, dpi = 500, bg = "white")
+#  
