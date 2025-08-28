@@ -47,11 +47,12 @@ ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp, )) +
   geom_bar(stat = "identity",) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 0.5,vjust = 0.5, size = 12,    margin = margin(t = -8) ),
-    axis.text.y = element_text(size = 12),
-    axis.title.x = element_text(size = 15, margin = margin(t = 20)),
-    axis.title.y = element_text(size = 15, margin = margin(r = 20)),
+    axis.text.x = element_text(angle = 90, hjust = 0.5,vjust = 0.5, size = 8,    margin = margin(t = -8) ),
+    axis.text.y = element_text(size = 8),
+    axis.title.x = element_text(size = 10, margin = margin(t = 20)),
+    axis.title.y = element_text(size =10, margin = margin(r = 20)),
     panel.grid.major.x = element_blank(),
+    panel.background = element_rect(fill = "white", color = NA),
     legend.position = "none" 
    # legend.position = "right",
     #legend.text = element_text(size = 30),
@@ -63,6 +64,28 @@ ggplot(km_df, aes(x = midoc.stn, y = bm_g_m3, fill = tax.grp, )) +
 
 
 stacked_bar_plot
+
+ggsave(
+  filename = "~/Desktop/stacked_bar_plot.tiff",
+  plot = stacked_bar_plot ,
+  width = 190,      # mm (full double-column)
+  height = 120,     # mm (square-ish for 2x2 layout)
+  units = "mm",
+  dpi = 500,
+  compression = "lzw"
+)
+
+
+
+
+
+
+
+
+
+
+
+
 
 output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/K4S_key_scripts/K4S_DA_Aims/K4S_DA_A1/K4S_Plot_A1/K4S_Plot_A1_Stacked")
 output_filename <- "K4S_Plot_A1_Bar_Chart.png"
