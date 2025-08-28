@@ -223,8 +223,9 @@ ceph_lunar <- lapply(seq_along(p_list_ceph_depth_lumar_re ), function(i) {
     theme(
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 2),
-      axis.text = element_text(size = 14, color = "black"), 
-      axis.title = element_text(size = 14, colour = "black"),
+      axis.text = element_text(size = 8, color = "black"), 
+      axis.title.x = element_text(size = 9, colour = "black", margin = margin(t = 7)),
+      axis.title = element_text(size = 9, colour = "black"),
       axis.ticks = element_line(color = "black", size = 0.5),
     )
 })
@@ -235,7 +236,20 @@ ceph_depth_lunar <-
   plot_layout(guides = "collect") &
   theme(legend.position = "none")
 
-output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
-output_filename <- "KAXIS_ceph_lunar_plot.png"
-full_output_path <- file.path(output_directory, output_filename)
-ggsave(filename = full_output_path, plot = ceph_depth_lunar , width =9, height =9, dpi = 500, bg = "white")
+
+ggsave(
+  filename = "~/Desktop/ceph_depth_lunar.tiff",
+  plot = ceph_depth_lunar,
+  width = 90,      # mm (full double-column)
+  height = 100,     # mm (square-ish for 2x2 layout)
+  units = "mm",
+  dpi = 500,
+  compression = "lzw"
+)
+
+
+
+# output_directory <-  paste0("/Users/", usr,"/Desktop/Honours/Data_Analysis/K_axis_midoc/publish/KAXIS_figures")
+# output_filename <- "KAXIS_ceph_lunar_plot.png"
+# full_output_path <- file.path(output_directory, output_filename)
+# ggsave(filename = full_output_path, plot = ceph_depth_lunar , width =9, height =9, dpi = 500, bg = "white")
